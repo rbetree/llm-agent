@@ -1,0 +1,2783 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Net.Http;
+using System.Text;
+using System.Text.Json;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using System.Linq;
+using System.IO;
+using System.Runtime.CompilerServices;
+using System.Threading;
+using llm_agent.BLL;
+using llm_agent.Model;
+using llm_agent.API.Provider;
+using llm_agent.Common.Exceptions;
+using llm_agent.Properties;
+using llm_agent.DAL;
+using llm_agent.UI.Controls;
+using llm_agent.Common.Utils;
+
+namespace llm_agent.UI.Forms
+{
+    public partial class LlmAgentMainForm : Form
+    {
+        // 静态集合，用于跟踪所有正在被聊天窗口使用的渠道ID
+        private static HashSet<Guid> _activeChannels = new HashSet<Guid>();
+
+        // 添加渠道到活跃列表
+        public static void AddActiveChannel(Guid channelId)
+        {
+            if (channelId != Guid.Empty)
+            {
+                _activeChannels.Add(channelId);
+            }
+        }
+
+        // 从活跃列表移除渠道
+        public static void RemoveActiveChannel(Guid channelId)
+        {
+            _activeChannels.Remove(channelId);
+        }
+
+        // 检查渠道是否正在被使用
+        public static bool IsChannelActive(Guid channelId)
+        {
+            return _activeChannels.Contains(channelId);
+        }
+
+        // 获取活跃渠道数量
+        public static int GetActiveChannelCount()
+        {
+            return _activeChannels.Count;
+        }
+
+        private HttpClient _httpClient = null!;
+        private ProviderFactory _providerFactory = null!;
+        private ChatHistoryManager _chatHistoryManager = null!;
+        private ChannelManager _channelManager = null!;
+        private ChannelService _channelService = null!;
+        private ProviderType _currentProviderType = ProviderType.OpenAI;
+        private string _currentModelId = string.Empty;
+        private Guid _currentChannelId = Guid.Empty; // 当前使用的渠道ID
+        private bool _isProcessingMessage = false;
+        private bool _useStreamResponse = true;  // 默认启用流式响应
+        private string _systemPrompt = "";      // 系统提示内容
+        private bool _isUpdatingChannelDetails = false; // 用于防止界面更新时触发事件处理
+        private bool _enableMarkdown = false; // 用于Markdown支持设置
+
+        protected FlowLayoutPanel chatListPanel;
+        protected TextBox searchBox;
+        private Panel searchPanel;
+
+        public LlmAgentMainForm()
+        {
+            InitializeComponent();
+            InitializeHttpClient();
+            InitializeProviderFactory();
+            InitializeChatHistoryManager();
+            InitializeChannelManager();
+            InitializeChannelService();
+            LoadSettings();
+
+            // 设置KeyPreview为true，使窗体可以在控件之前处理键盘事件
+            this.KeyPreview = true;
+            // 添加KeyDown事件处理
+            this.KeyDown += LlmAgentMainForm_KeyDown;
+            // 添加窗体关闭事件处理
+            this.FormClosing += LlmAgentMainForm_FormClosing;
+
+            SetupEvents();
+            SetupUI();
+        }
+
+        private void InitializeHttpClient()
+        {
+            _httpClient = new HttpClient();
+            _httpClient.Timeout = TimeSpan.FromSeconds(300);
+        }
+
+        private void InitializeProviderFactory()
+        {
+            _providerFactory = new ProviderFactory(_httpClient);
+        }
+
+        private void InitializeChatHistoryManager()
+        {
+            _chatHistoryManager = new ChatHistoryManager();
+            // 不再自动创建新会话
+        }
+
+        private void InitializeChannelManager()
+        {
+            _channelManager = new ChannelManager();
+        }
+
+        private void InitializeChannelService()
+        {
+            _channelService = new ChannelService(_httpClient);
+        }
+
+        private void LoadSettings()
+        {
+            try
+            {
+                _systemPrompt = Properties.Settings.Default.SystemPrompt;
+                
+                // 加载流式响应设置
+                _useStreamResponse = Properties.Settings.Default.EnableStreamResponse;
+                
+                // 加载Markdown支持设置
+                _enableMarkdown = Properties.Settings.Default.EnableMarkdown;
+
+                // 初始化聊天页面的流式响应复选框
+                streamCheckBox.Checked = _useStreamResponse;
+
+                // 加载上次使用的模型
+                if (Enum.TryParse<ProviderType>(Properties.Settings.Default.ProviderType, out var providerType))
+                {
+                    _currentProviderType = providerType;
+                }
+                else if (Enum.TryParse<ProviderType>(Properties.Settings.Default.LastSelectedProvider, out providerType))
+                {
+                    _currentProviderType = providerType;
+                }
+                
+                Properties.Settings.Default.ProviderType = providerType.ToString();
+                Properties.Settings.Default.Save();
+                
+                // 加载上次使用的模型
+                _currentModelId = Properties.Settings.Default.LastSelectedModel;
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"加载设置时出错: {ex.Message}");
+            }
+        }
+
+        private void SetupEvents()
+        {
+            // 获取控件引用
+            TextBox txtInput = inputPanel.Controls["txtInput"] as TextBox;
+            Button btnSend = inputPanel.Controls["btnSend"] as Button;
+            Button btnUpload = inputPanel.Controls["btnUpload"] as Button;
+            ComboBox cboModel = inputPanel.Controls["cboModel"] as ComboBox;
+            // 不再查找设置页面中的流式响应复选框
+            // CheckBox chkStreamResponse = settingsContentContainer.Controls.Find("chkStreamResponse", true).FirstOrDefault() as CheckBox;
+            TextBox txtSystemPrompt = settingsContentContainer.Controls.Find("txtSystemPrompt", true).FirstOrDefault() as TextBox;
+
+            // 不再设置设置页面中的流式响应复选框
+            // if (chkStreamResponse != null)
+            // {
+            //     chkStreamResponse.Checked = _useStreamResponse;
+            // }
+
+            // 初始化聊天页面的模型选择器
+            InitializeChatPageModelSelector();
+
+            // 添加聊天页面中streamCheckBox的事件处理
+            streamCheckBox.CheckedChanged += (s, e) =>
+            {
+                _useStreamResponse = streamCheckBox.Checked;
+                Properties.Settings.Default.EnableStreamResponse = _useStreamResponse;
+                Properties.Settings.Default.Save();
+            };
+
+            // Markdown支持复选框事件处理
+            chkEnableMarkdown.CheckedChanged += (s, e) =>
+            {
+                _enableMarkdown = chkEnableMarkdown.Checked;
+                Properties.Settings.Default.EnableMarkdown = _enableMarkdown;
+                Properties.Settings.Default.Save();
+            };
+
+            // 系统提示输入框事件处理
+            if (txtSystemPrompt != null)
+            {
+                txtSystemPrompt.TextChanged += (s, e) =>
+                {
+                    _systemPrompt = txtSystemPrompt.Text;
+                    Properties.Settings.Default.SystemPrompt = _systemPrompt;
+                    Properties.Settings.Default.Save();
+                };
+            }
+
+            // chatModelComboBox模型选择事件
+            chatModelComboBox.SelectedIndexChanged += ChatModelComboBox_SelectedIndexChanged;
+
+            // 模型列表选择事件
+            // modelListBox.SelectedIndexChanged += ModelListBox_SelectedIndexChanged;
+
+            // 模型选择事件
+            // if (cboModel != null)
+            // {
+            //     cboModel.SelectedIndexChanged += (s, e) =>
+            //     {
+            //         if (cboModel.SelectedItem != null)
+            //         {
+            //             string selectedModel = cboModel.SelectedItem.ToString();
+            //             if (!string.IsNullOrEmpty(selectedModel))
+            //             {
+            //                 _currentModelId = selectedModel;
+            //                 Properties.Settings.Default.LastSelectedModel = _currentModelId;
+            //                 Properties.Settings.Default.Save();
+            //                 UpdateTitle();
+            //             }
+            //         }
+            //     };
+            // }
+
+            // 调整模型选择器位置事件
+            inputPanel.Resize += (s, e) =>
+            {
+                if (btnSend != null)
+                {
+                    btnSend.Location = new Point(inputPanel.ClientSize.Width - btnSend.Width - 10,
+                                               inputPanel.ClientSize.Height - btnSend.Height - 10);
+                }
+
+                // 调整模型选择器位置
+                // if (cboModel != null)
+                // {
+                //     cboModel.Location = new Point(btnSend.Left - cboModel.Width - 10,
+                //                                     inputPanel.ClientSize.Height - cboModel.Height - 10);
+                // }
+
+                // 调整comboBox1位置
+                chatModelComboBox.Location = new Point(10, 10);
+
+                // 如果有上传按钮，也调整其位置
+                if (btnUpload != null)
+                {
+                    btnUpload.Location = new Point(10, inputPanel.ClientSize.Height - btnUpload.Height - 10);
+                }
+            };
+
+            // 输入框回车事件
+            if (txtInput != null)
+            {
+                txtInput.KeyDown += async (s, e) =>
+                {
+                    if (e.KeyCode == Keys.Enter && e.Modifiers == Keys.Control)
+                    {
+                        e.SuppressKeyPress = true;
+                        await SendMessage();
+                    }
+                };
+            }
+
+            // 发送按钮事件
+            if (btnSend != null)
+            {
+                btnSend.Click += async (s, e) => await SendMessage();
+            }
+
+            // 上传按钮事件
+            if (btnUpload != null)
+            {
+                btnUpload.Click += (s, e) => MessageBox.Show("文件上传功能待实现", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+
+            // 导航按钮事件
+            avatarButton.Click += (s, e) => SwitchToPanel(userProfilePanel, avatarButton);
+            chatNavButton.Click += (s, e) => SwitchToPanel(chatPagePanel, chatNavButton);
+            websiteNavButton.Click += (s, e) => SwitchToPanel(aiWebsitePanel, websiteNavButton);
+            promptsNavButton.Click += (s, e) => SwitchToPanel(promptsPanel, promptsNavButton);
+            filesNavButton.Click += (s, e) => SwitchToPanel(filesPanel, filesNavButton);
+            settingsNavButton.Click += (s, e) => SwitchToPanel(settingsPanel, settingsNavButton);
+            channelNavButton.Click += channelNavButton_Click;
+
+            // 设置页面事件
+            ComboBox cboProvider = settingsContentContainer.Controls.Find("cboProvider", true).FirstOrDefault() as ComboBox;
+            Button btnUpdateApiKey = settingsContentContainer.Controls.Find("btnUpdateApiKey", true).FirstOrDefault() as Button;
+
+            // 设置菜单按钮事件
+            shortcutSettingsButton.Click += (s, e) => SwitchSettingsPage(shortcutSettingsContainer);
+            generalSettingsButton.Click += (s, e) => SwitchSettingsPage(generalSettingsContainer);
+            dataSettingsButton.Click += (s, e) => SwitchSettingsPage(dataSettingsContainer);
+            aboutSettingsButton.Click += (s, e) => SwitchSettingsPage(aboutContainer);
+
+            // 模型管理按钮事件
+            Button manageModelsButton = settingsContentContainer.Controls.Find("manageModelsButton", true).FirstOrDefault() as Button;
+            Button testModelButton = settingsContentContainer.Controls.Find("testModelButton", true).FirstOrDefault() as Button;
+
+            if (manageModelsButton != null)
+                manageModelsButton.Click += ManageModelsButton_Click;
+
+            if (testModelButton != null)
+                testModelButton.Click += TestModelButton_Click;
+
+            if (cboProvider != null)
+                cboProvider.SelectedIndexChanged += ProviderChanged;
+
+            if (btnUpdateApiKey != null)
+                btnUpdateApiKey.Click += UpdateApiSettings;
+
+            // 流式响应复选框 - 移除设置页面中的chkStreamResponse事件处理
+            // if (chkStreamResponse != null)
+            // {
+            //    chkStreamResponse.CheckedChanged += (s, e) =>
+            //    {
+            //        _useStreamResponse = chkStreamResponse.Checked;
+            //        Properties.Settings.Default.EnableStreamResponse = _useStreamResponse;
+            //        Properties.Settings.Default.Save();
+            //    };
+            // }
+
+            // 系统提示文本框
+            if (txtSystemPrompt != null)
+            {
+                txtSystemPrompt.Leave += (s, e) =>
+                {
+                    _systemPrompt = txtSystemPrompt.Text.Trim();
+                    Properties.Settings.Default.SystemPrompt = _systemPrompt;
+                    Properties.Settings.Default.Save();
+                };
+            }
+
+            // 设置数据页面"清除所有聊天记录"按钮事件
+            clearChatHistoryButton.Click += ClearChatHistoryButton_Click;
+        }
+
+        private void InitializeChatPageModelSelector()
+        {
+            // 初始化聊天页面的模型选择下拉框
+            chatModelComboBox.Items.Clear();
+
+            // 获取所有已启用的渠道
+            var enabledChannels = _channelManager.GetEnabledChannels();
+
+            // 加载所有启用渠道的模型
+            foreach (var channel in enabledChannels)
+            {
+                // 获取渠道支持的模型列表
+                var availableModels = channel.SupportedModels;
+
+                foreach (var model in availableModels)
+                {
+                    // 添加渠道前缀来区分不同渠道的模型
+                    string displayName = $"{channel.Name}: {model}";
+                    chatModelComboBox.Items.Add(displayName);
+                }
+            }
+
+            // 选择上次使用的模型
+            if (!string.IsNullOrEmpty(_currentModelId) && chatModelComboBox.Items.Contains(_currentModelId))
+            {
+                chatModelComboBox.SelectedItem = _currentModelId;
+            }
+            else if (chatModelComboBox.Items.Count > 0)
+            {
+                chatModelComboBox.SelectedIndex = 0;
+                _currentModelId = chatModelComboBox.SelectedItem.ToString();
+                Properties.Settings.Default.LastSelectedModel = _currentModelId;
+                Properties.Settings.Default.Save();
+            }
+        }
+
+        // 切换到指定面板并高亮对应按钮
+        private void SwitchToPanel(Control targetPanel, Button activeButton)
+        {
+            // 隐藏所有内容面板
+            foreach (Control control in mainSplitContainer.Panel2.Controls)
+            {
+                control.Visible = false;
+            }
+
+            // 显示目标面板
+            targetPanel.Visible = true;
+
+            // 重置所有导航按钮样式
+            foreach (Control control in navPanel.Controls)
+            {
+                if (control is Button button)
+                {
+                    button.BackColor = Color.Transparent;
+                }
+            }
+
+            // 高亮当前活动按钮
+            activeButton.BackColor = Color.FromArgb(240, 240, 240);
+
+            // 执行特定面板的初始化操作
+            InitializePanel(targetPanel);
+        }
+
+        // 执行特定面板的初始化操作
+        private void InitializePanel(Control targetPanel)
+        {
+            // 根据目标面板类型执行相应的操作
+            if (targetPanel == chatPageSplitContainer || targetPanel == chatPagePanel)
+            {
+                // 初始化聊天选择器（左侧列表）
+                InitializeChatTopics();
+                
+                // 初始化聊天模型选择器
+                InitializeChatPageModelSelector();
+
+                // 设置流式响应复选框状态
+                streamCheckBox.Checked = _useStreamResponse;
+                
+                DisplayChatInterface();
+            }
+            else if (targetPanel == channelPanel)
+            {
+                InitializeChannelList();
+            }
+            else if (targetPanel == settingsPanel)
+            {
+                // 初始化设置面板状态
+                if (generalSettingsGroup != null)
+                {
+                    // 初始化Markdown支持复选框状态
+                    if (chkEnableMarkdown != null)
+                    {
+                        chkEnableMarkdown.Checked = _enableMarkdown;
+                    }
+                    
+                    // 其他设置页面初始化...
+                }
+                
+                // 默认选中通用设置按钮
+                SwitchSettingsPage(generalSettingsContainer);
+                generalSettingsButton.BackColor = Color.FromArgb(230, 230, 230);
+            }
+            else if (targetPanel == promptsPanel)
+            {
+                // 初始化提示词库面板
+                // 待实现
+            }
+            else if (targetPanel == filesPanel)
+            {
+                // 初始化文件管理面板
+                // 待实现
+            }
+            else if (targetPanel == aiWebsitePanel)
+            {
+                // 初始化AI网站面板
+                // 待实现
+            }
+            else if (targetPanel == userProfilePanel)
+            {
+                // 初始化用户资料面板
+                // 待实现
+            }
+        }
+
+        private void SetupUI()
+        {
+            try
+            {
+                // 设置窗体标题
+                UpdateTitle();
+
+                // 设置提供商选择下拉框
+                // 不再使用cboProvider
+                // cboProvider.Items.Clear();
+                // foreach (ProviderType type in Enum.GetValues(typeof(ProviderType)))
+                // {
+                //     string displayName = GetProviderDisplayName(type);
+                //     cboProvider.Items.Add(displayName);
+                // }
+
+                // 选择当前提供商
+                // string currentProviderName = GetProviderDisplayName(_currentProviderType);
+                // cboProvider.SelectedItem = currentProviderName;
+
+
+                // 设置comboBox1的样式和位置
+                chatModelComboBox.DropDownStyle = ComboBoxStyle.DropDownList;
+                chatModelComboBox.Width = 180;
+                chatModelComboBox.Location = new Point(10, 10);
+
+                // 加载模型列表
+                UpdateModelList();
+
+                // 填充API密钥和主机
+                txtApiKey.Text = GetApiKey();
+                txtApiHost.Text = GetApiHost();
+
+                // 添加图标到导航按钮
+                AddIconToNavButton(chatNavButton, "💬");
+                AddIconToNavButton(websiteNavButton, "🌐");
+                AddIconToNavButton(promptsNavButton, "📝");
+                AddIconToNavButton(filesNavButton, "📁");
+                AddIconToNavButton(settingsNavButton, "⚙️");
+                AddIconToNavButton(avatarButton, "👤");
+                AddIconToNavButton(channelNavButton, "🔌");
+
+                // 更新导航按钮工具提示
+                toolTip1.SetToolTip(avatarButton, "用户");
+                toolTip1.SetToolTip(chatNavButton, "聊天");
+                toolTip1.SetToolTip(websiteNavButton, "AI网站");
+                toolTip1.SetToolTip(promptsNavButton, "提示词库");
+                toolTip1.SetToolTip(filesNavButton, "文件");
+                toolTip1.SetToolTip(settingsNavButton, "设置");
+                toolTip1.SetToolTip(channelNavButton, "渠道管理");
+
+                // 注册渠道页面中模型管理和测试按钮的事件
+                manageChannelModelsButton.Click += manageChannelModelsButton_Click;
+                testChannelModelButton.Click += testChannelModelButton_Click;
+
+                // 默认显示聊天页面
+                SwitchToPanel(chatPagePanel, chatNavButton);
+
+                // 初始化聊天列表面板
+                InitializeChatListPanel();
+
+                // 更新API主机地址标签提示文本
+                Label lblApiHost = settingsContentContainer.Controls.Find("lblApiHost", true).FirstOrDefault() as Label;
+                if (lblApiHost != null)
+                {
+                    lblApiHost.Text = "API主机地址（已预设，可修改）：";
+                }
+
+                // 创建第一个默认会话
+                if (_chatHistoryManager.GetAllSessions().Count == 0)
+                {
+                    CreateNewChat();
+                }
+                else
+                {
+                    // 加载第一个会话
+                    var sessions = _chatHistoryManager.GetAllSessions();
+                    if (sessions.Count > 0)
+                    {
+                        SwitchToChat(sessions[0]);
+                    }
+                }
+
+                // 显示欢迎消息
+                string welcomeMessage = $"欢迎使用LLM Agent！\n当前使用的模型：{GetCurrentModelName()}";
+                AppendFormattedMessage(new ChatMessage { Role = ChatRole.System, Content = welcomeMessage }, txtOutput, true);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"设置UI时出错: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        // 为导航按钮添加图标（修改方法签名，接受Font参数）
+        private void AddIconToNavButton(Button button, string iconText, Font? iconFont = null)
+        {
+            // 使用传入的字体或默认系统字体
+            Font font = iconFont ?? new Font("Segoe UI Symbol", 22, FontStyle.Regular);
+
+            // 创建图标标签
+            Label iconLabel = new Label
+            {
+                Text = iconText,
+                Font = font,
+                Size = new Size(button.Width, button.Height), // 修改为与按钮大小一致
+                Location = new Point(0, 0), // 修改为从按钮左上角开始
+                TextAlign = ContentAlignment.MiddleCenter,
+                BackColor = Color.Transparent,
+                ForeColor = Color.FromArgb(80, 80, 80),
+                Enabled = false // 禁用Label以允许事件传递给按钮
+            };
+
+            button.Controls.Add(iconLabel);
+
+            // 添加悬停效果
+            button.MouseEnter += (s, e) =>
+            {
+                if (button.BackColor != Color.FromArgb(240, 240, 240)) // 如果不是当前活动按钮
+                {
+                    button.BackColor = Color.FromArgb(245, 245, 245);
+                }
+                iconLabel.ForeColor = Color.FromArgb(0, 120, 212);
+            };
+
+            button.MouseLeave += (s, e) =>
+            {
+                if (button.BackColor != Color.FromArgb(240, 240, 240)) // 如果不是当前活动按钮
+                {
+                    button.BackColor = Color.Transparent;
+                }
+                iconLabel.ForeColor = Color.FromArgb(80, 80, 80);
+            };
+        }
+
+        private void InitializeChatTopics()
+        {
+            try
+            {
+                var chatTopicPanel = chatListPanel.Controls["chatTopicPanel"] as FlowLayoutPanel;
+                if (chatTopicPanel == null)
+                    return;
+
+                // 清空现有的对话主题
+                chatTopicPanel.Controls.Clear();
+
+                // 获取所有会话
+                var sessions = _chatHistoryManager.GetAllSessions();
+
+                // 如果没有会话，只显示新建对话按钮即可，不需要额外处理
+                if (sessions.Count == 0)
+                    return;
+
+                // 添加各个会话的按钮
+                foreach (var session in sessions)
+                {
+                    var sessionTitle = string.IsNullOrEmpty(session.Title) ? "新建对话" : session.Title;
+
+                    Button sessionButton = new Button();
+                    sessionButton.Text = sessionTitle;
+                    sessionButton.FlatStyle = FlatStyle.Flat;
+                    sessionButton.Margin = new Padding(0, 1, 0, 1);
+                    sessionButton.Height = 40;
+                    sessionButton.Width = chatTopicPanel.Width - SystemInformation.VerticalScrollBarWidth - 5;
+                    sessionButton.TextAlign = ContentAlignment.MiddleLeft;
+                    sessionButton.Padding = new Padding(10, 0, 0, 0);
+                    sessionButton.UseVisualStyleBackColor = true;
+                    sessionButton.Tag = session;
+
+                    // 突出显示当前会话
+                    var currentSession = _chatHistoryManager.GetCurrentSession();
+                    if (currentSession != null && session.Id == currentSession.Id)
+                    {
+                        sessionButton.BackColor = Color.FromArgb(230, 230, 230);
+                        sessionButton.Font = new Font(sessionButton.Font, FontStyle.Bold);
+                    }
+
+                    // 添加点击事件
+                    sessionButton.Click += (s, e) =>
+                    {
+                        SwitchToChat(session);
+                    };
+
+                    chatTopicPanel.Controls.Add(sessionButton);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"初始化聊天主题时出错: {ex.Message}");
+            }
+        }
+
+        private void SwitchToChat(ChatSession session)
+        {
+            if (session == null)
+                return;
+
+            // 将当前会话设为所选会话
+            var loadedSession = _chatHistoryManager.GetOrCreateSession(session.Id);
+            if (loadedSession == null)
+                return;
+
+            // 刷新会话列表
+            UpdateChatList();
+
+            // 显示对话内容
+            DisplayChatInterface();
+        }
+
+        private void DisplayChatInterface()
+        {
+            // 获取正确的RichTextBox控件
+            RichTextBox txtOutput = chatOutputPanel.Controls["txtOutput"] as RichTextBox;
+            if (txtOutput == null)
+                return;
+
+            // 清空聊天记录显示区域
+            txtOutput.Clear();
+
+            // 获取当前会话
+            var currentSession = _chatHistoryManager.GetCurrentSession();
+            if (currentSession == null)
+            {
+                // 显示空界面提示
+                txtOutput.AppendText("欢迎使用LLM Agent！点击左侧的「+ 新对话」按钮开始聊天。");
+                return;
+            }
+
+            if (currentSession.Messages.Count == 0)
+                return;
+
+            // 显示当前会话的所有消息
+            foreach (var message in currentSession.Messages)
+            {
+                AppendFormattedMessage(message, txtOutput, message.Role == ChatRole.System);
+            }
+
+            // 使光标定位到输入框
+            TextBox txtInput = inputPanel.Controls["txtInput"] as TextBox;
+            if (txtInput != null)
+                txtInput.Focus();
+        }
+
+        private void CreateNewChat()
+        {
+            // 创建新的聊天会话
+            var session = _chatHistoryManager.CreateNewSession();
+            if (session == null)
+                return;
+
+            // 获取正确的RichTextBox控件
+            RichTextBox txtOutput = chatOutputPanel.Controls["txtOutput"] as RichTextBox;
+            if (txtOutput == null)
+                return;
+
+            // 清空消息输出区域
+            txtOutput.Clear();
+
+            // 添加系统欢迎消息
+            string welcomeMessage = "欢迎使用AI助手，我可以帮助您回答问题、提供信息或与您聊天。请告诉我您需要什么帮助？";
+            ChatMessage systemMessage = new ChatMessage
+            {
+                Role = ChatRole.Assistant,
+                Content = welcomeMessage,
+                Timestamp = DateTime.Now
+            };
+
+            // 添加消息到会话并保存
+            _chatHistoryManager.AddMessageToSession(session, systemMessage);
+
+            // 显示消息
+            AppendFormattedMessage(systemMessage, txtOutput, true);
+
+            // 重新初始化聊天列表
+            UpdateChatList();
+
+            // 确保切换到聊天界面
+            SwitchToPanel(chatPagePanel, chatNavButton);
+
+            // 设置输入框焦点
+            TextBox txtInput = inputPanel.Controls["txtInput"] as TextBox;
+            if (txtInput != null)
+                txtInput.Focus();
+        }
+
+        // 格式化消息并显示在聊天窗口中
+        private void AppendFormattedMessage(ChatMessage message, RichTextBox txtOutput, bool isSystem = false)
+        {
+            // 获取当前窗口视图最底部的位置
+            int oldVisible = txtOutput.GetPositionFromCharIndex(txtOutput.TextLength).Y;
+            bool isAtBottom = (txtOutput.Height - oldVisible < 20) || txtOutput.TextLength == 0;
+
+            int startPosition = txtOutput.TextLength;
+
+            // 添加当前时间
+            string timestamp = message.Timestamp.ToString("HH:mm:ss");
+            txtOutput.AppendText($"[{timestamp}] ");
+
+            // 设置头部样式
+            txtOutput.SelectionStart = startPosition;
+            txtOutput.SelectionLength = timestamp.Length + 3;
+            txtOutput.SelectionColor = Color.Gray;
+            txtOutput.SelectionFont = new Font(txtOutput.Font, FontStyle.Regular);
+
+            // 插入角色头像和名称
+            string roleIcon, roleName;
+            Color msgColor;
+
+            int roleStart = txtOutput.TextLength;
+
+            if (message.Role == ChatRole.User)
+            {
+                roleIcon = "👤 ";
+                roleName = "You";
+                msgColor = Color.FromArgb(0, 120, 212);
+            }
+            else if (isSystem)
+            {
+                roleIcon = "🤖 ";
+                roleName = "System";
+                msgColor = Color.FromArgb(80, 80, 80);
+            }
+            else
+            {
+                roleIcon = "🤖 ";
+                roleName = GetCurrentModelName();
+                msgColor = Color.FromArgb(80, 80, 80);
+            }
+
+            txtOutput.AppendText($"{roleIcon}{roleName}: ");
+
+            // 设置角色名称样式
+            txtOutput.SelectionStart = roleStart;
+            txtOutput.SelectionLength = (roleIcon + roleName + ": ").Length;
+            txtOutput.SelectionColor = msgColor;
+            txtOutput.SelectionFont = new Font(txtOutput.Font, FontStyle.Bold);
+
+            // 添加换行
+            txtOutput.AppendText(Environment.NewLine);
+
+            // 添加消息内容
+            int contentStart = txtOutput.TextLength;
+
+            // 移除缩进设置
+            txtOutput.SelectionStart = contentStart;
+            txtOutput.SelectionLength = 0;
+            
+            // 添加内容
+            string content = message.Content;
+            
+            // 检查是否启用Markdown格式并且内容包含Markdown语法
+            if (_enableMarkdown && !isSystem && MarkdownToRichTextConverter.ContainsMarkdown(content))
+            {
+                // 使用Markdown渲染器
+                var markdownConverter = new MarkdownToRichTextConverter(txtOutput);
+                markdownConverter.RenderMarkdown(content, contentStart);
+                
+                // 添加额外的换行
+                txtOutput.AppendText(Environment.NewLine);
+            }
+            else
+            {
+                // 使用普通文本格式
+                txtOutput.AppendText($"{content}{Environment.NewLine}{Environment.NewLine}");
+                
+                // 设置内容样式 - 保留文本颜色
+                txtOutput.SelectionStart = contentStart;
+                txtOutput.SelectionLength = content.Length;
+                txtOutput.SelectionColor = Color.Black; // 统一使用黑色文本
+                txtOutput.SelectionFont = new Font(txtOutput.Font, FontStyle.Regular);
+            }
+
+            // 如果原来是在底部，滚动到底部
+            if (isAtBottom)
+            {
+                txtOutput.SelectionStart = txtOutput.TextLength;
+                txtOutput.ScrollToCaret();
+            }
+        }
+
+        private void ProviderChanged(object sender, EventArgs e)
+        {
+            if (sender is ComboBox cboProvider && cboProvider.SelectedIndex >= 0)
+            {
+                string selectedProvider = cboProvider.SelectedItem.ToString();
+
+                // 从显示名称获取提供商类型
+                ProviderType selectedProviderType = _providerFactory.GetProviderTypeFromDisplayName(selectedProvider);
+
+                // 更新当前提供商类型
+                _currentProviderType = selectedProviderType;
+
+                // 更新聊天页面的模型选择器
+                InitializeChatPageModelSelector();
+
+                // 更新设置页面的模型列表
+                UpdateModelList();
+
+                // 保存设置
+                Properties.Settings.Default.ProviderType = selectedProviderType.ToString();
+                Properties.Settings.Default.Save();
+
+                // 更新窗体标题
+                UpdateTitle();
+            }
+        }
+
+        // 根据提供商类型获取默认API主机地址
+        private string GetDefaultApiHost(ProviderType providerType)
+        {
+            return ProviderFactory.GetDefaultApiHost(providerType);
+        }
+
+        private void ModelChanged(object sender, EventArgs e)
+        {
+            if (sender is ComboBox cboModel && cboModel.SelectedIndex >= 0)
+            {
+                string selectedModel = cboModel.SelectedItem.ToString();
+                if (!string.IsNullOrEmpty(selectedModel))
+                {
+                    _currentModelId = selectedModel;
+                    Properties.Settings.Default.LastSelectedModel = _currentModelId;
+                    Properties.Settings.Default.Save();
+                    UpdateTitle();
+                }
+            }
+        }
+
+        private void UpdateApiSettings(object sender, EventArgs e)
+        {
+            // 获取当前选中的渠道
+            var channel = GetSelectedChannel();
+            if (channel == null)
+            {
+                MessageBox.Show("请选择一个渠道", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            // 使用渠道的API设置
+            string apiKey = channel.ApiKey;
+            string apiHost = channel.ApiHost;
+
+            if (string.IsNullOrEmpty(apiKey))
+            {
+                MessageBox.Show("API密钥不能为空", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            // 更新提供商实例的API密钥和主机
+            var provider = _providerFactory.GetProvider(channel.ProviderType);
+            if (provider != null)
+            {
+                provider.UpdateApiKey(apiKey);
+                provider.UpdateApiHost(apiHost);
+                MessageBox.Show($"{channel.Name}的API设置已更新", "成功", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            else
+            {
+                MessageBox.Show($"无法获取{channel.Name}提供商", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void UpdateModelList()
+        {
+            try
+            {
+                // 此方法现在更新settingsPanel中的模型列表
+                // 1. 更新设置面板中的模型列表
+                UpdateSettingsModelList();
+
+                // 2. 更新聊天面板中的模型选择下拉框
+                UpdateChatProviderModels();
+
+                // 3. 更新聊天页面的模型选择器
+                InitializeChatPageModelSelector();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"更新模型列表时出错: {ex.Message}");
+            }
+        }
+
+        private void UpdateSettingsModelList()
+        {
+            // 该方法不再需要，因为已删除modelListBox控件
+            // 清空模型列表框
+            // if (modelListBox != null)
+            // {
+            //     modelListBox.Items.Clear();
+
+            //     // 根据当前提供商类型填充模型列表
+            //     var provider = _providerFactory.GetProvider(_currentProviderType);
+            //     if (provider != null)
+            //     {
+            //         var availableModels = provider.GetAvailableModels();
+            //         foreach (var model in availableModels)
+            //         {
+            //             modelListBox.Items.Add(model);
+            //         }
+
+            //         // 如果有模型，则默认选中第一个
+            //         if (modelListBox.Items.Count > 0)
+            //         {
+            //             modelListBox.SelectedIndex = 0;
+            //         }
+            //     }
+
+            //     // 更新标题
+            //     modelListGroup.Text = $"{GetProviderDisplayName(_currentProviderType)}支持的模型";
+            // }
+        }
+
+        private void UpdateTitle()
+        {
+            // 从选中的聊天模型获取信息
+            string modelInfo = string.IsNullOrEmpty(_currentModelId) ? "未选择模型" : _currentModelId;
+
+            // 如果当前模型是带提供商前缀的格式，则分离显示
+            if (modelInfo.Contains(":"))
+            {
+                string[] parts = modelInfo.Split(new[] { ':' }, 2);
+                string provider = parts[0].Trim();
+                string model = parts[1].Trim();
+
+                this.Text = $"LLM Agent - {provider} - {model}";
+            }
+            else
+            {
+                // 否则使用当前提供商和模型
+                string provider = GetProviderDisplayName(_currentProviderType);
+                this.Text = $"LLM Agent - {provider} - {modelInfo}";
+            }
+        }
+
+        private string GetProviderDisplayName(ProviderType providerType)
+        {
+            return providerType switch
+            {
+                ProviderType.OpenAI => "OpenAI",
+                ProviderType.AzureOpenAI => "Azure OpenAI",
+                ProviderType.Anthropic => "Anthropic Claude",
+                ProviderType.Google => "Google Gemini",
+                ProviderType.ZhipuAI => "智谱 GLM",
+                ProviderType.Other => "其他",
+                _ => "未知提供商"
+            };
+        }
+
+        private object? GetCurrentProvider()
+        {
+            try
+            {
+                var apiKey = GetProviderApiKey(_currentProviderType);
+                if (string.IsNullOrEmpty(apiKey))
+                    return null;
+
+                return new { ApiKey = apiKey, ApiHost = GetProviderApiHost(_currentProviderType) };
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"获取提供商失败: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return null;
+            }
+        }
+
+        private string GetProviderApiKey(ProviderType providerType)
+        {
+            switch (providerType)
+            {
+                case ProviderType.OpenAI:
+                    return Properties.Settings.Default.OpenAIApiKey;
+                case ProviderType.AzureOpenAI:
+                    return Properties.Settings.Default.AzureApiKey;
+                case ProviderType.Anthropic:
+                    return Properties.Settings.Default.AnthropicApiKey;
+                case ProviderType.Google:
+                    return Properties.Settings.Default.GeminiApiKey;
+                case ProviderType.ZhipuAI:
+                    return Properties.Settings.Default.ZhipuApiKey;
+                case ProviderType.Other:
+                    return Properties.Settings.Default.OtherApiKey;
+                default:
+                    return string.Empty;
+            }
+        }
+
+        private string GetProviderApiHost(ProviderType providerType)
+        {
+            switch (providerType)
+            {
+                case ProviderType.OpenAI:
+                    return Properties.Settings.Default.OpenAIApiHost;
+                case ProviderType.AzureOpenAI:
+                    return Properties.Settings.Default.AzureApiHost;
+                case ProviderType.Anthropic:
+                    return Properties.Settings.Default.AnthropicApiHost;
+                case ProviderType.Google:
+                    return Properties.Settings.Default.GeminiApiHost;
+                case ProviderType.ZhipuAI:
+                    return Properties.Settings.Default.ZhipuApiHost;
+                case ProviderType.Other:
+                    return Properties.Settings.Default.OtherApiHost;
+                default:
+                    return string.Empty;
+            }
+        }
+
+        private string GetApiKey()
+        {
+            var provider = GetCurrentProvider();
+            return provider?.GetType().GetProperty("ApiKey")?.GetValue(provider) as string ?? string.Empty;
+        }
+
+        private string GetApiHost()
+        {
+            var provider = GetCurrentProvider();
+            return provider?.GetType().GetProperty("ApiHost")?.GetValue(provider) as string ?? string.Empty;
+        }
+
+        // 获取当前模型显示名称
+        private string GetCurrentModelName()
+        {
+            if (string.IsNullOrEmpty(_currentModelId))
+            {
+                return GetProviderDisplayName(_currentProviderType);
+            }
+            return _currentModelId;
+        }
+
+        // 辅助方法：截断文本
+        private string TruncateText(string text, int maxLength)
+        {
+            if (string.IsNullOrEmpty(text)) return string.Empty;
+            return text.Length <= maxLength ? text : text.Substring(0, maxLength) + "...";
+        }
+
+        // 发送消息并接收回复
+        private async Task SendMessage()
+        {
+            try
+            {
+                if (_isProcessingMessage)
+                    return;
+
+                _isProcessingMessage = true;
+
+                // 获取输入框与输出框
+                TextBox txtInput = inputPanel.Controls["txtInput"] as TextBox;
+                RichTextBox txtOutput = chatOutputPanel.Controls["txtOutput"] as RichTextBox;
+
+                if (txtInput == null || txtOutput == null)
+                    return;
+
+                string userInput = txtInput.Text.Trim();
+                if (string.IsNullOrEmpty(userInput))
+                    return;
+
+                // 清空输入框
+                txtInput.Text = string.Empty;
+
+                // 创建并添加用户消息
+                var userMessage = new ChatMessage
+                {
+                    Role = ChatRole.User,
+                    Content = userInput
+                };
+
+                // 添加到界面
+                AppendFormattedMessage(userMessage, txtOutput);
+
+                // 获取当前会话消息列表
+                var currentSession = _chatHistoryManager.GetCurrentSession();
+                if (currentSession == null)
+                {
+                    MessageBox.Show("无法获取当前会话信息", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    _isProcessingMessage = false;
+                    return;
+                }
+
+                // 添加到会话并保存
+                _chatHistoryManager.AddMessageToSession(currentSession, userMessage);
+
+                // 获取所有消息（包括系统提示）
+                var messages = new List<ChatMessage>();
+
+                // 添加系统提示消息（如果有）
+                if (!string.IsNullOrEmpty(_systemPrompt))
+                {
+                    messages.Add(new ChatMessage
+                    {
+                        Role = ChatRole.System,
+                        Content = _systemPrompt
+                    });
+                }
+
+                // 添加所有会话消息
+                messages.AddRange(currentSession.Messages);
+
+                // 使用chatModelComboBox中选择的模型
+                string modelId = _currentModelId;
+                ProviderType providerType = _currentProviderType;
+                Channel selectedChannel = null;
+
+                if (chatModelComboBox.SelectedItem != null)
+                {
+                    string selectedModel = chatModelComboBox.SelectedItem.ToString();
+                    if (!string.IsNullOrEmpty(selectedModel))
+                    {
+                        // 解析渠道名称和模型名称
+                        string[] parts = selectedModel.Split(new[] { ':' }, 2);
+                        if (parts.Length == 2)
+                        {
+                            string channelName = parts[0].Trim();
+                            modelId = parts[1].Trim();
+
+                            // 从渠道管理器中获取对应的渠道
+                            var channel = _channelManager.GetEnabledChannels()
+                                .FirstOrDefault(c => c.Name.Equals(channelName, StringComparison.OrdinalIgnoreCase));
+
+                            if (channel != null)
+                            {
+                                providerType = channel.ProviderType;
+                                selectedChannel = channel;
+                            }
+                        }
+                    }
+                }
+
+                // 如果有选择的渠道，优先使用渠道进行发送
+                if (selectedChannel != null)
+                {
+                    // API调用添加占位文本
+                    var placeholderText = "正在生成响应...";
+                    txtOutput.AppendText(Environment.NewLine);
+                    txtOutput.AppendText(Environment.NewLine + placeholderText);
+
+                    // 滚动到底部
+                    txtOutput.ScrollToCaret();
+
+                    string responseText;
+                    ChatMessage finalAiMessage;
+
+                    try
+                    {
+                        // 根据设置决定是否使用流式响应
+                        if (_useStreamResponse)
+                        {
+                            // 移除占位符文本，使用选择和替换方式
+                            int placeholderStart = txtOutput.Text.LastIndexOf(placeholderText);
+                            if (placeholderStart >= 0)
+                            {
+                                txtOutput.SelectionStart = placeholderStart;
+                                txtOutput.SelectionLength = placeholderText.Length;
+                                txtOutput.SelectedText = "";
+                            }
+
+                            // 创建AI回复消息（用于流式更新）
+                            var aiMessage = new ChatMessage
+                            {
+                                Role = ChatRole.Assistant,
+                                Content = ""
+                            };
+
+                            // 显示初始空消息
+                            AppendFormattedMessage(aiMessage, txtOutput);
+
+                            // 获取ai消息的起始位置
+                            int aiContentStart = txtOutput.TextLength - 2; // 减去两个换行符
+
+                            StringBuilder sb = new StringBuilder();
+
+                            // 从消息列表中获取用户消息文本
+                            string userMessageText = messages.LastOrDefault(m => m.Role == ChatRole.User)?.Content ?? userInput;
+
+                            // 使用渠道服务发送流式消息
+                            await _channelService.SendStreamMessageAsync(
+                                selectedChannel,
+                                modelId,
+                                messages,
+                                (chunk) =>
+                                {
+                                    // 添加到临时响应文本，用于记录完整的响应内容
+                                    sb.Append(chunk);
+
+                                    // 更新UI - 只添加新接收的chunk，而不是显示整个累积内容
+                                    if (_enableMarkdown && MarkdownToRichTextConverter.ContainsMarkdown(chunk))
+                                    {
+                                        // 对于Markdown内容，目前仍需整体渲染
+                                        // 删除当前AI响应内容
+                                        txtOutput.SelectionStart = aiContentStart;
+                                        txtOutput.SelectionLength = txtOutput.TextLength - aiContentStart;
+                                        txtOutput.SelectedText = "";
+                                        
+                                        // 使用Markdown渲染器添加完整内容
+                                        var markdownConverter = new MarkdownToRichTextConverter(txtOutput);
+                                        markdownConverter.RenderMarkdown(sb.ToString(), aiContentStart);
+                                    }
+                                    else
+                                    {
+                                        // 对于普通文本，直接在末尾追加新chunk
+                                        txtOutput.SelectionStart = txtOutput.TextLength;
+                                        txtOutput.SelectionLength = 0;
+                                        txtOutput.SelectedText = chunk;
+                                    }
+
+                                    // 滚动到底部
+                                    txtOutput.SelectionStart = txtOutput.TextLength;
+                                    txtOutput.ScrollToCaret();
+                                });
+
+                            // 获取完整响应文本，用于保存到聊天历史
+                            responseText = sb.ToString();
+
+                            // 完善AI回复消息
+                            aiMessage.Content = responseText;
+                            
+                            // 添加额外的换行符，保持消息格式一致
+                            txtOutput.AppendText(Environment.NewLine + Environment.NewLine);
+
+                            // 创建最终的AI响应消息用于保存
+                            finalAiMessage = aiMessage;
+                        }
+                        else
+                        {
+                            // 从消息列表中获取用户消息文本
+                            string userMessageText = messages.LastOrDefault(m => m.Role == ChatRole.User)?.Content ?? userInput;
+
+                            // 使用普通响应
+                            responseText = await _channelService.SendMessageAsync(selectedChannel, modelId, messages);
+
+                            // 移除占位符文本，使用选择和替换方式
+                            int placeholderStart = txtOutput.Text.LastIndexOf(placeholderText);
+                            if (placeholderStart >= 0)
+                            {
+                                txtOutput.SelectionStart = placeholderStart;
+                                txtOutput.SelectionLength = placeholderText.Length;
+                                txtOutput.SelectedText = "";
+                            }
+
+                            // 创建并添加AI回复消息
+                            var aiMessage = new ChatMessage
+                            {
+                                Role = ChatRole.Assistant,
+                                Content = responseText
+                            };
+
+                            // 添加到界面
+                            AppendFormattedMessage(aiMessage, txtOutput);
+
+                            // 创建最终的AI响应消息用于保存
+                            finalAiMessage = aiMessage;
+                        }
+
+                        // 添加到会话并保存
+                        _chatHistoryManager.AddMessageToSession(currentSession, finalAiMessage);
+
+                        // 更新会话标题
+                        var titleText = string.IsNullOrEmpty(currentSession.Title) ? TruncateText(userInput, 20) : currentSession.Title;
+                        _chatHistoryManager.UpdateSessionTitle(currentSession, titleText);
+
+                        // 刷新会话列表
+                        UpdateChatList();
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"使用渠道发送消息时出错: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
+                else // 没有选择渠道的情况
+                {
+                    // 显示错误信息并退出
+                    var errorMessage = "未选择有效的渠道和模型，无法发送消息。请在聊天页面的模型选择框中选择一个有效的渠道模型。";
+                    MessageBox.Show(errorMessage, "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                    // 创建并添加系统消息提示用户
+                    var systemMessage = new ChatMessage
+                    {
+                        Role = ChatRole.System,
+                        Content = errorMessage
+                    };
+
+                    // 添加到界面
+                    AppendFormattedMessage(systemMessage, txtOutput, true);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"发送消息时出错: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                _isProcessingMessage = false;
+            }
+        }
+
+        private void LlmAgentMainForm_Load(object sender, EventArgs e)
+        {
+            // 触发窗体加载逻辑
+            // 更新聊天会话列表
+            UpdateChatList();
+
+            // 获取当前会话，检查是否存在
+            var currentSession = _chatHistoryManager.GetCurrentSession();
+
+            // 更新聊天界面
+            if (currentSession != null)
+            {
+                DisplayChatInterface();
+            }
+            else
+            {
+                // 如果没有会话，显示空界面提示
+                RichTextBox txtOutput = chatOutputPanel.Controls["txtOutput"] as RichTextBox;
+                if (txtOutput != null)
+                {
+                    txtOutput.Clear();
+                    txtOutput.AppendText("欢迎使用LLM Agent！点击左侧的「+ 新对话」按钮开始聊天。");
+                }
+            }
+
+            // 默认切换到聊天页面
+            SwitchToPanel(chatPagePanel, chatNavButton);
+
+            // 更新模型选择器
+            UpdateChatProviderModels();
+        }
+
+        private void panel1_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
+
+        private void label1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void lblSystemPrompt_Click(object sender, EventArgs e)
+        {
+            // 此方法不再需要，但保留空实现以避免错误
+        }
+
+        // 全局键盘快捷键处理
+        private void LlmAgentMainForm_KeyDown(object sender, KeyEventArgs e)
+        {
+            // 发送消息 - Ctrl+Enter
+            if (e.Control && e.KeyCode == Keys.Enter)
+            {
+                TextBox txtInput = inputPanel.Controls["txtInput"] as TextBox;
+                if (txtInput != null && txtInput.Focused)
+                {
+                    e.SuppressKeyPress = true;  // 阻止默认回车换行行为
+                    Button btnSend = inputPanel.Controls["btnSend"] as Button;
+                    if (btnSend != null)
+                        btnSend.PerformClick();
+                }
+            }
+
+            // 新建对话 - Ctrl+N
+            if (e.Control && e.KeyCode == Keys.N)
+            {
+                e.SuppressKeyPress = true;
+                CreateNewChat();
+            }
+
+            // 切换到聊天页面 - Alt+1
+            if (e.Alt && e.KeyCode == Keys.D1)
+            {
+                e.SuppressKeyPress = true;
+                SwitchToPanel(chatPagePanel, chatNavButton);
+            }
+
+            // 切换到设置页面 - Alt+2
+            if (e.Alt && e.KeyCode == Keys.D2)
+            {
+                e.SuppressKeyPress = true;
+                SwitchToPanel(settingsPanel, settingsNavButton);
+            }
+
+            // 切换到AI网站页面 - Alt+3
+            if (e.Alt && e.KeyCode == Keys.D3)
+            {
+                e.SuppressKeyPress = true;
+                SwitchToPanel(aiWebsitePanel, websiteNavButton);
+            }
+
+            // 焦点到搜索框 - Ctrl+F
+            if (e.Control && e.KeyCode == Keys.F)
+            {
+                e.SuppressKeyPress = true;
+                TextBox searchBox = chatListPanel.Controls.Find("searchBox", true).FirstOrDefault() as TextBox;
+                if (searchBox != null)
+                    searchBox.Focus();
+            }
+
+            // 清空聊天框 - Ctrl+L
+            if (e.Control && e.KeyCode == Keys.L)
+            {
+                e.SuppressKeyPress = true;
+                RichTextBox txtOutput = chatOutputPanel.Controls["txtOutput"] as RichTextBox;
+                if (txtOutput != null)
+                    txtOutput.Clear();
+            }
+        }
+
+        /// <summary>
+        /// 窗体关闭事件处理，清理活跃渠道
+        /// </summary>
+        private void LlmAgentMainForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            // 如果当前窗体有使用中的渠道，在关闭窗体时将其从活跃列表中移除
+            if (_currentChannelId != Guid.Empty)
+            {
+                RemoveActiveChannel(_currentChannelId);
+            }
+        }
+
+        private void SwitchToNextNavPage()
+        {
+            // 实现在导航页面之间循环切换的逻辑
+            Button[] navButtons = { avatarButton, chatNavButton, websiteNavButton, promptsNavButton, filesNavButton, settingsNavButton };
+
+            // 找出当前活动的按钮
+            int currentIndex = -1;
+            for (int i = 0; i < navButtons.Length; i++)
+            {
+                if (navButtons[i].ForeColor == Color.White) // 假设活动按钮文本为白色
+                {
+                    currentIndex = i;
+                    break;
+                }
+            }
+
+            // 计算下一个按钮的索引
+            int nextIndex = (currentIndex + 1) % navButtons.Length;
+            navButtons[nextIndex].PerformClick();
+        }
+
+        // 切换设置页面
+        private void SwitchSettingsPage(Control targetContainer)
+        {
+            // 隐藏所有设置内容面板
+            foreach (Control control in settingsContentContainer.Controls)
+            {
+                if (control is Panel)
+                {
+                    control.Visible = false;
+                }
+            }
+
+            // 显示目标设置面板
+            targetContainer.Visible = true;
+
+            // 重置所有设置菜单按钮样式
+            foreach (Control control in settingsMenuPanel.Controls)
+            {
+                if (control is Button button)
+                {
+                    button.BackColor = Color.FromArgb(248, 249, 250);
+                }
+            }
+
+            // 高亮当前活动按钮
+            if (targetContainer == shortcutSettingsContainer)
+                shortcutSettingsButton.BackColor = Color.FromArgb(230, 230, 230);
+            else if (targetContainer == generalSettingsContainer)
+                generalSettingsButton.BackColor = Color.FromArgb(230, 230, 230);
+            else if (targetContainer == dataSettingsContainer)
+                dataSettingsButton.BackColor = Color.FromArgb(230, 230, 230);
+            else if (targetContainer == aboutContainer)
+                aboutSettingsButton.BackColor = Color.FromArgb(230, 230, 230);
+        }
+
+        // 更新聊天区域的模型提供商选择列表
+        private void UpdateChatProviderModels()
+        {
+            // 获取所有已启用的渠道
+            var enabledChannels = _channelManager.GetEnabledChannels();
+
+            // 清空现有模型列表
+            chatModelComboBox.Items.Clear();
+
+            // 加载所有启用渠道的模型
+            foreach (var channel in enabledChannels)
+            {
+                // 获取渠道支持的模型列表
+                var availableModels = channel.SupportedModels;
+
+                foreach (var model in availableModels)
+                {
+                    // 添加渠道前缀来区分不同渠道的模型
+                    string displayName = $"{channel.Name}: {model}";
+                    chatModelComboBox.Items.Add(displayName);
+                }
+            }
+
+            // 选择上次使用的模型
+            if (!string.IsNullOrEmpty(_currentModelId) && chatModelComboBox.Items.Contains(_currentModelId))
+            {
+                chatModelComboBox.SelectedItem = _currentModelId;
+            }
+            else if (chatModelComboBox.Items.Count > 0)
+            {
+                chatModelComboBox.SelectedIndex = 0;
+                _currentModelId = chatModelComboBox.SelectedItem.ToString();
+                Properties.Settings.Default.LastSelectedModel = _currentModelId;
+                Properties.Settings.Default.Save();
+            }
+        }
+
+        // 获取提供商的简称
+        private string GetProviderShortName(ProviderType providerType)
+        {
+            switch (providerType)
+            {
+                case ProviderType.OpenAI:
+                    return "OAI";
+                case ProviderType.AzureOpenAI:
+                    return "Azure";
+                case ProviderType.Anthropic:
+                    return "Claude";
+                case ProviderType.Google:
+                    return "Google";
+                case ProviderType.ZhipuAI:
+                    return "ZhipuAI";
+                case ProviderType.Other:
+                    return "Other";
+                default:
+                    return providerType.ToString();
+            }
+        }
+
+        // 获取已启用的提供商列表
+        private List<ProviderType> GetEnabledProviders()
+        {
+            // 从渠道管理器中获取所有启用的渠道
+            var enabledChannels = _channelManager.GetEnabledChannels();
+
+            // 提取所有启用的渠道的提供商类型
+            return enabledChannels
+                .Select(c => c.ProviderType)
+                .Distinct()
+                .ToList();
+        }
+
+        // 根据简称获取提供商类型
+        private ProviderType GetProviderTypeFromDisplayName(string displayName)
+        {
+            if (string.IsNullOrEmpty(displayName))
+                return ProviderType.OpenAI;
+
+            if (displayName.Contains("OpenAI", StringComparison.OrdinalIgnoreCase))
+            {
+                if (displayName.Contains("Azure", StringComparison.OrdinalIgnoreCase))
+                    return ProviderType.AzureOpenAI;
+                else
+                    return ProviderType.OpenAI;
+            }
+            else if (displayName.Contains("Anthropic", StringComparison.OrdinalIgnoreCase) ||
+                     displayName.Contains("Claude", StringComparison.OrdinalIgnoreCase))
+                return ProviderType.Anthropic;
+            else if (displayName.Contains("Google", StringComparison.OrdinalIgnoreCase) ||
+                     displayName.Contains("Gemini", StringComparison.OrdinalIgnoreCase))
+                return ProviderType.Google;
+            else if (displayName.Contains("智谱", StringComparison.OrdinalIgnoreCase) ||
+                     displayName.Contains("GLM", StringComparison.OrdinalIgnoreCase))
+                return ProviderType.ZhipuAI;
+            else if (displayName.Contains("其他", StringComparison.OrdinalIgnoreCase) ||
+                     displayName.Contains("Other", StringComparison.OrdinalIgnoreCase))
+                return ProviderType.Other;
+
+            // 默认返回OpenAI
+            return ProviderType.OpenAI;
+        }
+
+        // 模型列表选择事件处理
+        // private void ModelListBox_SelectedIndexChanged(object sender, EventArgs e)
+        // {
+        //     if (modelListBox.SelectedItem != null)
+        //     {
+        //         string selectedModel = modelListBox.SelectedItem.ToString();
+        // 
+        //         // 设置当前模型ID
+        //         _currentModelId = selectedModel;
+        // 
+        //         // 保存设置
+        //         Properties.Settings.Default.LastSelectedModel = _currentModelId;
+        //         Properties.Settings.Default.Save();
+        // 
+        //         // 更新窗体标题
+        //         UpdateTitle();
+        //     }
+        // }
+
+        // 管理模型按钮点击事件
+        private void ManageModelsButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                // 获取当前选中的提供商和模型
+                string providerName = GetProviderDisplayName(_currentProviderType);
+                // 不再需要获取选中的模型ID
+
+                // 打开模型管理界面
+                using (var modelForm = new ModelManagementForm(providerName, _currentProviderType, _providerFactory))
+                {
+                    if (modelForm.ShowDialog() == DialogResult.OK)
+                    {
+                        // 创建新的HttpClient实例，避免重用已发送请求的实例
+                        _httpClient.Dispose();
+                        _httpClient = new HttpClient();
+                        _httpClient.Timeout = TimeSpan.FromMinutes(5);
+
+                        // 重新初始化提供商，确保能获取到最新的模型列表
+                        _providerFactory = new ProviderFactory(_httpClient);
+                        // 重新创建当前提供商实例
+                        var currentProvider = _providerFactory.GetProvider(_currentProviderType);
+
+                        // 重新加载模型列表
+                        UpdateModelList();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"打开模型管理功能时出错: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        // 测试模型按钮点击事件
+        private void TestModelButton_Click(object sender, EventArgs e)
+        {
+            if (channelModelListBox.SelectedItem == null)
+            {
+                MessageBox.Show("请先选择要测试的模型", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            string selectedModelId = channelModelListBox.SelectedItem.ToString();
+            var channel = GetSelectedChannel();
+
+            if (channel == null)
+            {
+                MessageBox.Show("请先选择渠道", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            // 使用新的构造函数创建ModelTestForm
+            using (var testForm = new ModelTestForm(channel, selectedModelId))
+            {
+                testForm.ShowDialog();
+            }
+        }
+
+        private void channelNavButton_Click(object sender, EventArgs e)
+        {
+            SwitchToPanel(channelPanel, channelNavButton);
+
+            // 初始化渠道列表
+            InitializeChannelList();
+        }
+
+        private void InitializeChannelList()
+        {
+            try
+            {
+                // 清空现有列表
+                channelListBox.Items.Clear();
+
+                // 获取所有渠道
+                var channels = _channelManager.GetAllChannels();
+
+                // 创建字典，用于保存渠道ID和索引的映射关系
+                Dictionary<int, Guid> channelIndexMap = new Dictionary<int, Guid>();
+
+                for (int i = 0; i < channels.Count; i++)
+                {
+                    // 在列表中显示渠道名称，前面加上启用状态标记
+                    string displayName = channels[i].IsEnabled ? "✓ " : "✗ ";
+                    displayName += channels[i].Name;
+
+                    channelListBox.Items.Add(displayName);
+
+                    // 保存索引和ID的映射
+                    channelIndexMap[i] = channels[i].Id;
+                }
+
+                // 保存索引映射为Tag
+                channelListBox.Tag = channelIndexMap;
+
+                // 如果有项目，默认选择第一个
+                if (channelListBox.Items.Count > 0)
+                {
+                    channelListBox.SelectedIndex = 0;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"初始化渠道列表失败: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void channelListBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                if (channelListBox.SelectedIndex >= 0)
+                {
+                    // 从Tag中获取索引映射
+                    var channelIndexMap = channelListBox.Tag as Dictionary<int, Guid>;
+
+                    if (channelIndexMap != null && channelIndexMap.TryGetValue(channelListBox.SelectedIndex, out Guid channelId))
+                    {
+                        // 获取渠道对象
+                        var channel = _channelManager.GetChannelById(channelId);
+
+                        // 检查渠道模型列表是否为空，如果为空并且API密钥不为空，则尝试从API获取模型列表
+                        if ((channel.SupportedModels == null || channel.SupportedModels.Count == 0) && !string.IsNullOrEmpty(channel.ApiKey))
+                        {
+                            try
+                            {
+                                // 显示加载提示
+                                Cursor = Cursors.WaitCursor;
+                                channelTitleLabel.Text = $"渠道详情 - {channel.Name} (正在从API获取模型列表...)";
+
+                                // 在后台线程中执行
+                                Task.Run(async () =>
+                                {
+                                    List<string> modelList = new List<string>();
+
+                                    try
+                                    {
+                                        // 获取提供商实例
+                                        var provider = _providerFactory.GetProvider(channel.ProviderType);
+
+                                        // 设置API密钥和主机
+                                        provider.UpdateApiKey(channel.ApiKey);
+                                        provider.UpdateApiHost(channel.ApiHost);
+
+                                        // 尝试执行对应的GetModelsFromApiAsync方法
+                                        if (provider is OpenAIProvider openAIProvider)
+                                        {
+                                            modelList = await openAIProvider.GetModelsFromApiAsync();
+                                        }
+                                        else if (provider is AzureOpenAIProvider azureProvider)
+                                        {
+                                            modelList = await azureProvider.GetModelsFromApiAsync();
+                                        }
+                                        else if (provider is AnthropicProvider anthropicProvider)
+                                        {
+                                            modelList = await anthropicProvider.GetModelsFromApiAsync();
+                                        }
+                                        else if (provider is GeminiProvider geminiProvider)
+                                        {
+                                            modelList = await geminiProvider.GetModelsFromApiAsync();
+                                        }
+                                        else if (provider is ZhipuProvider zhipuProvider)
+                                        {
+                                            modelList = await zhipuProvider.GetModelsFromApiAsync();
+                                        }
+                                        else if (provider is SiliconFlowProvider siliconFlowProvider)
+                                        {
+                                            modelList = await siliconFlowProvider.GetModelsFromApiAsync();
+                                        }
+                                        else
+                                        {
+                                            // 如果没有特定的API获取方法，使用默认支持的模型
+                                            modelList = provider.GetSupportedModels();
+                                        }
+
+                                        // 如果成功获取模型列表
+                                        if (modelList.Count > 0)
+                                        {
+                                            // 更新渠道的支持模型列表
+                                            channel.SupportedModels = modelList;
+                                            _channelManager.UpdateChannelModels(channelId, modelList);
+                                        }
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        BeginInvoke(new Action(() =>
+                                        {
+                                            MessageBox.Show($"从API获取模型列表失败: {ex.Message}\n将使用默认模型列表。",
+                                                "警告", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                                        }));
+                                    }
+                                    finally
+                                    {
+                                        // 在UI线程中更新界面
+                                        BeginInvoke(new Action(() =>
+                                        {
+                                            // 更新渠道详情
+                                            UpdateChannelDetails(channel);
+                                            Cursor = Cursors.Default;
+                                        }));
+                                    }
+                                });
+                            }
+                            catch (Exception ex)
+                            {
+                                MessageBox.Show($"尝试从API获取模型列表失败: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                Cursor = Cursors.Default;
+
+                                // 继续更新渠道详情
+                                UpdateChannelDetails(channel);
+                            }
+                        }
+                        else
+                        {
+                            // 正常更新渠道详情
+                            UpdateChannelDetails(channel);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"加载渠道详情失败: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Cursor = Cursors.Default;
+            }
+        }
+
+        private void UpdateChannelDetails(Channel channel)
+        {
+            try
+            {
+                _isUpdatingChannelDetails = true; // 设置标志，表示正在更新渠道详情
+
+                // 更新渠道详情界面
+                channelTitleLabel.Text = $"渠道详情 - {channel.Name}";
+
+                // 填充渠道信息
+                txtChannelName.Text = channel.Name;
+
+                // 设置渠道类型下拉框
+                if (cboChannelType.Items.Count == 0)
+                {
+                    // 添加所有提供商类型
+                    foreach (ProviderType type in Enum.GetValues(typeof(ProviderType)))
+                    {
+                        cboChannelType.Items.Add(GetProviderDisplayName(type));
+                    }
+                }
+
+                // 根据渠道类型选择对应的下拉框项
+                string providerName = GetProviderDisplayName(channel.ProviderType);
+
+                // 暂时移除事件处理，避免自动触发API主机地址更新
+                cboChannelType.SelectedIndexChanged -= cboChannelType_SelectedIndexChanged;
+
+                // 查找匹配的下拉框项
+                cboChannelType.SelectedIndex = -1; // 先清除选择
+                for (int i = 0; i < cboChannelType.Items.Count; i++)
+                {
+                    string item = cboChannelType.Items[i].ToString();
+                    if (string.Equals(item, providerName, StringComparison.OrdinalIgnoreCase))
+                    {
+                        cboChannelType.SelectedIndex = i;
+                        break;
+                    }
+                }
+
+                // 如果没找到匹配项，选择第一项
+                if (cboChannelType.SelectedIndex == -1 && cboChannelType.Items.Count > 0)
+                {
+                    cboChannelType.SelectedIndex = 0;
+                }
+
+                // 重新添加事件处理
+                cboChannelType.SelectedIndexChanged += cboChannelType_SelectedIndexChanged;
+
+                // 填充API设置
+                txtApiKey.Text = channel.ApiKey;
+
+                // 如果API主机地址为空，则使用默认值
+                if (string.IsNullOrEmpty(channel.ApiHost))
+                {
+                    txtApiHost.Text = GetDefaultApiHost(channel.ProviderType);
+                }
+                else
+                {
+                    txtApiHost.Text = channel.ApiHost;
+                }
+
+                // 设置启用状态
+                enableChannelCheckBox.Checked = channel.IsEnabled;
+
+                // 更新模型列表
+                UpdateChannelModelList(channel);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"更新渠道详情失败: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                _isUpdatingChannelDetails = false; // 重置标志
+            }
+        }
+
+        private void UpdateChannelModelList(Channel channel)
+        {
+            // 清空现有列表
+            channelModelListBox.Items.Clear();
+
+            // 添加渠道中的所有模型
+            foreach (var model in channel.SupportedModels)
+            {
+                channelModelListBox.Items.Add(model);
+            }
+        }
+
+        private void addChannelButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                // 创建新渠道
+                var channel = new Channel
+                {
+                    Name = $"新渠道_{DateTime.Now.ToString("HHmmss")}",
+                    ProviderType = ProviderType.OpenAI,
+                    ApiHost = GetDefaultApiHost(ProviderType.OpenAI),
+                    IsEnabled = true,
+                    SupportedModels = new List<string>() // 使用空列表，不预设模型
+                };
+
+                // 添加到渠道管理器
+                _channelManager.AddChannel(channel);
+
+                // 刷新渠道列表
+                InitializeChannelList();
+
+                // 选中新添加的渠道
+                int lastIndex = channelListBox.Items.Count - 1;
+                if (lastIndex >= 0)
+                {
+                    channelListBox.SelectedIndex = lastIndex;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"添加渠道失败: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void deleteChannelButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (channelListBox.SelectedIndex >= 0)
+                {
+                    // 从Tag中获取索引映射
+                    var channelIndexMap = channelListBox.Tag as Dictionary<int, Guid>;
+
+                    if (channelIndexMap != null && channelIndexMap.TryGetValue(channelListBox.SelectedIndex, out Guid channelId))
+                    {
+                        var channel = _channelManager.GetChannelById(channelId);
+
+                        // 检查渠道是否正在被使用
+                        if (IsChannelActive(channelId))
+                        {
+                            // 显示警告信息
+                            if (MessageBox.Show($"渠道 '{channel.Name}' 正在被聊天窗口使用，删除可能会导致正在使用此渠道的对话失败。确定要继续删除吗？",
+                                "删除确认", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes)
+                            {
+                                return; // 用户取消删除
+                            }
+                        }
+                        else
+                        {
+                            if (MessageBox.Show($"确定要删除渠道 '{channel.Name}' 吗？", "确认删除", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                            {
+                                // 删除渠道
+                                _channelManager.DeleteChannel(channelId);
+
+                                // 记住当前选择的索引
+                                int selectedIndex = channelListBox.SelectedIndex;
+
+                                // 刷新渠道列表
+                                InitializeChannelList();
+
+                                // 选择合适的项目
+                                if (channelListBox.Items.Count > 0)
+                                {
+                                    channelListBox.SelectedIndex = Math.Min(selectedIndex, channelListBox.Items.Count - 1);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"删除渠道失败: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void btnUpdateChannel_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (channelListBox.SelectedIndex >= 0)
+                {
+                    // 从Tag中获取索引映射
+                    var channelIndexMap = channelListBox.Tag as Dictionary<int, Guid>;
+
+                    if (channelIndexMap != null && channelIndexMap.TryGetValue(channelListBox.SelectedIndex, out Guid channelId))
+                    {
+                        // 获取当前渠道
+                        var channel = _channelManager.GetChannelById(channelId);
+
+                        // 获取渠道类型
+                        string providerName = cboChannelType.SelectedItem?.ToString() ?? "OpenAI";
+
+                        // 检查selectedItem是否有效
+                        if (string.IsNullOrEmpty(providerName))
+                        {
+                            MessageBox.Show("请选择有效的渠道类型！", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return;
+                        }
+
+                        // 使用修正的方法获取提供商类型
+                        ProviderType providerType = GetProviderTypeFromDisplayName(providerName);
+
+                        // 验证输入
+                        string name = txtChannelName.Text.Trim();
+                        if (string.IsNullOrEmpty(name))
+                        {
+                            MessageBox.Show("渠道名称不能为空！", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return;
+                        }
+
+                        // 如果名称变更，检查是否已存在
+                        if (name != channel.Name && _channelManager.GetAllChannels().Any(c => c.Id != channelId && c.Name.Equals(name, StringComparison.OrdinalIgnoreCase)))
+                        {
+                            MessageBox.Show($"渠道名称 '{name}' 已存在！", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return;
+                        }
+
+                        // 更新渠道属性
+                        channel.Name = name;
+                        channel.ProviderType = providerType;
+                        channel.ApiKey = txtApiKey.Text.Trim();
+                        channel.ApiHost = txtApiHost.Text.Trim();
+                        channel.IsEnabled = enableChannelCheckBox.Checked;
+                        channel.UpdatedAt = DateTime.Now;
+
+                        // 保存到渠道管理器
+                        _channelManager.UpdateChannel(channel);
+
+                        // 如果是启用状态，同步更新应用程序的当前提供商设置
+                        if (channel.IsEnabled)
+                        {
+                            // 更新应用程序的当前提供商类型
+                            _currentProviderType = providerType;
+
+                            // 更新应用程序设置
+                            Properties.Settings.Default.ProviderType = providerType.ToString();
+
+                            // 根据提供商类型更新API密钥和主机设置
+                            switch (providerType)
+                            {
+                                case ProviderType.OpenAI:
+                                    Properties.Settings.Default.OpenAIApiKey = channel.ApiKey;
+                                    Properties.Settings.Default.OpenAIApiHost = channel.ApiHost;
+                                    break;
+                                case ProviderType.AzureOpenAI:
+                                    Properties.Settings.Default.AzureApiKey = channel.ApiKey;
+                                    Properties.Settings.Default.AzureApiHost = channel.ApiHost;
+                                    break;
+                                case ProviderType.Anthropic:
+                                    Properties.Settings.Default.AnthropicApiKey = channel.ApiKey;
+                                    Properties.Settings.Default.AnthropicApiHost = channel.ApiHost;
+                                    break;
+                                case ProviderType.Google:
+                                    Properties.Settings.Default.GeminiApiKey = channel.ApiKey;
+                                    Properties.Settings.Default.GeminiApiHost = channel.ApiHost;
+                                    break;
+                                case ProviderType.ZhipuAI:
+                                    Properties.Settings.Default.ZhipuApiKey = channel.ApiKey;
+                                    Properties.Settings.Default.ZhipuApiHost = channel.ApiHost;
+                                    break;
+                                case ProviderType.Other:
+                                    Properties.Settings.Default.OtherApiKey = channel.ApiKey;
+                                    Properties.Settings.Default.OtherApiHost = channel.ApiHost;
+                                    break;
+                            }
+
+                            // 更新API设置
+                            Properties.Settings.Default.Save();
+
+                            // 更新窗体标题
+                            UpdateTitle();
+
+                            // 更新模型列表
+                            UpdateModelList();
+                        }
+
+                        // 刷新渠道列表
+                        int selectedIndex = channelListBox.SelectedIndex;
+                        InitializeChannelList();
+                        channelListBox.SelectedIndex = selectedIndex;
+
+                        MessageBox.Show($"渠道 '{channel.Name}' 已更新！", "更新成功", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"更新渠道失败: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void testChannelButton_Click(object sender, EventArgs e)
+        {
+            // 批量渠道测试模式
+            using (var tester = new ChannelTestForm())
+            {
+                tester.ShowDialog();
+            }
+        }
+
+        private void enableChannelCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            // 如果是界面更新触发的，不执行实际的启用/禁用操作
+            if (_isUpdatingChannelDetails)
+                return;
+
+            try
+            {
+                if (channelListBox.SelectedIndex >= 0)
+                {
+                    // 从Tag中获取索引映射
+                    var channelIndexMap = channelListBox.Tag as Dictionary<int, Guid>;
+
+                    if (channelIndexMap != null && channelIndexMap.TryGetValue(channelListBox.SelectedIndex, out Guid channelId))
+                    {
+                        // 获取渠道
+                        var channel = _channelManager.GetChannelById(channelId);
+
+                        // 检查是否正在禁用渠道
+                        bool isEnabled = enableChannelCheckBox.Checked;
+
+                        // 如果是禁用操作且渠道正在被使用，显示警告
+                        if (!isEnabled && IsChannelActive(channelId))
+                        {
+                            if (MessageBox.Show($"渠道 '{channel.Name}' 正在被聊天窗口使用，禁用可能会导致正在使用此渠道的对话失败。确定要继续禁用吗？",
+                                "禁用确认", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes)
+                            {
+                                // 用户取消禁用，恢复复选框状态
+                                _isUpdatingChannelDetails = true;
+                                enableChannelCheckBox.Checked = true;
+                                _isUpdatingChannelDetails = false;
+                                return;
+                            }
+                        }
+
+                        // 更新渠道启用状态
+                        _channelManager.SetChannelEnabledState(channelId, isEnabled);
+
+                        // 如果渠道被启用，将其设置为当前使用的渠道
+                        if (isEnabled)
+                        {
+                            // 更新应用程序的当前提供商类型
+                            _currentProviderType = channel.ProviderType;
+
+                            // 更新应用程序设置
+                            Properties.Settings.Default.ProviderType = channel.ProviderType.ToString();
+
+                            // 根据提供商类型更新API密钥和主机设置
+                            switch (channel.ProviderType)
+                            {
+                                case ProviderType.OpenAI:
+                                    Properties.Settings.Default.OpenAIApiKey = channel.ApiKey;
+                                    Properties.Settings.Default.OpenAIApiHost = channel.ApiHost;
+                                    break;
+                                case ProviderType.AzureOpenAI:
+                                    Properties.Settings.Default.AzureApiKey = channel.ApiKey;
+                                    Properties.Settings.Default.AzureApiHost = channel.ApiHost;
+                                    break;
+                                case ProviderType.Anthropic:
+                                    Properties.Settings.Default.AnthropicApiKey = channel.ApiKey;
+                                    Properties.Settings.Default.AnthropicApiHost = channel.ApiHost;
+                                    break;
+                                case ProviderType.Google:
+                                    Properties.Settings.Default.GeminiApiKey = channel.ApiKey;
+                                    Properties.Settings.Default.GeminiApiHost = channel.ApiHost;
+                                    break;
+                                case ProviderType.ZhipuAI:
+                                    Properties.Settings.Default.ZhipuApiKey = channel.ApiKey;
+                                    Properties.Settings.Default.ZhipuApiHost = channel.ApiHost;
+                                    break;
+                                case ProviderType.Other:
+                                    Properties.Settings.Default.OtherApiKey = channel.ApiKey;
+                                    Properties.Settings.Default.OtherApiHost = channel.ApiHost;
+                                    break;
+                            }
+
+                            // 更新API设置
+                            Properties.Settings.Default.Save();
+
+                            // 更新窗体标题
+                            UpdateTitle();
+
+                            // 删除这行消息提示
+                            // MessageBox.Show($"已将 '{channel.Name}' 设置为当前使用的渠道", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        }
+
+                        // 无论渠道是启用还是禁用，都更新模型列表
+                        UpdateModelList();
+
+                        // 刷新渠道列表
+                        int selectedIndex = channelListBox.SelectedIndex;
+                        InitializeChannelList();
+                        channelListBox.SelectedIndex = selectedIndex;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"更新渠道启用状态失败: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void settingsNavButton_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        // 添加渠道页面模型管理按钮事件处理
+        private void manageChannelModelsButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                // 确保已选择渠道
+                if (channelListBox.SelectedIndex < 0)
+                {
+                    MessageBox.Show("请先选择一个渠道！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
+
+                // 从Tag中获取索引映射
+                var channelIndexMap = channelListBox.Tag as Dictionary<int, Guid>;
+
+                if (channelIndexMap != null && channelIndexMap.TryGetValue(channelListBox.SelectedIndex, out Guid channelId))
+                {
+                    // 获取当前渠道
+                    var channel = _channelManager.GetChannelById(channelId);
+
+                    // 打开模型管理窗体
+                    using (var modelManagementForm = new ModelManagementForm(
+                        GetProviderDisplayName(channel.ProviderType),
+                        channel.ProviderType,
+                        _providerFactory))
+                    {
+                        if (modelManagementForm.ShowDialog() == DialogResult.OK)
+                        {
+                            // 获取数据库中为该提供商保存的模型
+                            // 注意：ModelManagementForm已经将模型保存到数据库中
+                            // 现在我们需要从数据库中获取已启用的模型ID列表，并更新到渠道中
+
+                            try
+                            {
+                                // 获取提供商类型字符串
+                                string providerStr = channel.ProviderType.ToString().ToLower();
+                                if (providerStr == "azureopenai")
+                                    providerStr = "openai"; // 特殊处理Azure OpenAI
+
+                                // 从数据库获取已启用的模型
+                                var dbManager = new DAL.DatabaseManager();
+                                var dbModels = dbManager.GetModels(providerStr);
+
+                                // 提取已启用的模型ID列表
+                                List<string> enabledModelIds = dbModels
+                                    .Where(m => m.Enabled)
+                                    .Select(m => m.Id)
+                                    .ToList();
+
+                                // 如果列表为空（可能出现的异常情况），使用默认模型
+                                if (enabledModelIds.Count == 0)
+                                {
+                                    // 回退到提供商的默认支持模型
+                                    var provider = _providerFactory.GetProvider(channel.ProviderType);
+                                    enabledModelIds = provider.GetSupportedModels();
+                                }
+
+                                // 更新渠道的支持模型列表
+                                channel.SupportedModels = enabledModelIds;
+                                _channelManager.UpdateChannelModels(channelId, enabledModelIds);
+
+                                // 刷新模型列表显示
+                                UpdateChannelModelList(channel);
+
+                                MessageBox.Show($"模型列表已更新！共有 {enabledModelIds.Count} 个启用的模型。",
+                                    "更新成功", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                            }
+                            catch (Exception ex)
+                            {
+                                // 如果获取数据库模型失败，回退到重新获取渠道信息
+                                channel = _channelManager.GetChannelById(channelId);
+                                UpdateChannelModelList(channel);
+
+                                MessageBox.Show($"从数据库获取模型列表时出错: {ex.Message}\n已恢复到原有模型列表。",
+                                    "更新警告", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"打开模型管理窗体失败: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        // 添加渠道页面模型测试按钮事件处理
+        private void testChannelModelButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                // 确保已选择渠道
+                if (channelListBox.SelectedIndex < 0)
+                {
+                    MessageBox.Show("请先选择一个渠道！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
+
+                // 确保已选择模型
+                if (channelModelListBox.SelectedIndex < 0)
+                {
+                    MessageBox.Show("请先选择一个模型！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
+
+                // 获取当前渠道
+                var channel = GetSelectedChannel();
+
+                if (channel != null)
+                {
+                    // 获取选中的模型名称
+                    string modelName = channelModelListBox.SelectedItem?.ToString();
+
+                    if (!string.IsNullOrEmpty(modelName))
+                    {
+                        // 打开模型测试窗体，使用新的构造函数
+                        using (var modelTestForm = new ModelTestForm(channel, modelName))
+                        {
+                            modelTestForm.ShowDialog();
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"打开模型测试窗体失败: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void channelModelsGroupBox_Enter(object sender, EventArgs e)
+        {
+
+        }
+
+        // 渠道类型下拉框选择变更事件
+        private void cboChannelType_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                if (cboChannelType.SelectedIndex >= 0)
+                {
+                    // 获取选中的提供商名称
+                    string providerName = cboChannelType.SelectedItem.ToString();
+
+                    // 转换为提供商类型
+                    ProviderType providerType = GetProviderTypeFromDisplayName(providerName);
+
+                    // 获取该提供商类型的默认API主机地址
+                    string defaultApiHost = GetDefaultApiHost(providerType);
+
+                    // 更新API主机地址文本框
+                    txtApiHost.Text = defaultApiHost;
+                }
+            }
+            catch (Exception ex)
+            {
+                // 记录错误但不显示给用户，以免打断用户操作
+                Console.Error.WriteLine($"更新API主机地址失败: {ex.Message}");
+            }
+        }
+
+        private Channel GetSelectedChannel()
+        {
+            if (channelListBox.SelectedIndex >= 0)
+            {
+                // 从Tag中获取索引映射
+                var channelIndexMap = channelListBox.Tag as Dictionary<int, Guid>;
+
+                if (channelIndexMap != null && channelIndexMap.TryGetValue(channelListBox.SelectedIndex, out Guid channelId))
+                {
+                    // 获取渠道对象
+                    return _channelManager.GetChannelById(channelId);
+                }
+            }
+            return null;
+        }
+
+        // 清除所有聊天记录按钮点击事件
+        private void ClearChatHistoryButton_Click(object sender, EventArgs e)
+        {
+            var result = MessageBox.Show(
+                "确定要清除所有聊天记录吗？此操作无法恢复！",
+                "确认清除",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Warning);
+
+            if (result == DialogResult.Yes)
+            {
+                try
+                {
+                    // 清除所有聊天记录
+                    _chatHistoryManager.ClearAllChatHistory();
+
+                    // 刷新聊天列表
+                    UpdateChatList();
+
+                    // 切换到新的空聊天界面
+                    SwitchToPanel(chatPagePanel, chatNavButton);
+
+                    MessageBox.Show(
+                        "已成功清除所有聊天记录！",
+                        "操作成功",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Information);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(
+                        $"清除聊天记录失败: {ex.Message}",
+                        "操作失败",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Error);
+                }
+            }
+        }
+
+        private void InitializeChatListPanel()
+        {
+            // 使用设计器已创建的控件，只添加事件处理器
+
+            // 为searchBox绑定事件
+            searchBox.TextChanged += SearchBox_TextChanged;
+
+            // 创建searchPanel面板（用于兼容代码中可能的引用）
+            searchPanel = new Panel
+            {
+                Visible = false,
+                Width = 0,
+                Height = 0
+            };
+
+            // 为chatListPanel添加拖放支持
+            chatListPanel.AllowDrop = true;
+            chatListPanel.DragEnter += ChatListPanel_DragEnter;
+            chatListPanel.DragDrop += ChatListPanel_DragDrop;
+            
+            // 添加大小改变事件
+            chatListPanel.SizeChanged += ChatListPanel_SizeChanged;
+
+            // 确保newChatButton事件已绑定
+            newChatButton.Click += (s, e) => CreateNewChat();
+        }
+        
+        private void ChatListPanel_SizeChanged(object sender, EventArgs e)
+        {
+            // 当面板大小改变时调整所有ChatSessionItem的宽度
+            foreach (Control control in chatListPanel.Controls)
+            {
+                if (control is ChatSessionItem sessionItem)
+                {
+                    sessionItem.Width = chatListPanel.ClientSize.Width - sessionItem.Margin.Horizontal;
+                }
+            }
+        }
+
+        private void UpdateChatList()
+        {
+            chatListPanel.Controls.Clear();
+
+            var sessions = _chatHistoryManager.GetAllSessions();
+            foreach (var session in sessions)
+            {
+                var sessionItem = new ChatSessionItem();
+                sessionItem.Session = session;
+                sessionItem.OnSessionSelected += (s, e) => SwitchToChat(e);
+                sessionItem.OnSessionDeleted += (s, e) => DeleteChatSession(e);
+                
+                // 添加到Panel之前先调整宽度
+                sessionItem.Width = chatListPanel.ClientSize.Width - sessionItem.Margin.Horizontal;
+                
+                // 添加到控件集合
+                chatListPanel.Controls.Add(sessionItem);
+                
+                // 在控件添加后再次调整大小，确保适应当前DPI设置
+                float dpiScaleFactor = sessionItem.CreateGraphics().DpiX / 96f;
+                int scaledHeight = (int)(100 * dpiScaleFactor);
+                sessionItem.Height = scaledHeight;
+                
+                // 确保内部控件也正确调整大小
+                if (sessionItem.IsHandleCreated)
+                {
+                    sessionItem.Invoke(new Action(() => 
+                    {
+                        typeof(ChatSessionItem).GetMethod("AdjustControlSizes", 
+                            System.Reflection.BindingFlags.NonPublic | 
+                            System.Reflection.BindingFlags.Instance)?.Invoke(sessionItem, null);
+                    }));
+                }
+            }
+        }
+
+        private void ChatListPanel_DragEnter(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(typeof(ChatSessionItem)))
+            {
+                e.Effect = DragDropEffects.Move;
+            }
+        }
+
+        private void ChatListPanel_DragDrop(object sender, DragEventArgs e)
+        {
+            var draggedItem = (ChatSessionItem)e.Data.GetData(typeof(ChatSessionItem));
+            var dropPoint = chatListPanel.PointToClient(new Point(e.X, e.Y));
+            var targetIndex = GetDropIndex(dropPoint);
+
+            if (targetIndex > -1)
+            {
+                chatListPanel.Controls.SetChildIndex(draggedItem, targetIndex);
+                // 更新会话顺序
+                UpdateSessionOrder();
+            }
+        }
+
+        private int GetDropIndex(Point dropPoint)
+        {
+            for (int i = 0; i < chatListPanel.Controls.Count; i++)
+            {
+                var control = chatListPanel.Controls[i];
+                if (control is ChatSessionItem)
+                {
+                    if (dropPoint.Y < control.Bottom)
+                    {
+                        return i;
+                    }
+                }
+            }
+            return chatListPanel.Controls.Count - 1;
+        }
+
+        private void UpdateSessionOrder()
+        {
+            var sessions = new List<ChatSession>();
+            foreach (Control control in chatListPanel.Controls)
+            {
+                if (control is ChatSessionItem item)
+                {
+                    sessions.Add(item.Session);
+                }
+            }
+            // 取消注释此行，启用会话顺序更新功能
+            _chatHistoryManager.UpdateSessionOrder(sessions);
+        }
+
+        private void SearchBox_TextChanged(object sender, EventArgs e)
+        {
+            var searchText = searchBox.Text.ToLower();
+            foreach (Control control in chatListPanel.Controls)
+            {
+                if (control is ChatSessionItem item)
+                {
+                    bool match = item.Session.Title?.ToLower().Contains(searchText) == true ||
+                                item.Session.Messages.Any(m => m.Content.ToLower().Contains(searchText));
+                    control.Visible = match;
+                }
+            }
+        }
+
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        {
+            // 检查是否按下Ctrl键
+            bool isCtrlPressed = (keyData & Keys.Control) == Keys.Control;
+
+            // 检查是否按下Alt键
+            bool isAltPressed = (keyData & Keys.Alt) == Keys.Alt;
+
+            // 获取主键（去除修饰键）
+            Keys mainKey = keyData & ~Keys.Control & ~Keys.Alt;
+
+            // 搜索快捷键：Ctrl+F
+            if (isCtrlPressed && mainKey == Keys.F)
+            {
+                searchBox.Focus();
+                return true;
+            }
+
+            // 删除会话快捷键：Delete
+            if (mainKey == Keys.Delete && chatListPanel.Focused)
+            {
+                var selectedItem = chatListPanel.Controls.OfType<ChatSessionItem>()
+                    .FirstOrDefault(item => item.ClientRectangle.Contains(item.PointToClient(Control.MousePosition)));
+                if (selectedItem != null)
+                {
+                    DeleteChatSession(selectedItem.Session);
+                }
+                return true;
+            }
+
+            // 切换会话快捷键：Alt+数字键
+            if (isAltPressed && mainKey >= Keys.D1 && mainKey <= Keys.D9)
+            {
+                int index = (int)mainKey - (int)Keys.D1;
+                var sessions = chatListPanel.Controls.OfType<ChatSessionItem>().ToList();
+                if (index < sessions.Count)
+                {
+                    SwitchToChat(sessions[index].Session);
+                }
+                return true;
+            }
+
+            return base.ProcessCmdKey(ref msg, keyData);
+        }
+
+        private void DeleteChatSession(ChatSession session)
+        {
+            if (session == null) return;
+
+            var result = MessageBox.Show(
+                string.Format("确定要删除会话 \"{0}\" 吗？", session.Title),
+                "删除确认",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question);
+
+            if (result == DialogResult.Yes)
+            {
+                // 从数据库中删除会话
+                _chatHistoryManager.DeleteChat(session.Id);
+
+                // 更新会话列表
+                UpdateChatList();
+
+                // 注释掉引用不存在的变量的代码
+                /*
+                // 如果当前正在显示这个会话，清空聊天区域
+                if (_currentSession?.Id == session.Id)
+                {
+                    _currentSession = null;
+                    chatBox.Clear();
+                }
+                */
+            }
+        }
+
+        /// <summary>
+        /// 处理聊天模型下拉框选择变更事件
+        /// </summary>
+        private void ChatModelComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (chatModelComboBox.SelectedItem != null)
+            {
+                string selectedModel = chatModelComboBox.SelectedItem.ToString();
+                if (!string.IsNullOrEmpty(selectedModel))
+                {
+                    // 解析渠道名称和模型名称
+                    string[] parts = selectedModel.Split(new[] { ':' }, 2);
+                    if (parts.Length == 2)
+                    {
+                        string channelName = parts[0].Trim();
+                        string modelName = parts[1].Trim();
+
+                        // 从渠道管理器中获取对应的渠道
+                        var channel = _channelManager.GetEnabledChannels()
+                            .FirstOrDefault(c => c.Name.Equals(channelName, StringComparison.OrdinalIgnoreCase));
+
+                        if (channel != null)
+                        {
+                            // 如果之前有选择其他渠道，先从活跃列表中移除
+                            if (_currentChannelId != Guid.Empty && _currentChannelId != channel.Id)
+                            {
+                                RemoveActiveChannel(_currentChannelId);
+                            }
+
+                            // 更新当前渠道ID和模型
+                            _currentChannelId = channel.Id;
+                            _currentModelId = selectedModel;
+
+                            // 将新渠道添加到活跃列表
+                            AddActiveChannel(_currentChannelId);
+
+                            // 保存设置
+                            Properties.Settings.Default.LastSelectedModel = _currentModelId;
+                            Properties.Settings.Default.Save();
+
+                            // 更新窗体标题
+                            UpdateTitle();
+                        }
+                    }
+                }
+            }
+        }
+
+        private void streamCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
+    }
+}

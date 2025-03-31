@@ -1,0 +1,44 @@
+# Visual Studio 临时文件
+.vs/
+**/obj/
+**/bin/
+**/*.user
+**/*.suo
+**/*.userosscache
+**/*.sln.docstates
+
+# 构建结果
+[Bb]in/
+[Oo]bj/
+
+# Visual Studio 缓存/选项目录
+.vs/
+# MSTest 测试结果
+[Tt]est[Rr]esult*/
+[Bb]uild[Ll]og.*
+
+# NUNIT
+*.VisualState.xml
+TestResult.xml
+
+# ReSharper
+_ReSharper*/
+*.[Rr]e[Ss]harper
+*.DotSettings.user
+
+# NuGet 程序包
+*.nupkg
+# NuGet 程序包文件夹
+packages/
+
+# 日志文件
+*.log 
+# SpecStory explanation file
+.specstory/.what-is-this.md
+
+# 项目文档
+Docs/
+
+# 工具配置文件夹
+.specstory/
+.cursor/
