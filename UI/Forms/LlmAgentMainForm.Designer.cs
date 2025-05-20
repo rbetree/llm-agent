@@ -424,7 +424,7 @@ namespace llm_agent.UI.Forms
             // 
             chatContainer.Panel2.Controls.Add(inputPanel);
             chatContainer.Size = new System.Drawing.Size(669, 653);
-            chatContainer.SplitterDistance = 388;
+            chatContainer.SplitterDistance = 387;
             chatContainer.SplitterWidth = 5;
             chatContainer.TabIndex = 1;
             // 
@@ -436,7 +436,7 @@ namespace llm_agent.UI.Forms
             chatOutputPanel.Location = new System.Drawing.Point(0, 0);
             chatOutputPanel.Margin = new System.Windows.Forms.Padding(0);
             chatOutputPanel.Name = "chatOutputPanel";
-            chatOutputPanel.Size = new System.Drawing.Size(669, 388);
+            chatOutputPanel.Size = new System.Drawing.Size(669, 387);
             chatOutputPanel.TabIndex = 0;
             // 
             // txtOutput
@@ -449,7 +449,7 @@ namespace llm_agent.UI.Forms
             txtOutput.Name = "txtOutput";
             txtOutput.ReadOnly = true;
             txtOutput.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
-            txtOutput.Size = new System.Drawing.Size(669, 388);
+            txtOutput.Size = new System.Drawing.Size(669, 387);
             txtOutput.TabIndex = 0;
             txtOutput.Text = "";
             // 
@@ -465,7 +465,7 @@ namespace llm_agent.UI.Forms
             inputPanel.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             inputPanel.Name = "inputPanel";
             inputPanel.Padding = new System.Windows.Forms.Padding(3, 0, 3, 0);
-            inputPanel.Size = new System.Drawing.Size(669, 260);
+            inputPanel.Size = new System.Drawing.Size(669, 261);
             inputPanel.TabIndex = 0;
             // 
             // streamCheckBox
@@ -503,7 +503,7 @@ namespace llm_agent.UI.Forms
             btnSend.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             btnSend.Font = new System.Drawing.Font("Microsoft YaHei UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 134);
             btnSend.ForeColor = System.Drawing.Color.White;
-            btnSend.Location = new System.Drawing.Point(576, 220);
+            btnSend.Location = new System.Drawing.Point(576, 221);
             btnSend.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             btnSend.Name = "btnSend";
             btnSend.Size = new System.Drawing.Size(90, 36);

@@ -74,6 +74,25 @@ namespace llm_agent.BLL
         }
         
         /// <summary>
+        /// 获取渠道支持的模型列表（同步版本）
+        /// </summary>
+        /// <param name="channel">渠道信息</param>
+        /// <returns>模型列表</returns>
+        public List<string> GetChannelModels(Channel channel)
+        {
+            try
+            {
+                return GetChannelModelsAsync(channel);
+            }
+            catch (Exception ex)
+            {
+                // 记录错误但返回空列表，避免中断UI操作
+                Console.WriteLine($"获取渠道模型失败: {ex.Message}");
+                return new List<string>();
+            }
+        }
+        
+        /// <summary>
         /// 测试渠道连接
         /// </summary>
         /// <param name="channel">渠道信息</param>

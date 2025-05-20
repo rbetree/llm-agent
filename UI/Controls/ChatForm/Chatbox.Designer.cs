@@ -30,6 +30,8 @@
 		{
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Chatbox));
 			this.topPanel = new System.Windows.Forms.Panel();
+			this.streamCheckBox = new System.Windows.Forms.CheckBox();
+			this.modelComboBox = new System.Windows.Forms.ComboBox();
 			this.statusLabel = new System.Windows.Forms.Label();
 			this.phoneLabel = new System.Windows.Forms.Label();
 			this.clientnameLabel = new System.Windows.Forms.Label();
@@ -46,6 +48,8 @@
 			// topPanel
 			// 
 			this.topPanel.BackColor = System.Drawing.Color.RoyalBlue;
+			this.topPanel.Controls.Add(this.streamCheckBox);
+			this.topPanel.Controls.Add(this.modelComboBox);
 			this.topPanel.Controls.Add(this.statusLabel);
 			this.topPanel.Controls.Add(this.phoneLabel);
 			this.topPanel.Controls.Add(this.clientnameLabel);
@@ -58,6 +62,31 @@
 			this.topPanel.Size = new System.Drawing.Size(479, 89);
 			this.topPanel.TabIndex = 0;
 			this.topPanel.Paint += new System.Windows.Forms.PaintEventHandler(this.topPanel_Paint);
+			// 
+			// streamCheckBox
+			// 
+			this.streamCheckBox.AutoSize = true;
+			this.streamCheckBox.Checked = true;
+			this.streamCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
+			this.streamCheckBox.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+			this.streamCheckBox.Location = new System.Drawing.Point(280, 17);
+			this.streamCheckBox.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+			this.streamCheckBox.Name = "streamCheckBox";
+			this.streamCheckBox.Size = new System.Drawing.Size(97, 19);
+			this.streamCheckBox.TabIndex = 4;
+			this.streamCheckBox.Text = "流式响应";
+			this.streamCheckBox.UseVisualStyleBackColor = true;
+			// 
+			// modelComboBox
+			// 
+			this.modelComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.modelComboBox.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+			this.modelComboBox.FormattingEnabled = true;
+			this.modelComboBox.Location = new System.Drawing.Point(280, 51);
+			this.modelComboBox.Margin = new System.Windows.Forms.Padding(0);
+			this.modelComboBox.Name = "modelComboBox";
+			this.modelComboBox.Size = new System.Drawing.Size(180, 23);
+			this.modelComboBox.TabIndex = 3;
 			// 
 			// statusLabel
 			// 
@@ -212,5 +241,7 @@
 		private System.Windows.Forms.Button removeButton;
 		private System.Windows.Forms.TextBox chatTextbox;
 		private System.Windows.Forms.Panel itemsPanel;
+		private System.Windows.Forms.CheckBox streamCheckBox;
+		private System.Windows.Forms.ComboBox modelComboBox;
 	}
 }

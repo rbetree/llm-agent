@@ -20,6 +20,7 @@ using llm_agent.Properties;
 using llm_agent.DAL;
 using llm_agent.UI.Controls;
 using llm_agent.Common.Utils;
+using llm_agent.UI.Controls.ChatForm; // 添加对ChatForm命名空间的引用
 
 namespace llm_agent.UI.Forms
 {
@@ -72,6 +73,7 @@ namespace llm_agent.UI.Forms
         protected FlowLayoutPanel chatListPanel;
         protected TextBox searchBox;
         private Panel searchPanel;
+        private Chatbox chatboxControl; // 新集成的现代化聊天控件
 
         public LlmAgentMainForm()
         {
@@ -119,6 +121,56 @@ namespace llm_agent.UI.Forms
         private void InitializeChannelService()
         {
             _channelService = new ChannelService(_httpClient);
+        }
+
+        /// <summary>
+        /// 初始化Chatbox信息对象，配置正确的用户名和样式
+        /// </summary>
+        /// <returns>配置好的ChatboxInfo对象</returns>
+        private ChatboxInfo InitializeChatboxInfo()
+        {
+            return new ChatboxInfo
+            {
+                User = "用户", // 或从配置获取用户名
+                NamePlaceholder = "LLM助手", // 聊天对象名称
+                StatusPlaceholder = "在线", // 聊天对象状态
+                PhonePlaceholder = _currentModelId, // 显示当前使用的模型
+                ChatPlaceholder = "请输入消息..." // 输入框占位文本
+            };
+        }
+
+        /// <summary>
+        /// 为空会话配置Chatbox，提供良好的空会话体验
+        /// </summary>
+        /// <param name="chatbox">要配置的Chatbox控件</param>
+        private void InitializeChatboxForEmptySession(Chatbox chatbox)
+        {
+            if (chatbox == null) return;
+            
+            // 创建系统欢迎消息
+            var welcomeMessage = new TextChatModel
+            {
+                Author = "系统",
+                Body = "欢迎使用LLM助手！您可以在这里开始一段新的对话。",
+                Inbound = true,
+                Read = true,
+                Time = DateTime.Now
+            };
+            
+            // 添加欢迎消息到聊天界面
+            chatbox.AddMessage(welcomeMessage);
+            
+            // 添加使用指南
+            var guideMessage = new TextChatModel
+            {
+                Author = "系统",
+                Body = "您可以:\n- 输入问题并按Enter发送\n- 使用Shift+Enter发送消息\n- 勾选流式响应选项启用实时回复",
+                Inbound = true,
+                Read = true,
+                Time = DateTime.Now
+            };
+            
+            chatbox.AddMessage(guideMessage);
         }
 
         private void LoadSettings()
@@ -278,7 +330,7 @@ namespace llm_agent.UI.Forms
             // 上传按钮事件
             if (btnUpload != null)
             {
-                btnUpload.Click += (s, e) => MessageBox.Show("文件上传功能待实现", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                btnUpload.Click += (s, e) => UploadAttachment();
             }
 
             // 导航按钮事件
@@ -552,7 +604,18 @@ namespace llm_agent.UI.Forms
 
                 // 显示欢迎消息
                 string welcomeMessage = $"欢迎使用LLM Agent！\n当前使用的模型：{GetCurrentModelName()}";
-                AppendFormattedMessage(new ChatMessage { Role = ChatRole.System, Content = welcomeMessage }, txtOutput, true);
+                // 使用 chatboxControl 显示欢迎消息
+                if (chatboxControl == null)
+                {
+                    InitializeChatbox();
+                }
+                var systemMessage = new ChatMessage
+                {
+                    Role = ChatRole.System,
+                    Content = welcomeMessage,
+                    Timestamp = DateTime.Now
+                };
+                chatboxControl.AddMessage(ChatModelAdapter.ToTextChatModel(systemMessage));
             }
             catch (Exception ex)
             {
@@ -677,36 +740,28 @@ namespace llm_agent.UI.Forms
 
         private void DisplayChatInterface()
         {
-            // 获取正确的RichTextBox控件
-            RichTextBox txtOutput = chatOutputPanel.Controls["txtOutput"] as RichTextBox;
-            if (txtOutput == null)
-                return;
-
-            // 清空聊天记录显示区域
-            txtOutput.Clear();
+            // 初始化Chatbox控件
+            InitializeChatbox();
 
             // 获取当前会话
             var currentSession = _chatHistoryManager.GetCurrentSession();
             if (currentSession == null)
             {
                 // 显示空界面提示
-                txtOutput.AppendText("欢迎使用LLM Agent！点击左侧的「+ 新对话」按钮开始聊天。");
+                InitializeChatboxForEmptySession(chatboxControl);
                 return;
             }
 
             if (currentSession.Messages.Count == 0)
                 return;
 
-            // 显示当前会话的所有消息
-            foreach (var message in currentSession.Messages)
-            {
-                AppendFormattedMessage(message, txtOutput, message.Role == ChatRole.System);
-            }
-
-            // 使光标定位到输入框
-            TextBox txtInput = inputPanel.Controls["txtInput"] as TextBox;
-            if (txtInput != null)
-                txtInput.Focus();
+            // 使用Chatbox显示当前会话的所有消息
+            RefreshChatMessages(chatboxControl, currentSession.Messages);
+            
+            // 将焦点设置到Chatbox的输入框
+            var chatTextbox = chatboxControl.Controls.Find("chatTextbox", true).FirstOrDefault() as TextBox;
+            if (chatTextbox != null)
+                chatTextbox.Focus();
         }
 
         private void CreateNewChat()
@@ -716,13 +771,8 @@ namespace llm_agent.UI.Forms
             if (session == null)
                 return;
 
-            // 获取正确的RichTextBox控件
-            RichTextBox txtOutput = chatOutputPanel.Controls["txtOutput"] as RichTextBox;
-            if (txtOutput == null)
-                return;
-
-            // 清空消息输出区域
-            txtOutput.Clear();
+            // 初始化Chatbox控件
+            InitializeChatbox();
 
             // 添加系统欢迎消息
             string welcomeMessage = "欢迎使用AI助手，我可以帮助您回答问题、提供信息或与您聊天。请告诉我您需要什么帮助？";
@@ -736,8 +786,8 @@ namespace llm_agent.UI.Forms
             // 添加消息到会话并保存
             _chatHistoryManager.AddMessageToSession(session, systemMessage);
 
-            // 显示消息
-            AppendFormattedMessage(systemMessage, txtOutput, true);
+            // 使用Chatbox显示消息
+            chatboxControl.AddMessage(ChatModelAdapter.ToTextChatModel(systemMessage));
 
             // 重新初始化聊天列表
             UpdateChatList();
@@ -749,101 +799,6 @@ namespace llm_agent.UI.Forms
             TextBox txtInput = inputPanel.Controls["txtInput"] as TextBox;
             if (txtInput != null)
                 txtInput.Focus();
-        }
-
-        // 格式化消息并显示在聊天窗口中
-        private void AppendFormattedMessage(ChatMessage message, RichTextBox txtOutput, bool isSystem = false)
-        {
-            // 获取当前窗口视图最底部的位置
-            int oldVisible = txtOutput.GetPositionFromCharIndex(txtOutput.TextLength).Y;
-            bool isAtBottom = (txtOutput.Height - oldVisible < 20) || txtOutput.TextLength == 0;
-
-            int startPosition = txtOutput.TextLength;
-
-            // 添加当前时间
-            string timestamp = message.Timestamp.ToString("HH:mm:ss");
-            txtOutput.AppendText($"[{timestamp}] ");
-
-            // 设置头部样式
-            txtOutput.SelectionStart = startPosition;
-            txtOutput.SelectionLength = timestamp.Length + 3;
-            txtOutput.SelectionColor = Color.Gray;
-            txtOutput.SelectionFont = new Font(txtOutput.Font, FontStyle.Regular);
-
-            // 插入角色头像和名称
-            string roleIcon, roleName;
-            Color msgColor;
-
-            int roleStart = txtOutput.TextLength;
-
-            if (message.Role == ChatRole.User)
-            {
-                roleIcon = "👤 ";
-                roleName = "You";
-                msgColor = Color.FromArgb(0, 120, 212);
-            }
-            else if (isSystem)
-            {
-                roleIcon = "🤖 ";
-                roleName = "System";
-                msgColor = Color.FromArgb(80, 80, 80);
-            }
-            else
-            {
-                roleIcon = "🤖 ";
-                roleName = GetCurrentModelName();
-                msgColor = Color.FromArgb(80, 80, 80);
-            }
-
-            txtOutput.AppendText($"{roleIcon}{roleName}: ");
-
-            // 设置角色名称样式
-            txtOutput.SelectionStart = roleStart;
-            txtOutput.SelectionLength = (roleIcon + roleName + ": ").Length;
-            txtOutput.SelectionColor = msgColor;
-            txtOutput.SelectionFont = new Font(txtOutput.Font, FontStyle.Bold);
-
-            // 添加换行
-            txtOutput.AppendText(Environment.NewLine);
-
-            // 添加消息内容
-            int contentStart = txtOutput.TextLength;
-
-            // 移除缩进设置
-            txtOutput.SelectionStart = contentStart;
-            txtOutput.SelectionLength = 0;
-            
-            // 添加内容
-            string content = message.Content;
-            
-            // 检查是否启用Markdown格式并且内容包含Markdown语法
-            if (_enableMarkdown && !isSystem && MarkdownToRichTextConverter.ContainsMarkdown(content))
-            {
-                // 使用Markdown渲染器
-                var markdownConverter = new MarkdownToRichTextConverter(txtOutput);
-                markdownConverter.RenderMarkdown(content, contentStart);
-                
-                // 添加额外的换行
-                txtOutput.AppendText(Environment.NewLine);
-            }
-            else
-            {
-                // 使用普通文本格式
-                txtOutput.AppendText($"{content}{Environment.NewLine}{Environment.NewLine}");
-                
-                // 设置内容样式 - 保留文本颜色
-                txtOutput.SelectionStart = contentStart;
-                txtOutput.SelectionLength = content.Length;
-                txtOutput.SelectionColor = Color.Black; // 统一使用黑色文本
-                txtOutput.SelectionFont = new Font(txtOutput.Font, FontStyle.Regular);
-            }
-
-            // 如果原来是在底部，滚动到底部
-            if (isAtBottom)
-            {
-                txtOutput.SelectionStart = txtOutput.TextLength;
-                txtOutput.ScrollToCaret();
-            }
         }
 
         private void ProviderChanged(object sender, EventArgs e)
@@ -1105,255 +1060,180 @@ namespace llm_agent.UI.Forms
         // 发送消息并接收回复
         private async Task SendMessage()
         {
+            // 防止重复处理或并发请求
+            if (_isProcessingMessage)
+                return;
+
+            // 获取Chatbox的输入框控件
+            var chatTextbox = chatboxControl.Controls.Find("chatTextbox", true).FirstOrDefault() as TextBox;
+            if (chatTextbox == null)
+                return;
+
+            // 获取用户输入消息，必须和占位符文本不同
+            string messageText = chatTextbox.Text.Trim();
+            if (string.IsNullOrEmpty(messageText) || messageText == chatboxControl.chatbox_info.ChatPlaceholder)
+                return;
+
+            _isProcessingMessage = true;
+
             try
             {
-                if (_isProcessingMessage)
-                    return;
+                // 清空输入框（使用新添加的方法避免双重清除）
+                chatboxControl.ClearInputText();
 
-                _isProcessingMessage = true;
+                // 确保活跃会话
+                var session = _chatHistoryManager.GetCurrentSession();
+                if (session == null)
+                {
+                    session = _chatHistoryManager.CreateNewSession();
+                }
 
-                // 获取输入框与输出框
-                TextBox txtInput = inputPanel.Controls["txtInput"] as TextBox;
-                RichTextBox txtOutput = chatOutputPanel.Controls["txtOutput"] as RichTextBox;
-
-                if (txtInput == null || txtOutput == null)
-                    return;
-
-                string userInput = txtInput.Text.Trim();
-                if (string.IsNullOrEmpty(userInput))
-                    return;
-
-                // 清空输入框
-                txtInput.Text = string.Empty;
-
-                // 创建并添加用户消息
+                // 创建用户消息
                 var userMessage = new ChatMessage
                 {
                     Role = ChatRole.User,
-                    Content = userInput
+                    Content = messageText,
+                    Timestamp = DateTime.Now
                 };
 
-                // 添加到界面
-                AppendFormattedMessage(userMessage, txtOutput);
+                // 保存用户消息到会话
+                _chatHistoryManager.AddMessageToSession(session, userMessage);
+                
+                // 使用Chatbox显示用户消息
+                chatboxControl.AddMessage(ChatModelAdapter.ToTextChatModel(userMessage));
 
-                // 获取当前会话消息列表
-                var currentSession = _chatHistoryManager.GetCurrentSession();
-                if (currentSession == null)
+                // 创建一个占位的助手响应消息
+                var waitingMessage = new ChatMessage
                 {
-                    MessageBox.Show("无法获取当前会话信息", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    _isProcessingMessage = false;
-                    return;
-                }
+                    Role = ChatRole.Assistant,
+                    Content = "思考中...",
+                    Timestamp = DateTime.Now
+                };
 
-                // 添加到会话并保存
-                _chatHistoryManager.AddMessageToSession(currentSession, userMessage);
+                // 保存占位消息到会话
+                _chatHistoryManager.AddMessageToSession(session, waitingMessage);
+                
+                // 使用Chatbox显示占位消息
+                chatboxControl.AddMessage(ChatModelAdapter.ToTextChatModel(waitingMessage));
 
-                // 获取所有消息（包括系统提示）
-                var messages = new List<ChatMessage>();
+                // 准备发送给LLM的消息列表
+                var messages = session.Messages
+                    .Where(m => m.Role != ChatRole.System || m == session.Messages.FirstOrDefault())
+                    .ToList();
 
-                // 添加系统提示消息（如果有）
-                if (!string.IsNullOrEmpty(_systemPrompt))
+                try
                 {
-                    messages.Add(new ChatMessage
+                    // 开始API请求
+                    string apiKey = GetApiKey();
+                    string apiHost = GetApiHost();
+                    string modelId = string.Empty;
+                    
+                    // 从_currentModelId中提取真正的模型名称
+                    // _currentModelId的格式为"渠道名: 模型名"
+                    if (!string.IsNullOrEmpty(_currentModelId) && _currentModelId.Contains(":"))
                     {
-                        Role = ChatRole.System,
-                        Content = _systemPrompt
-                    });
-                }
-
-                // 添加所有会话消息
-                messages.AddRange(currentSession.Messages);
-
-                // 使用chatModelComboBox中选择的模型
-                string modelId = _currentModelId;
-                ProviderType providerType = _currentProviderType;
-                Channel selectedChannel = null;
-
-                if (chatModelComboBox.SelectedItem != null)
-                {
-                    string selectedModel = chatModelComboBox.SelectedItem.ToString();
-                    if (!string.IsNullOrEmpty(selectedModel))
-                    {
-                        // 解析渠道名称和模型名称
-                        string[] parts = selectedModel.Split(new[] { ':' }, 2);
+                        string[] parts = _currentModelId.Split(new[] { ':' }, 2);
                         if (parts.Length == 2)
                         {
-                            string channelName = parts[0].Trim();
-                            modelId = parts[1].Trim();
-
-                            // 从渠道管理器中获取对应的渠道
-                            var channel = _channelManager.GetEnabledChannels()
-                                .FirstOrDefault(c => c.Name.Equals(channelName, StringComparison.OrdinalIgnoreCase));
-
-                            if (channel != null)
+                            modelId = parts[1].Trim(); // 提取模型名称部分
+                        }
+                    }
+                    
+                    // 获取提供商实例
+                    var provider = _providerFactory.GetProvider(_currentProviderType);
+                    if (provider == null)
+                    {
+                        throw new InvalidOperationException($"无法创建提供商实例: {_currentProviderType}");
+                    }
+                    
+                    // 处理特定渠道模型
+                    if (_currentChannelId != Guid.Empty)
+                    {
+                        var channel = _channelManager.GetChannelById(_currentChannelId);
+                        if (channel != null && channel.ProviderType == _currentProviderType)
+                        {
+                            // 使用渠道的配置
+                            apiKey = channel.ApiKey;
+                            apiHost = channel.ApiHost;
+                            
+                            // 如果未能从_currentModelId提取模型名称，使用第一个可用模型作为备选
+                            if (string.IsNullOrEmpty(modelId))
                             {
-                                providerType = channel.ProviderType;
-                                selectedChannel = channel;
+                                var channelModels = _channelService.GetChannelModels(channel);
+                                if (channelModels.Count > 0)
+                                {
+                                    modelId = channelModels[0]; // 使用第一个可用模型
+                                }
                             }
                         }
                     }
-                }
 
-                // 如果有选择的渠道，优先使用渠道进行发送
-                if (selectedChannel != null)
-                {
-                    // API调用添加占位文本
-                    var placeholderText = "正在生成响应...";
-                    txtOutput.AppendText(Environment.NewLine);
-                    txtOutput.AppendText(Environment.NewLine + placeholderText);
+                    // 配置提供商
+                    provider.UpdateApiKey(apiKey);
+                    provider.UpdateApiHost(apiHost);
 
-                    // 滚动到底部
-                    txtOutput.ScrollToCaret();
+                    // 更新占位消息的ID（用于后续标识）
+                    waitingMessage.Id = Guid.NewGuid().ToString();
 
-                    string responseText;
-                    ChatMessage finalAiMessage;
-
-                    try
+                    // 如果是流式响应
+                    if (_useStreamResponse)
                     {
-                        // 根据设置决定是否使用流式响应
-                        if (_useStreamResponse)
+                        // 初始化响应内容
+                        StringBuilder responseContent = new StringBuilder();
+
+                        // 处理流式响应
+                        await foreach (var content in provider.StreamChatAsync(messages, modelId))
                         {
-                            // 移除占位符文本，使用选择和替换方式
-                            int placeholderStart = txtOutput.Text.LastIndexOf(placeholderText);
-                            if (placeholderStart >= 0)
-                            {
-                                txtOutput.SelectionStart = placeholderStart;
-                                txtOutput.SelectionLength = placeholderText.Length;
-                                txtOutput.SelectedText = "";
-                            }
+                            responseContent.Append(content);
+                            waitingMessage.Content = responseContent.ToString();
 
-                            // 创建AI回复消息（用于流式更新）
-                            var aiMessage = new ChatMessage
-                            {
-                                Role = ChatRole.Assistant,
-                                Content = ""
-                            };
-
-                            // 显示初始空消息
-                            AppendFormattedMessage(aiMessage, txtOutput);
-
-                            // 获取ai消息的起始位置
-                            int aiContentStart = txtOutput.TextLength - 2; // 减去两个换行符
-
-                            StringBuilder sb = new StringBuilder();
-
-                            // 从消息列表中获取用户消息文本
-                            string userMessageText = messages.LastOrDefault(m => m.Role == ChatRole.User)?.Content ?? userInput;
-
-                            // 使用渠道服务发送流式消息
-                            await _channelService.SendStreamMessageAsync(
-                                selectedChannel,
-                                modelId,
-                                messages,
-                                (chunk) =>
-                                {
-                                    // 添加到临时响应文本，用于记录完整的响应内容
-                                    sb.Append(chunk);
-
-                                    // 更新UI - 只添加新接收的chunk，而不是显示整个累积内容
-                                    if (_enableMarkdown && MarkdownToRichTextConverter.ContainsMarkdown(chunk))
-                                    {
-                                        // 对于Markdown内容，目前仍需整体渲染
-                                        // 删除当前AI响应内容
-                                        txtOutput.SelectionStart = aiContentStart;
-                                        txtOutput.SelectionLength = txtOutput.TextLength - aiContentStart;
-                                        txtOutput.SelectedText = "";
-                                        
-                                        // 使用Markdown渲染器添加完整内容
-                                        var markdownConverter = new MarkdownToRichTextConverter(txtOutput);
-                                        markdownConverter.RenderMarkdown(sb.ToString(), aiContentStart);
-                                    }
-                                    else
-                                    {
-                                        // 对于普通文本，直接在末尾追加新chunk
-                                        txtOutput.SelectionStart = txtOutput.TextLength;
-                                        txtOutput.SelectionLength = 0;
-                                        txtOutput.SelectedText = chunk;
-                                    }
-
-                                    // 滚动到底部
-                                    txtOutput.SelectionStart = txtOutput.TextLength;
-                                    txtOutput.ScrollToCaret();
-                                });
-
-                            // 获取完整响应文本，用于保存到聊天历史
-                            responseText = sb.ToString();
-
-                            // 完善AI回复消息
-                            aiMessage.Content = responseText;
-                            
-                            // 添加额外的换行符，保持消息格式一致
-                            txtOutput.AppendText(Environment.NewLine + Environment.NewLine);
-
-                            // 创建最终的AI响应消息用于保存
-                            finalAiMessage = aiMessage;
-                        }
-                        else
-                        {
-                            // 从消息列表中获取用户消息文本
-                            string userMessageText = messages.LastOrDefault(m => m.Role == ChatRole.User)?.Content ?? userInput;
-
-                            // 使用普通响应
-                            responseText = await _channelService.SendMessageAsync(selectedChannel, modelId, messages);
-
-                            // 移除占位符文本，使用选择和替换方式
-                            int placeholderStart = txtOutput.Text.LastIndexOf(placeholderText);
-                            if (placeholderStart >= 0)
-                            {
-                                txtOutput.SelectionStart = placeholderStart;
-                                txtOutput.SelectionLength = placeholderText.Length;
-                                txtOutput.SelectedText = "";
-                            }
-
-                            // 创建并添加AI回复消息
-                            var aiMessage = new ChatMessage
-                            {
-                                Role = ChatRole.Assistant,
-                                Content = responseText
-                            };
-
-                            // 添加到界面
-                            AppendFormattedMessage(aiMessage, txtOutput);
-
-                            // 创建最终的AI响应消息用于保存
-                            finalAiMessage = aiMessage;
+                            // 更新UI上的响应内容
+                            UpdateLastAssistantMessageContent(chatboxControl, responseContent.ToString());
                         }
 
-                        // 添加到会话并保存
-                        _chatHistoryManager.AddMessageToSession(currentSession, finalAiMessage);
+                        // 更新会话中的消息内容
+                        waitingMessage.UpdatedAt = DateTime.Now;
+                        // 重新添加消息（因为没有UpdateMessage方法）
+                        _chatHistoryManager.SaveSession(session);
+                    }
+                    else
+                    {
+                        // 发送非流式请求
+                        string response = await provider.ChatAsync(messages, modelId);
 
-                        // 更新会话标题
-                        var titleText = string.IsNullOrEmpty(currentSession.Title) ? TruncateText(userInput, 20) : currentSession.Title;
-                        _chatHistoryManager.UpdateSessionTitle(currentSession, titleText);
+                        // 获取响应结果
+                        waitingMessage.Content = response;
+                        waitingMessage.UpdatedAt = DateTime.Now;
 
-                        // 刷新会话列表
+                        // 更新UI显示和会话记录
+                        UpdateLastAssistantMessageContent(chatboxControl, response);
+                        // 保存更新后的会话
+                        _chatHistoryManager.SaveSession(session);
+                    }
+
+                    // 更新会话标题（如果第一个消息）
+                    if (session.Messages.Count <= 3)
+                    {
+                        // 使用用户消息的前20个字符作为会话标题
+                        _chatHistoryManager.UpdateSessionTitle(session, TruncateText(userMessage.Content, 20));
                         UpdateChatList();
                     }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show($"使用渠道发送消息时出错: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
                 }
-                else // 没有选择渠道的情况
+                catch (Exception ex)
                 {
-                    // 显示错误信息并退出
-                    var errorMessage = "未选择有效的渠道和模型，无法发送消息。请在聊天页面的模型选择框中选择一个有效的渠道模型。";
-                    MessageBox.Show(errorMessage, "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
-
-                    // 创建并添加系统消息提示用户
-                    var systemMessage = new ChatMessage
-                    {
-                        Role = ChatRole.System,
-                        Content = errorMessage
-                    };
-
-                    // 添加到界面
-                    AppendFormattedMessage(systemMessage, txtOutput, true);
+                    // 处理API请求错误
+                    string errorContent = $"请求出错：{ex.Message}";
+                    
+                    // 使用错误消息替换"思考中..."
+                    waitingMessage.Content = errorContent;
+                    waitingMessage.UpdatedAt = DateTime.Now;
+                    
+                    // 更新UI上的错误消息
+                    UpdateLastAssistantMessageContent(chatboxControl, errorContent);
+                    
+                    // 保存更新后的会话
+                    _chatHistoryManager.SaveSession(session);
                 }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"发送消息时出错: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
             {
@@ -1378,12 +1258,8 @@ namespace llm_agent.UI.Forms
             else
             {
                 // 如果没有会话，显示空界面提示
-                RichTextBox txtOutput = chatOutputPanel.Controls["txtOutput"] as RichTextBox;
-                if (txtOutput != null)
-                {
-                    txtOutput.Clear();
-                    txtOutput.AppendText("欢迎使用LLM Agent！点击左侧的「+ 新对话」按钮开始聊天。");
-                }
+                InitializeChatbox();
+                InitializeChatboxForEmptySession(chatboxControl);
             }
 
             // 默认切换到聊天页面
@@ -1414,13 +1290,14 @@ namespace llm_agent.UI.Forms
             // 发送消息 - Ctrl+Enter
             if (e.Control && e.KeyCode == Keys.Enter)
             {
-                TextBox txtInput = inputPanel.Controls["txtInput"] as TextBox;
-                if (txtInput != null && txtInput.Focused)
+                // 查找Chatbox的输入框控件
+                var chatTextbox = chatboxControl?.Controls.Find("chatTextbox", true)?.FirstOrDefault() as TextBox;
+                if (chatTextbox != null && chatTextbox.Focused)
                 {
                     e.SuppressKeyPress = true;  // 阻止默认回车换行行为
-                    Button btnSend = inputPanel.Controls["btnSend"] as Button;
-                    if (btnSend != null)
-                        btnSend.PerformClick();
+                    
+                    // 触发发送消息
+                    _ = SendMessage();
                 }
             }
 
@@ -1465,9 +1342,13 @@ namespace llm_agent.UI.Forms
             if (e.Control && e.KeyCode == Keys.L)
             {
                 e.SuppressKeyPress = true;
-                RichTextBox txtOutput = chatOutputPanel.Controls["txtOutput"] as RichTextBox;
-                if (txtOutput != null)
-                    txtOutput.Clear();
+                if (chatboxControl != null)
+                {
+                    // 清空 chatboxControl 的消息
+                    chatboxControl.ClearMessages();
+                    // 显示欢迎界面
+                    InitializeChatboxForEmptySession(chatboxControl);
+                }
             }
         }
 
@@ -2759,6 +2640,8 @@ namespace llm_agent.UI.Forms
                             // 更新当前渠道ID和模型
                             _currentChannelId = channel.Id;
                             _currentModelId = selectedModel;
+                            // 更新当前提供商类型，确保API调用使用正确的提供商
+                            _currentProviderType = channel.ProviderType;
 
                             // 将新渠道添加到活跃列表
                             AddActiveChannel(_currentChannelId);
@@ -2777,7 +2660,380 @@ namespace llm_agent.UI.Forms
 
         private void streamCheckBox_CheckedChanged(object sender, EventArgs e)
         {
+            // 更新流式响应设置
+            _useStreamResponse = streamCheckBox.Checked;
+            
+            // 同步到Chatbox控件
+            if (chatboxControl != null)
+            {
+                chatboxControl.SetStreamResponse(_useStreamResponse);
+            }
+            
+            // 保存设置
+            Properties.Settings.Default.EnableStreamResponse = _useStreamResponse;
+            Properties.Settings.Default.Save();
+        }
 
+        /// <summary>
+        /// 刷新聊天消息，将ChatMessage集合加载到Chatbox控件中显示
+        /// </summary>
+        /// <param name="chatbox">目标Chatbox控件</param>
+        /// <param name="messages">要显示的消息集合</param>
+        private void RefreshChatMessages(Chatbox chatbox, IEnumerable<ChatMessage> messages)
+        {
+            if (chatbox == null || messages == null)
+                return;
+
+            // 清空现有消息
+            chatbox.ClearMessages();
+            
+            // 没有消息的情况，显示欢迎界面
+            if (!messages.Any())
+            {
+                InitializeChatboxForEmptySession(chatbox);
+                return;
+            }
+            
+            // 转换并添加所有消息
+            foreach (var message in messages)
+            {
+                // 使用适配器将ChatMessage转换为TextChatModel
+                var chatModel = ChatModelAdapter.ToTextChatModel(message);
+                if (chatModel != null)
+                {
+                    chatbox.AddMessage(chatModel);
+                }
+            }
+            
+            // 确保滚动到最新消息
+            if (chatbox.GetMessageCount() > 0)
+            {
+                var lastMessage = chatbox.GetMessageAt(0);
+                chatbox.ScrollToMessage(lastMessage);
+            }
+        }
+        
+        /// <summary>
+        /// 查找并刷新最后一条助手消息
+        /// </summary>
+        /// <param name="chatbox">目标Chatbox控件</param>
+        /// <returns>找到的最后一条助手消息对应的ChatItem控件，如果没有找到则返回null</returns>
+        private ChatItem RefreshLastAssistantMessage(Chatbox chatbox)
+        {
+            if (chatbox == null || chatbox.GetMessageCount() == 0)
+                return null;
+                
+            // 寻找最后一条助手消息
+            // 注意：控件是按照添加顺序倒序排列的，所以最新的消息在顶部
+            for (int i = 0; i < chatbox.GetMessageCount(); i++)
+            {
+                var chatItem = chatbox.GetMessageAt(i);
+                if (chatItem != null)
+                {
+                    // 检查是否是助手消息（TextChatModel且Author为助手）
+                    if (chatItem.Message is TextChatModel textModel && 
+                        textModel.Inbound && 
+                        textModel.Author == "助手")
+                    {
+                        // 找到最后一条助手消息，滚动到该消息
+                        chatbox.ScrollToMessage(chatItem);
+                        return chatItem;
+                    }
+                }
+            }
+            
+            // 未找到助手消息
+            return null;
+        }
+        
+        /// <summary>
+        /// 更新最后一条助手消息的内容
+        /// </summary>
+        /// <param name="chatbox">目标Chatbox控件</param>
+        /// <param name="content">新的消息内容</param>
+        /// <returns>是否成功更新</returns>
+        private bool UpdateLastAssistantMessageContent(Chatbox chatbox, string content)
+        {
+            // 查找最后一条助手消息
+            ChatItem lastAssistantItem = RefreshLastAssistantMessage(chatbox);
+            if (lastAssistantItem == null)
+                return false;
+                
+            // 更新消息内容
+            if (lastAssistantItem.Message is TextChatModel textModel)
+            {
+                // 使用Chatbox的UpdateLastMessage方法更新内容
+                return chatbox.UpdateLastMessage("助手", content);
+            }
+            
+            return false;
+        }
+
+        /// <summary>
+        /// 初始化聊天面板现代化控件
+        /// </summary>
+        private void InitializeChatbox()
+        {
+            // 如果已经初始化，则不再重复初始化
+            if (chatboxControl != null && chatContainer.Panel1.Controls.Contains(chatboxControl))
+                return;
+
+            // 移除chatContainer中Panel1和Panel2的所有控件
+            chatContainer.Panel1.Controls.Clear();
+            chatContainer.Panel2.Controls.Clear();
+
+            // 使chatContainer变为普通的Panel（隐藏分割线）
+            chatContainer.Panel2Collapsed = true;
+            
+            // 创建 ChatboxInfo 对象配置 Chatbox
+            var chatboxInfo = new ChatboxInfo
+            {
+                User = "用户", // 用户名称
+                NamePlaceholder = "用户", // 顶部显示的名称
+                StatusPlaceholder = "在线", // 状态文本
+                PhonePlaceholder = "LLM Agent", // 显示的标识符
+                ChatPlaceholder = "在此输入消息..." // 输入框占位符文本
+            };
+
+            // 创建并配置 Chatbox 控件
+            chatboxControl = new Chatbox(chatboxInfo);
+            chatboxControl.Dock = DockStyle.Fill;
+            chatboxControl.Name = "chatboxControl";
+            
+            // 设置流式响应状态
+            chatboxControl.SetStreamResponse(_useStreamResponse);
+            
+            // 注册流式响应事件
+            chatboxControl.StreamResponseToggled += (s, e) => {
+                _useStreamResponse = chatboxControl.UseStreamResponse;
+                // 保存设置
+                Properties.Settings.Default.EnableStreamResponse = _useStreamResponse;
+                Properties.Settings.Default.Save();
+            };
+            
+            // 注册模型选择事件
+            chatboxControl.ModelSelectionChanged += (s, e) => {
+                string selectedModel = chatboxControl.GetSelectedModel();
+                if (!string.IsNullOrEmpty(selectedModel))
+                {
+                    // 直接处理模型选择逻辑
+                    HandleModelSelection(selectedModel);
+                }
+            };
+            
+            // 重新配置附件上传功能
+            // 移除原有的BuildAttachment事件处理
+            var attachButton = chatboxControl.Controls.Find("attachButton", true).FirstOrDefault() as Button;
+            if (attachButton != null)
+            {
+                // 清除原有的事件处理
+                attachButton.Click -= new EventHandler(chatboxControl.BuildAttachment);
+                
+                // 添加新的事件处理
+                attachButton.Click += (s, e) => {
+                    // 调用文件上传功能
+                    UploadAttachment();
+                };
+            }
+            
+            // 配置发送消息按钮
+            var sendButton = chatboxControl.Controls.Find("sendButton", true).FirstOrDefault() as Button;
+            if (sendButton != null)
+            {
+                // 直接添加新的发送事件处理，不移除原有事件
+                sendButton.Click += async (s, e) => {
+                    await SendMessage();
+                };
+            }
+            
+            // 配置输入框的按键事件（Shift+Enter发送）
+            var chatTextbox = chatboxControl.Controls.Find("chatTextbox", true).FirstOrDefault() as TextBox;
+            if (chatTextbox != null)
+            {
+                chatTextbox.KeyDown += async (s, e) => {
+                    if (e.Shift && e.KeyCode == Keys.Enter)
+                    {
+                        e.SuppressKeyPress = true; // 阻止Enter键的默认行为
+                        await SendMessage();
+                    }
+                };
+            }
+
+            // 将 Chatbox 添加到chatContainer的Panel1（主要面板）
+            chatContainer.Panel1.Controls.Add(chatboxControl);
+            
+            // 初始化模型列表
+            UpdateChatboxModelList();
+        }
+        
+        /// <summary>
+        /// 处理文件上传功能
+        /// </summary>
+        private void UploadAttachment()
+        {
+            try
+            {
+                // 创建文件选择对话框
+                using (OpenFileDialog openFileDialog = new OpenFileDialog())
+                {
+                    openFileDialog.Filter = "所有文件|*.*|图片文件|*.jpg;*.jpeg;*.png;*.gif|文档文件|*.pdf;*.doc;*.docx;*.txt";
+                    openFileDialog.Title = "选择要上传的文件";
+                    openFileDialog.Multiselect = false;
+                    
+                    // 显示文件选择对话框
+                    if (openFileDialog.ShowDialog() == DialogResult.OK)
+                    {
+                        // 获取选择的文件路径
+                        string filePath = openFileDialog.FileName;
+                        string fileName = Path.GetFileName(filePath);
+                        
+                        // 读取文件内容
+                        byte[] fileContent = File.ReadAllBytes(filePath);
+                        
+                        // 检查文件大小
+                        if (fileContent.Length > 1450000) // 限制文件大小为1.45MB
+                        {
+                            MessageBox.Show($"文件 {fileName} 太大，无法上传。请选择小于1.45MB的文件。", "文件过大", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                            return;
+                        }
+                        
+                        // 获取文件扩展名
+                        string extension = Path.GetExtension(filePath).ToLower();
+                        
+                        // 根据文件类型处理
+                        if (IsImageFile(extension))
+                        {
+                            // 处理图片文件
+                            try
+                            {
+                                using (MemoryStream ms = new MemoryStream(fileContent))
+                                {
+                                    Image image = Image.FromStream(ms);
+                                    
+                                    // 创建图片消息模型
+                                    var imageModel = new ImageChatModel
+                                    {
+                                        Author = "用户",
+                                        Inbound = false,
+                                        Read = true,
+                                        Time = DateTime.Now,
+                                        Image = image,
+                                        ImageName = fileName
+                                    };
+                                    
+                                    // 添加到聊天界面
+                                    chatboxControl.AddMessage(imageModel);
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                MessageBox.Show($"处理图片文件时出错: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            }
+                        }
+                        else
+                        {
+                            // 处理其他类型文件
+                            var attachmentModel = new AttachmentChatModel
+                            {
+                                Author = "用户",
+                                Inbound = false,
+                                Read = true,
+                                Time = DateTime.Now,
+                                Attachment = fileContent,
+                                Filename = fileName
+                            };
+                            
+                            // 添加到聊天界面
+                            chatboxControl.AddMessage(attachmentModel);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"上传文件时出错: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+        
+        /// <summary>
+        /// 判断文件是否为图片
+        /// </summary>
+        private bool IsImageFile(string extension)
+        {
+            string[] imageExtensions = { ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".tiff" };
+            return imageExtensions.Contains(extension);
+        }
+        
+        /// <summary>
+        /// 更新Chatbox控件的模型列表
+        /// </summary>
+        private void UpdateChatboxModelList()
+        {
+            if (chatboxControl == null)
+                return;
+                
+            // 获取所有已启用的渠道的模型
+            var models = new List<string>();
+            var enabledChannels = _channelManager.GetEnabledChannels();
+            
+            foreach (var channel in enabledChannels)
+            {
+                foreach (var model in channel.SupportedModels)
+                {
+                    string displayName = $"{channel.Name}: {model}";
+                    models.Add(displayName);
+                }
+            }
+            
+            // 设置模型列表
+            chatboxControl.SetModelList(models, _currentModelId);
+        }
+        
+        /// <summary>
+        /// 处理模型选择逻辑
+        /// </summary>
+        /// <param name="selectedModel">选中的模型</param>
+        private void HandleModelSelection(string selectedModel)
+        {
+            if (string.IsNullOrEmpty(selectedModel))
+                return;
+                
+            // 解析渠道名称和模型名称
+            string[] parts = selectedModel.Split(new[] { ':' }, 2);
+            if (parts.Length == 2)
+            {
+                string channelName = parts[0].Trim();
+                string modelName = parts[1].Trim();
+
+                // 从渠道管理器中获取对应的渠道
+                var channel = _channelManager.GetEnabledChannels()
+                    .FirstOrDefault(c => c.Name.Equals(channelName, StringComparison.OrdinalIgnoreCase));
+
+                if (channel != null)
+                {
+                    // 如果之前有选择其他渠道，先从活跃列表中移除
+                    if (_currentChannelId != Guid.Empty && _currentChannelId != channel.Id)
+                    {
+                        RemoveActiveChannel(_currentChannelId);
+                    }
+
+                    // 更新当前渠道ID和模型
+                    _currentChannelId = channel.Id;
+                    _currentModelId = selectedModel;
+                    // 更新当前提供商类型，确保API调用使用正确的提供商
+                    _currentProviderType = channel.ProviderType;
+
+                    // 将新渠道添加到活跃列表
+                    AddActiveChannel(_currentChannelId);
+
+                    // 保存设置
+                    Properties.Settings.Default.LastSelectedModel = _currentModelId;
+                    Properties.Settings.Default.Save();
+
+                    // 更新窗体标题
+                    UpdateTitle();
+                }
+            }
         }
     }
 }

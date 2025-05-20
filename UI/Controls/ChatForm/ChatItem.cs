@@ -13,6 +13,11 @@ namespace llm_agent.UI.Controls.ChatForm
 	public partial class ChatItem : UserControl
 	{
         public IChatModel ChatModel { get; set; }
+        
+        /// <summary>
+        /// 提供ChatModel的便捷访问属性
+        /// </summary>
+        public IChatModel Message { get => ChatModel; }
 
         public ChatItem()
         {

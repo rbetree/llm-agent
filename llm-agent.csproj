@@ -7,6 +7,7 @@
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>disable</ImplicitUsings>
+    <EnableDefaultItems>false</EnableDefaultItems>
   </PropertyGroup>
 
   <ItemGroup>
@@ -29,9 +30,26 @@
   </ItemGroup>
   
   <ItemGroup>
-    <None Update="Docs\**">
+    <None Include="Docs\**">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+
+  <!-- 显式引用ChatForm控件文件 -->
+  <ItemGroup>
+    <Compile Include="UI\Controls\ChatForm\*.cs" />
+    <EmbeddedResource Include="UI\Controls\ChatForm\*.resx" />
+    <None Include="UI\Controls\ChatForm\*.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  
+  <!-- 显式包含其他所有.cs文件和.resx文件 -->
+  <ItemGroup>
+    <Compile Include="**\*.cs" Exclude="UI\Controls\ChatForm\*.cs;参考\**;src\**;obj\**;bin\**" />
+    <EmbeddedResource Include="**\*.resx" Exclude="UI\Controls\ChatForm\*.resx;参考\**;src\**;obj\**;bin\**" />
+    <None Include="**\*.json" Exclude="obj\**;bin\**" />
+    <None Include="**\*.config" Exclude="obj\**;bin\**" />
   </ItemGroup>
 
 </Project>
