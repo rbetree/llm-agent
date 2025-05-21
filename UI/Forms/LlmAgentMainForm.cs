@@ -212,20 +212,8 @@ namespace llm_agent.UI.Forms
 
         private void SetupEvents()
         {
-            // 获取控件引用
-            TextBox txtInput = inputPanel.Controls["txtInput"] as TextBox;
-            Button btnSend = inputPanel.Controls["btnSend"] as Button;
-            Button btnUpload = inputPanel.Controls["btnUpload"] as Button;
-            ComboBox cboModel = inputPanel.Controls["cboModel"] as ComboBox;
-            // 不再查找设置页面中的流式响应复选框
-            // CheckBox chkStreamResponse = settingsContentContainer.Controls.Find("chkStreamResponse", true).FirstOrDefault() as CheckBox;
+            // 添加缺失的变量声明
             TextBox txtSystemPrompt = settingsContentContainer.Controls.Find("txtSystemPrompt", true).FirstOrDefault() as TextBox;
-
-            // 不再设置设置页面中的流式响应复选框
-            // if (chkStreamResponse != null)
-            // {
-            //     chkStreamResponse.Checked = _useStreamResponse;
-            // }
 
             // 初始化聊天页面的模型选择器
             InitializeChatPageModelSelector();
@@ -260,78 +248,12 @@ namespace llm_agent.UI.Forms
             // chatModelComboBox模型选择事件
             chatModelComboBox.SelectedIndexChanged += ChatModelComboBox_SelectedIndexChanged;
 
-            // 模型列表选择事件
-            // modelListBox.SelectedIndexChanged += ModelListBox_SelectedIndexChanged;
-
-            // 模型选择事件
-            // if (cboModel != null)
-            // {
-            //     cboModel.SelectedIndexChanged += (s, e) =>
-            //     {
-            //         if (cboModel.SelectedItem != null)
-            //         {
-            //             string selectedModel = cboModel.SelectedItem.ToString();
-            //             if (!string.IsNullOrEmpty(selectedModel))
-            //             {
-            //                 _currentModelId = selectedModel;
-            //                 Properties.Settings.Default.LastSelectedModel = _currentModelId;
-            //                 Properties.Settings.Default.Save();
-            //                 UpdateTitle();
-            //             }
-            //         }
-            //     };
-            // }
-
             // 调整模型选择器位置事件
             inputPanel.Resize += (s, e) =>
             {
-                if (btnSend != null)
-                {
-                    btnSend.Location = new Point(inputPanel.ClientSize.Width - btnSend.Width - 10,
-                                               inputPanel.ClientSize.Height - btnSend.Height - 10);
-                }
-
-                // 调整模型选择器位置
-                // if (cboModel != null)
-                // {
-                //     cboModel.Location = new Point(btnSend.Left - cboModel.Width - 10,
-                //                                     inputPanel.ClientSize.Height - cboModel.Height - 10);
-                // }
-
                 // 调整comboBox1位置
                 chatModelComboBox.Location = new Point(10, 10);
-
-                // 如果有上传按钮，也调整其位置
-                if (btnUpload != null)
-                {
-                    btnUpload.Location = new Point(10, inputPanel.ClientSize.Height - btnUpload.Height - 10);
-                }
             };
-
-            // 输入框回车事件
-            if (txtInput != null)
-            {
-                txtInput.KeyDown += async (s, e) =>
-                {
-                    if (e.KeyCode == Keys.Enter && e.Modifiers == Keys.Control)
-                    {
-                        e.SuppressKeyPress = true;
-                        await SendMessage();
-                    }
-                };
-            }
-
-            // 发送按钮事件
-            if (btnSend != null)
-            {
-                btnSend.Click += async (s, e) => await SendMessage();
-            }
-
-            // 上传按钮事件
-            if (btnUpload != null)
-            {
-                btnUpload.Click += (s, e) => UploadAttachment();
-            }
 
             // 导航按钮事件
             avatarButton.Click += (s, e) => SwitchToPanel(userProfilePanel, avatarButton);
@@ -367,17 +289,6 @@ namespace llm_agent.UI.Forms
 
             if (btnUpdateApiKey != null)
                 btnUpdateApiKey.Click += UpdateApiSettings;
-
-            // 流式响应复选框 - 移除设置页面中的chkStreamResponse事件处理
-            // if (chkStreamResponse != null)
-            // {
-            //    chkStreamResponse.CheckedChanged += (s, e) =>
-            //    {
-            //        _useStreamResponse = chkStreamResponse.Checked;
-            //        Properties.Settings.Default.EnableStreamResponse = _useStreamResponse;
-            //        Properties.Settings.Default.Save();
-            //    };
-            // }
 
             // 系统提示文本框
             if (txtSystemPrompt != null)
@@ -794,11 +705,11 @@ namespace llm_agent.UI.Forms
 
             // 确保切换到聊天界面
             SwitchToPanel(chatPagePanel, chatNavButton);
-
-            // 设置输入框焦点
-            TextBox txtInput = inputPanel.Controls["txtInput"] as TextBox;
-            if (txtInput != null)
-                txtInput.Focus();
+            
+            // 设置Chatbox输入框焦点
+            var chatTextbox = chatboxControl.Controls.Find("chatTextbox", true).FirstOrDefault() as TextBox;
+            if (chatTextbox != null)
+                chatTextbox.Focus();
         }
 
         private void ProviderChanged(object sender, EventArgs e)
@@ -1078,7 +989,7 @@ namespace llm_agent.UI.Forms
 
             try
             {
-                // 清空输入框（使用新添加的方法避免双重清除）
+                // 清空输入框（使用Chatbox的方法）
                 chatboxControl.ClearInputText();
 
                 // 确保活跃会话
@@ -2595,16 +2506,6 @@ namespace llm_agent.UI.Forms
 
                 // 更新会话列表
                 UpdateChatList();
-
-                // 注释掉引用不存在的变量的代码
-                /*
-                // 如果当前正在显示这个会话，清空聊天区域
-                if (_currentSession?.Id == session.Id)
-                {
-                    _currentSession = null;
-                    chatBox.Clear();
-                }
-                */
             }
         }
 

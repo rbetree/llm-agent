@@ -49,13 +49,8 @@ namespace llm_agent.UI.Forms
             newChatButton = new System.Windows.Forms.Button();
             chatListPanel = new System.Windows.Forms.FlowLayoutPanel();
             chatContainer = new System.Windows.Forms.SplitContainer();
-            chatOutputPanel = new System.Windows.Forms.Panel();
-            txtOutput = new System.Windows.Forms.RichTextBox();
             inputPanel = new System.Windows.Forms.Panel();
             streamCheckBox = new System.Windows.Forms.CheckBox();
-            btnUpload = new System.Windows.Forms.Button();
-            btnSend = new System.Windows.Forms.Button();
-            txtInput = new System.Windows.Forms.TextBox();
             settingsPanel = new System.Windows.Forms.Panel();
             settingsPageSplitContainer = new System.Windows.Forms.SplitContainer();
             settingsMenuPanel = new System.Windows.Forms.Panel();
@@ -122,9 +117,7 @@ namespace llm_agent.UI.Forms
             chatListContainer.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)chatContainer).BeginInit();
             chatContainer.Panel1.SuspendLayout();
-            chatContainer.Panel2.SuspendLayout();
             chatContainer.SuspendLayout();
-            chatOutputPanel.SuspendLayout();
             inputPanel.SuspendLayout();
             settingsPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)settingsPageSplitContainer).BeginInit();
@@ -418,54 +411,22 @@ namespace llm_agent.UI.Forms
             // 
             // chatContainer.Panel1
             // 
-            chatContainer.Panel1.Controls.Add(chatOutputPanel);
-            // 
-            // chatContainer.Panel2
-            // 
-            chatContainer.Panel2.Controls.Add(inputPanel);
+            chatContainer.Panel1.Controls.Add(inputPanel);
             chatContainer.Size = new System.Drawing.Size(669, 653);
-            chatContainer.SplitterDistance = 387;
+            chatContainer.SplitterDistance = 386;
             chatContainer.SplitterWidth = 5;
             chatContainer.TabIndex = 1;
-            // 
-            // chatOutputPanel
-            // 
-            chatOutputPanel.AutoScroll = true;
-            chatOutputPanel.Controls.Add(txtOutput);
-            chatOutputPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            chatOutputPanel.Location = new System.Drawing.Point(0, 0);
-            chatOutputPanel.Margin = new System.Windows.Forms.Padding(0);
-            chatOutputPanel.Name = "chatOutputPanel";
-            chatOutputPanel.Size = new System.Drawing.Size(669, 387);
-            chatOutputPanel.TabIndex = 0;
-            // 
-            // txtOutput
-            // 
-            txtOutput.BackColor = System.Drawing.Color.White;
-            txtOutput.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            txtOutput.Dock = System.Windows.Forms.DockStyle.Fill;
-            txtOutput.Location = new System.Drawing.Point(0, 0);
-            txtOutput.Margin = new System.Windows.Forms.Padding(0);
-            txtOutput.Name = "txtOutput";
-            txtOutput.ReadOnly = true;
-            txtOutput.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
-            txtOutput.Size = new System.Drawing.Size(669, 387);
-            txtOutput.TabIndex = 0;
-            txtOutput.Text = "";
             // 
             // inputPanel
             // 
             inputPanel.Controls.Add(streamCheckBox);
             inputPanel.Controls.Add(chatModelComboBox);
-            inputPanel.Controls.Add(btnUpload);
-            inputPanel.Controls.Add(btnSend);
-            inputPanel.Controls.Add(txtInput);
             inputPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             inputPanel.Location = new System.Drawing.Point(0, 0);
             inputPanel.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             inputPanel.Name = "inputPanel";
             inputPanel.Padding = new System.Windows.Forms.Padding(3, 0, 3, 0);
-            inputPanel.Size = new System.Drawing.Size(669, 261);
+            inputPanel.Size = new System.Drawing.Size(669, 386);
             inputPanel.TabIndex = 0;
             // 
             // streamCheckBox
@@ -482,44 +443,6 @@ namespace llm_agent.UI.Forms
             streamCheckBox.Text = "启用流式响应";
             streamCheckBox.UseVisualStyleBackColor = true;
             streamCheckBox.CheckedChanged += streamCheckBox_CheckedChanged;
-            // 
-            // btnUpload
-            // 
-            btnUpload.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            btnUpload.Font = new System.Drawing.Font("Microsoft YaHei UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 134);
-            btnUpload.ForeColor = System.Drawing.SystemColors.WindowFrame;
-            btnUpload.Location = new System.Drawing.Point(3, 158);
-            btnUpload.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            btnUpload.Name = "btnUpload";
-            btnUpload.Size = new System.Drawing.Size(36, 36);
-            btnUpload.TabIndex = 2;
-            btnUpload.Text = "+";
-            btnUpload.UseVisualStyleBackColor = true;
-            // 
-            // btnSend
-            // 
-            btnSend.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right;
-            btnSend.BackColor = System.Drawing.Color.FromArgb(26, 147, 254);
-            btnSend.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            btnSend.Font = new System.Drawing.Font("Microsoft YaHei UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 134);
-            btnSend.ForeColor = System.Drawing.Color.White;
-            btnSend.Location = new System.Drawing.Point(576, 221);
-            btnSend.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            btnSend.Name = "btnSend";
-            btnSend.Size = new System.Drawing.Size(90, 36);
-            btnSend.TabIndex = 1;
-            btnSend.Text = "发送";
-            btnSend.UseVisualStyleBackColor = false;
-            // 
-            // txtInput
-            // 
-            txtInput.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            txtInput.Location = new System.Drawing.Point(3, 27);
-            txtInput.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            txtInput.Multiline = true;
-            txtInput.Name = "txtInput";
-            txtInput.Size = new System.Drawing.Size(663, 124);
-            txtInput.TabIndex = 0;
             // 
             // settingsPanel
             // 
@@ -1312,10 +1235,8 @@ namespace llm_agent.UI.Forms
             ((System.ComponentModel.ISupportInitialize)chatListContainer).EndInit();
             chatListContainer.ResumeLayout(false);
             chatContainer.Panel1.ResumeLayout(false);
-            chatContainer.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)chatContainer).EndInit();
             chatContainer.ResumeLayout(false);
-            chatOutputPanel.ResumeLayout(false);
             inputPanel.ResumeLayout(false);
             inputPanel.PerformLayout();
             settingsPanel.ResumeLayout(false);
@@ -1379,6 +1300,7 @@ namespace llm_agent.UI.Forms
         private System.Windows.Forms.Button newChatButton;
         private System.Windows.Forms.SplitContainer chatPageSplitContainer;
         private System.Windows.Forms.Panel inputPanel;
+        private System.Windows.Forms.ComboBox chatModelComboBox;
         private System.Windows.Forms.Panel settingsPanel;
         private System.Windows.Forms.SplitContainer settingsPageSplitContainer;
         private System.Windows.Forms.Panel settingsMenuPanel;
@@ -1432,31 +1354,14 @@ namespace llm_agent.UI.Forms
         private System.Windows.Forms.TextBox txtApiKey;
         private System.Windows.Forms.Label lblApiKey;
         private System.Windows.Forms.SplitContainer chatListContainer;
+        private System.Windows.Forms.CheckBox streamCheckBox;
         private System.Windows.Forms.Panel aiWebsitePanel;
         private System.Windows.Forms.SplitContainer aiWebsitePageSplitContainer;
         private System.Windows.Forms.Panel aiWebsiteMenuPanel;
-        private System.Windows.Forms.SplitContainer websiteListContainer;
-        private System.Windows.Forms.TextBox websiteSearchBox;
-        private System.Windows.Forms.Button newWebsiteButton;
-        private llm_agent.UI.Controls.HiddenScrollBarFlowLayoutPanel websiteListPanel;
         private System.Windows.Forms.Panel aiWebsiteContentPanel;
         private System.Windows.Forms.Panel settingsContentPanel;
         private System.Windows.Forms.GroupBox generalSettingsGroup;
-        private System.Windows.Forms.CheckBox chkEnableMarkdown;
         private System.Windows.Forms.Button btnSaveSettings;
         private System.Windows.Forms.CheckBox chkStreamResponse;
-        private System.Windows.Forms.Panel promptsContentPanel;
-        private System.Windows.Forms.Panel promptsWelcomePanel;
-        private System.Windows.Forms.Label welcomeTitleLabel;
-        private System.Windows.Forms.Label welcomeDescriptionLabel;
-        private System.Windows.Forms.Label welcomeStatsLabel;
-        private System.Windows.Forms.Label welcomeGuideLabel;
-        private System.Windows.Forms.Label welcomeGuide1Label;
-        private System.Windows.Forms.Label welcomeGuide2Label;
-        private System.Windows.Forms.Label welcomeGuide3Label;
-        private System.Windows.Forms.Label welcomeGuide4Label;
-        private System.Windows.Forms.Button welcomeQuickCreateButton;
-        private System.Windows.Forms.Panel chatPagePanel;
-        private System.Windows.Forms.Button channelNavButton;
     }
 }
