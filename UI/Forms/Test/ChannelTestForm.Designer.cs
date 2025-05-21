@@ -37,7 +37,7 @@ namespace llm_agent.UI.Forms
             this.lblTestMessage = new System.Windows.Forms.Label();
             this.txtTestMessage = new System.Windows.Forms.TextBox();
             this.btnTest = new System.Windows.Forms.Button();
-            this.txtLog = new System.Windows.Forms.TextBox();
+            this.txtLog = new llm_agent.UI.Controls.SimpleMessageDisplay.SimpleMessageDisplay();
             this.lblLog = new System.Windows.Forms.Label();
             this.channelListBox = new System.Windows.Forms.CheckedListBox();
             this.SuspendLayout();
@@ -102,21 +102,24 @@ namespace llm_agent.UI.Forms
             // 
             // txtTestMessage
             // 
-            this.txtTestMessage.Location = new System.Drawing.Point(15, 210);
+            this.txtTestMessage.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtTestMessage.Location = new System.Drawing.Point(95, 187);
             this.txtTestMessage.Multiline = true;
             this.txtTestMessage.Name = "txtTestMessage";
-            this.txtTestMessage.Size = new System.Drawing.Size(555, 70);
+            this.txtTestMessage.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.txtTestMessage.Size = new System.Drawing.Size(477, 52);
             this.txtTestMessage.TabIndex = 6;
-            this.txtTestMessage.Text = "这是一条测试消息，请回复以验证API连接是否正常。";
+            this.txtTestMessage.Text = "你好，请简要介绍一下你自己";
             // 
             // btnTest
             // 
             this.btnTest.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnTest.Location = new System.Drawing.Point(485, 248);
+            this.btnTest.Location = new System.Drawing.Point(485, 247);
             this.btnTest.Name = "btnTest";
             this.btnTest.Size = new System.Drawing.Size(87, 28);
-            this.btnTest.TabIndex = 4;
-            this.btnTest.Text = "开始测试";
+            this.btnTest.TabIndex = 7;
+            this.btnTest.Text = "测试";
             this.btnTest.UseVisualStyleBackColor = true;
             this.btnTest.Click += new System.EventHandler(this.btnTest_Click);
             // 
@@ -125,15 +128,10 @@ namespace llm_agent.UI.Forms
             this.txtLog.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtLog.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtLog.Location = new System.Drawing.Point(12, 305);
-            this.txtLog.Multiline = true;
+            this.txtLog.Location = new System.Drawing.Point(12, 309);
             this.txtLog.Name = "txtLog";
-            this.txtLog.ReadOnly = true;
-            this.txtLog.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.txtLog.Size = new System.Drawing.Size(560, 244);
-            this.txtLog.TabIndex = 6;
-            this.txtLog.WordWrap = false;
+            this.txtLog.Size = new System.Drawing.Size(560, 240);
+            this.txtLog.TabIndex = 8;
             // 
             // lblLog
             // 
@@ -160,14 +158,17 @@ namespace llm_agent.UI.Forms
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(584, 561);
+            this.Controls.Add(this.channelListBox);
+            this.Controls.Add(this.lblLog);
             this.Controls.Add(this.txtLog);
-            this.Controls.Add(this.lblStatus);
             this.Controls.Add(this.btnTest);
+            this.Controls.Add(this.txtTestMessage);
+            this.Controls.Add(this.lblTestMessage);
             this.Controls.Add(this.cboModel);
             this.Controls.Add(this.lblModel);
-            this.Controls.Add(this.channelListBox);
             this.Controls.Add(this.txtChannelInfo);
             this.Controls.Add(this.lblChannelInfo);
+            this.Controls.Add(this.lblStatus);
             this.MinimumSize = new System.Drawing.Size(500, 600);
             this.Name = "ChannelTestForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
@@ -186,7 +187,7 @@ namespace llm_agent.UI.Forms
         private System.Windows.Forms.Label lblTestMessage;
         private System.Windows.Forms.TextBox txtTestMessage;
         private System.Windows.Forms.Button btnTest;
-        private System.Windows.Forms.TextBox txtLog;
+        private llm_agent.UI.Controls.SimpleMessageDisplay.SimpleMessageDisplay txtLog;
         private System.Windows.Forms.Label lblLog;
         private System.Windows.Forms.CheckedListBox channelListBox;
     }

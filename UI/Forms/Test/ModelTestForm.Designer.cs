@@ -16,7 +16,7 @@ namespace llm_agent.UI.Forms
             this.txtPrompt = new System.Windows.Forms.TextBox();
             this.lblPrompt = new System.Windows.Forms.Label();
             this.btnRunTest = new System.Windows.Forms.Button();
-            this.txtOutput = new System.Windows.Forms.RichTextBox();
+            this.txtOutput = new llm_agent.UI.Controls.SimpleMessageDisplay.SimpleMessageDisplay();
             this.lblOutput = new System.Windows.Forms.Label();
             this.progressBar = new System.Windows.Forms.ProgressBar();
             this.btnClose = new System.Windows.Forms.Button();
@@ -77,14 +77,10 @@ namespace llm_agent.UI.Forms
             this.txtOutput.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtOutput.BackColor = System.Drawing.Color.White;
-            this.txtOutput.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txtOutput.Location = new System.Drawing.Point(12, 260);
             this.txtOutput.Name = "txtOutput";
-            this.txtOutput.ReadOnly = true;
             this.txtOutput.Size = new System.Drawing.Size(830, 260);
             this.txtOutput.TabIndex = 4;
-            this.txtOutput.Text = "";
             // 
             // lblOutput
             // 
@@ -109,10 +105,10 @@ namespace llm_agent.UI.Forms
             // btnClose
             // 
             this.btnClose.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnClose.Location = new System.Drawing.Point(725, 529);
+            this.btnClose.Location = new System.Drawing.Point(725, 526);
             this.btnClose.Name = "btnClose";
-            this.btnClose.Size = new System.Drawing.Size(117, 28);
-            this.btnClose.TabIndex = 7;
+            this.btnClose.Size = new System.Drawing.Size(117, 31);
+            this.btnClose.TabIndex = 9;
             this.btnClose.Text = "关闭";
             this.btnClose.UseVisualStyleBackColor = true;
             this.btnClose.Click += new System.EventHandler(this.btnClose_Click);
@@ -122,22 +118,19 @@ namespace llm_agent.UI.Forms
             this.chkStreamResponse.AutoSize = true;
             this.chkStreamResponse.Checked = true;
             this.chkStreamResponse.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkStreamResponse.Location = new System.Drawing.Point(12, 210);
+            this.chkStreamResponse.Location = new System.Drawing.Point(12, 215);
             this.chkStreamResponse.Name = "chkStreamResponse";
-            this.chkStreamResponse.Size = new System.Drawing.Size(105, 21);
-            this.chkStreamResponse.TabIndex = 8;
-            this.chkStreamResponse.Text = "使用流式响应";
+            this.chkStreamResponse.Size = new System.Drawing.Size(87, 21);
+            this.chkStreamResponse.TabIndex = 15;
+            this.chkStreamResponse.Text = "流式响应";
             this.chkStreamResponse.UseVisualStyleBackColor = true;
             // 
             // panelPerformance
             // 
-            this.panelPerformance.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.panelPerformance.BackColor = System.Drawing.SystemColors.Info;
-            this.panelPerformance.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panelPerformance.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.panelPerformance.Controls.Add(this.lblOutputSpeed);
             this.panelPerformance.Controls.Add(this.lblResponseTime);
-            this.panelPerformance.Location = new System.Drawing.Point(12, 529);
+            this.panelPerformance.Location = new System.Drawing.Point(12, 210);
             this.panelPerformance.Name = "panelPerformance";
             this.panelPerformance.Size = new System.Drawing.Size(707, 28);
             this.panelPerformance.TabIndex = 16;
@@ -189,7 +182,7 @@ namespace llm_agent.UI.Forms
         private System.Windows.Forms.TextBox txtPrompt;
         private System.Windows.Forms.Label lblPrompt;
         private System.Windows.Forms.Button btnRunTest;
-        private System.Windows.Forms.RichTextBox txtOutput;
+        private llm_agent.UI.Controls.SimpleMessageDisplay.SimpleMessageDisplay txtOutput;
         private System.Windows.Forms.Label lblOutput;
         private System.Windows.Forms.ProgressBar progressBar;
         private System.Windows.Forms.Button btnClose;

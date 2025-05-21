@@ -178,18 +178,19 @@ namespace llm_agent.UI.Forms
                 lblStatus.Text = "正在测试...";
                 txtLog.Clear();
                 
-                txtLog.Text += "开始测试渠道...\r\n";
-                txtLog.Text += $"时间: {DateTime.Now}\r\n";
-                txtLog.Text += "----------------------------------------\r\n";
+                // 添加测试信息
+                AppendLog("开始测试渠道...");
+                AppendLog($"时间: {DateTime.Now}");
+                AppendLog("----------------------------------------");
                 
                 // 选择第一个模型进行测试（如果有）
                 string modelToTest = _channel.SupportedModels.Count > 0 ? 
                     _channel.SupportedModels[0] : "未知模型";
                 
-                txtLog.Text += $"渠道: {_channel.Name}\r\n";
-                txtLog.Text += $"模型: {modelToTest}\r\n";
-                txtLog.Text += "使用系统默认测试消息\r\n";
-                txtLog.Text += "----------------------------------------\r\n";
+                AppendLog($"渠道: {_channel.Name}");
+                AppendLog($"模型: {modelToTest}");
+                AppendLog("使用系统默认测试消息");
+                AppendLog("----------------------------------------");
                 
                 // 执行测试
                 var result = await _channelService.TestChannelConnectionAsync(_channel, modelToTest);
@@ -197,22 +198,23 @@ namespace llm_agent.UI.Forms
                 if (result.success)
                 {
                     lblStatus.Text = "测试成功";
-                    txtLog.Text += "测试结果: 成功\r\n";
-                    txtLog.Text += "响应:\r\n";
-                    txtLog.Text += result.response;
+                    AppendLog("测试结果: 成功");
+                    AppendLog("响应:");
+                    AppendLog(result.response);
                 }
                 else
                 {
                     lblStatus.Text = "测试失败";
-                    txtLog.Text += "测试结果: 失败\r\n";
-                    txtLog.Text += "错误信息:\r\n";
-                    txtLog.Text += result.response;
+                    AppendLog("测试结果: 失败");
+                    AppendLog("错误信息:");
+                    AppendLog(result.response);
                 }
             }
             catch (Exception ex)
             {
                 lblStatus.Text = "测试时发生错误";
-                txtLog.Text += $"错误: {ex.Message}\r\n\r\n{ex.StackTrace}";
+                AppendLog($"错误: {ex.Message}");
+                AppendLog(ex.StackTrace);
             }
             finally
             {
@@ -248,16 +250,16 @@ namespace llm_agent.UI.Forms
                 lblStatus.Text = "批量测试中...";
                 txtLog.Clear();
                 
-                txtLog.Text += $"开始批量测试渠道 ({selectedIndexes.Count}/{_enabledChannels.Count})...\r\n";
-                txtLog.Text += $"时间: {DateTime.Now}\r\n";
-                txtLog.Text += "测试消息: 使用系统默认测试消息\r\n";
-                txtLog.Text += "================================================\r\n\r\n";
+                // 添加测试信息
+                AppendLog($"开始批量测试 {selectedIndexes.Count} 个渠道...");
+                AppendLog($"时间: {DateTime.Now}");
+                AppendLog("========================================");
                 
-                // 测试结果统计
+                // 计数器
                 int successCount = 0;
                 int failCount = 0;
                 
-                // 逐个测试选中的渠道
+                // 依次测试每个选中的渠道
                 for (int i = 0; i < selectedIndexes.Count; i++)
                 {
                     int index = selectedIndexes[i];
@@ -271,9 +273,9 @@ namespace llm_agent.UI.Forms
                     lblStatus.Text = $"正在测试 ({i+1}/{selectedIndexes.Count}): {channel.Name}";
                     
                     // 添加测试日志
-                    txtLog.Text += $"测试渠道 {i+1}/{selectedIndexes.Count}: {channel.Name}\r\n";
-                    txtLog.Text += $"模型: {modelToTest}\r\n";
-                    txtLog.Text += "----------------------------------------\r\n";
+                    AppendLog($"测试渠道 {i+1}/{selectedIndexes.Count}: {channel.Name}");
+                    AppendLog($"模型: {modelToTest}");
+                    AppendLog("----------------------------------------");
                     
                     // 执行测试
                     try
@@ -283,48 +285,36 @@ namespace llm_agent.UI.Forms
                         if (result.success)
                         {
                             successCount++;
-                            txtLog.Text += "测试结果: 成功\r\n";
-                            txtLog.Text += $"响应: {result.response.Substring(0, Math.Min(100, result.response.Length))}...\r\n";
+                            AppendLog("测试结果: 成功");
+                            AppendLog($"响应: {result.response.Substring(0, Math.Min(100, result.response.Length))}...");
                         }
                         else
                         {
                             failCount++;
-                            txtLog.Text += "测试结果: 失败\r\n";
-                            txtLog.Text += $"错误信息: {result.response}\r\n";
+                            AppendLog("测试结果: 失败");
+                            AppendLog($"错误信息: {result.response}");
                         }
                     }
                     catch (Exception ex)
                     {
                         failCount++;
-                        txtLog.Text += "测试结果: 出错\r\n";
-                        txtLog.Text += $"错误: {ex.Message}\r\n";
+                        AppendLog("测试结果: 异常");
+                        AppendLog($"错误: {ex.Message}");
                     }
                     
-                    txtLog.Text += "----------------------------------------\r\n\r\n";
-                    txtLog.ScrollToCaret();
-                    
-                    // 更新channelListBox的选中状态，将测试过的标记为未选中
-                    channelListBox.SetItemChecked(index, false);
-                    Application.DoEvents(); // 允许UI更新
+                    AppendLog("----------------------------------------");
                 }
                 
-                // 汇总测试结果
-                txtLog.Text += "================================================\r\n";
-                txtLog.Text += $"测试完成时间: {DateTime.Now}\r\n";
-                txtLog.Text += $"测试结果汇总: 总计 {selectedIndexes.Count} 个渠道\r\n";
-                txtLog.Text += $"- 成功: {successCount} 个\r\n";
-                txtLog.Text += $"- 失败: {failCount} 个\r\n";
-                
-                // 更新状态栏
-                lblStatus.Text = $"测试完成: {successCount}个成功, {failCount}个失败";
-                
-                // 滚动到底部
-                txtLog.ScrollToCaret();
+                // 测试完成，显示汇总信息
+                AppendLog("========================================");
+                AppendLog($"测试完成! 成功: {successCount}, 失败: {failCount}");
+                lblStatus.Text = $"批量测试完成 - 成功: {successCount}, 失败: {failCount}";
             }
             catch (Exception ex)
             {
-                lblStatus.Text = "批量测试时出错";
-                txtLog.Text += $"批量测试发生错误: {ex.Message}\r\n\r\n{ex.StackTrace}";
+                lblStatus.Text = "测试过程中发生错误";
+                AppendLog($"错误: {ex.Message}");
+                AppendLog(ex.StackTrace);
             }
             finally
             {
@@ -332,6 +322,12 @@ namespace llm_agent.UI.Forms
                 btnTest.Enabled = true;
                 channelListBox.Enabled = true;
             }
+        }
+        
+        // 添加日志的辅助方法
+        private void AppendLog(string message)
+        {
+            txtLog.AppendText(message + Environment.NewLine);
         }
     }
 } 

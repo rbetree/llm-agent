@@ -67,6 +67,7 @@ namespace llm_agent.UI.Forms
                 // 准备测试环境
                 btnRunTest.Enabled = false;
                 txtOutput.Clear();
+                txtOutput.ResetCharacterCount();
                 lblResponseTime.Text = "响应中...";
                 lblOutputSpeed.Text = "计算中...";
                 progressBar.Style = ProgressBarStyle.Marquee;
@@ -120,9 +121,7 @@ namespace llm_agent.UI.Forms
                             if (this.InvokeRequired)
                             {
                                 this.Invoke(new Action(() => {
-                                    txtOutput.AppendText(chunk);
-                                    txtOutput.SelectionStart = txtOutput.TextLength;
-                                    txtOutput.ScrollToCaret();
+                                    txtOutput.AppendTextToEnd(chunk);
                                     
                                     // 更新输出速度
                                     double elapsedSeconds = _stopwatch.ElapsedMilliseconds / 1000.0;
@@ -136,9 +135,7 @@ namespace llm_agent.UI.Forms
                             }
                             else
                             {
-                                txtOutput.AppendText(chunk);
-                                txtOutput.SelectionStart = txtOutput.TextLength;
-                                txtOutput.ScrollToCaret();
+                                txtOutput.AppendTextToEnd(chunk);
                                 
                                 // 更新输出速度
                                 double elapsedSeconds = _stopwatch.ElapsedMilliseconds / 1000.0;
@@ -179,6 +176,7 @@ namespace llm_agent.UI.Forms
                     
                     // 更新结果
                     txtOutput.Text = response;
+                    txtOutput.SetTotalCharacters(_totalCharacters);
                     
                     // 计算响应时间
                     TimeSpan responseTime = endTime - _startTime;
