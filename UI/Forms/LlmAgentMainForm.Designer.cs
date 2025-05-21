@@ -50,7 +50,6 @@ namespace llm_agent.UI.Forms
             chatListPanel = new System.Windows.Forms.FlowLayoutPanel();
             chatContainer = new System.Windows.Forms.SplitContainer();
             inputPanel = new System.Windows.Forms.Panel();
-            streamCheckBox = new System.Windows.Forms.CheckBox();
             settingsPanel = new System.Windows.Forms.Panel();
             settingsPageSplitContainer = new System.Windows.Forms.SplitContainer();
             settingsMenuPanel = new System.Windows.Forms.Panel();
@@ -158,20 +157,6 @@ namespace llm_agent.UI.Forms
             aiWebsitePageSplitContainer.SuspendLayout();
             generalSettingsGroup.SuspendLayout();
             SuspendLayout();
-            // 
-            // chatModelComboBox
-            // 
-            chatModelComboBox.Dock = System.Windows.Forms.DockStyle.Top;
-            chatModelComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            chatModelComboBox.Font = new System.Drawing.Font("Microsoft YaHei UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 134);
-            chatModelComboBox.FormattingEnabled = true;
-            chatModelComboBox.Location = new System.Drawing.Point(3, 0);
-            chatModelComboBox.Margin = new System.Windows.Forms.Padding(0);
-            chatModelComboBox.Name = "chatModelComboBox";
-            chatModelComboBox.Size = new System.Drawing.Size(663, 28);
-            chatModelComboBox.TabIndex = 4;
-            toolTip1.SetToolTip(chatModelComboBox, "选择要使用的对话模型");
-            chatModelComboBox.SelectedIndexChanged += ModelChanged;
             // 
             // mainSplitContainer
             // 
@@ -419,8 +404,6 @@ namespace llm_agent.UI.Forms
             // 
             // inputPanel
             // 
-            inputPanel.Controls.Add(streamCheckBox);
-            inputPanel.Controls.Add(chatModelComboBox);
             inputPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             inputPanel.Location = new System.Drawing.Point(0, 0);
             inputPanel.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
@@ -428,21 +411,6 @@ namespace llm_agent.UI.Forms
             inputPanel.Padding = new System.Windows.Forms.Padding(3, 0, 3, 0);
             inputPanel.Size = new System.Drawing.Size(669, 386);
             inputPanel.TabIndex = 0;
-            // 
-            // streamCheckBox
-            // 
-            streamCheckBox.AutoSize = true;
-            streamCheckBox.Checked = true;
-            streamCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
-            streamCheckBox.Font = new System.Drawing.Font("Microsoft YaHei UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 134);
-            streamCheckBox.Location = new System.Drawing.Point(147, 165);
-            streamCheckBox.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            streamCheckBox.Name = "streamCheckBox";
-            streamCheckBox.Size = new System.Drawing.Size(121, 24);
-            streamCheckBox.TabIndex = 5;
-            streamCheckBox.Text = "启用流式响应";
-            streamCheckBox.UseVisualStyleBackColor = true;
-            streamCheckBox.CheckedChanged += streamCheckBox_CheckedChanged;
             // 
             // settingsPanel
             // 
@@ -1300,7 +1268,6 @@ namespace llm_agent.UI.Forms
         private System.Windows.Forms.Button newChatButton;
         private System.Windows.Forms.SplitContainer chatPageSplitContainer;
         private System.Windows.Forms.Panel inputPanel;
-        private System.Windows.Forms.ComboBox chatModelComboBox;
         private System.Windows.Forms.Panel settingsPanel;
         private System.Windows.Forms.SplitContainer settingsPageSplitContainer;
         private System.Windows.Forms.Panel settingsMenuPanel;
@@ -1354,7 +1321,6 @@ namespace llm_agent.UI.Forms
         private System.Windows.Forms.TextBox txtApiKey;
         private System.Windows.Forms.Label lblApiKey;
         private System.Windows.Forms.SplitContainer chatListContainer;
-        private System.Windows.Forms.CheckBox streamCheckBox;
         private System.Windows.Forms.Panel aiWebsitePanel;
         private System.Windows.Forms.SplitContainer aiWebsitePageSplitContainer;
         private System.Windows.Forms.Panel aiWebsiteMenuPanel;

@@ -185,8 +185,8 @@ namespace llm_agent.UI.Forms
                 // 加载Markdown支持设置
                 _enableMarkdown = Properties.Settings.Default.EnableMarkdown;
 
-                // 初始化聊天页面的流式响应复选框
-                streamCheckBox.Checked = _useStreamResponse;
+                // 已删除以下控件初始化
+                // streamCheckBox.Checked = _useStreamResponse;
 
                 // 加载上次使用的模型
                 if (Enum.TryParse<ProviderType>(Properties.Settings.Default.ProviderType, out var providerType))
@@ -216,15 +216,17 @@ namespace llm_agent.UI.Forms
             TextBox txtSystemPrompt = settingsContentContainer.Controls.Find("txtSystemPrompt", true).FirstOrDefault() as TextBox;
 
             // 初始化聊天页面的模型选择器
-            InitializeChatPageModelSelector();
+            // 已移除旧控件方法
+            // InitializeChatPageModelSelector();
 
-            // 添加聊天页面中streamCheckBox的事件处理
-            streamCheckBox.CheckedChanged += (s, e) =>
-            {
-                _useStreamResponse = streamCheckBox.Checked;
-                Properties.Settings.Default.EnableStreamResponse = _useStreamResponse;
-                Properties.Settings.Default.Save();
-            };
+            // 已删除以下事件处理
+            // // 添加聊天页面中streamCheckBox的事件处理
+            // streamCheckBox.CheckedChanged += (s, e) =>
+            // {
+            //     _useStreamResponse = streamCheckBox.Checked;
+            //     Properties.Settings.Default.EnableStreamResponse = _useStreamResponse;
+            //     Properties.Settings.Default.Save();
+            // };
 
             // Markdown支持复选框事件处理
             chkEnableMarkdown.CheckedChanged += (s, e) =>
@@ -245,15 +247,17 @@ namespace llm_agent.UI.Forms
                 };
             }
 
-            // chatModelComboBox模型选择事件
-            chatModelComboBox.SelectedIndexChanged += ChatModelComboBox_SelectedIndexChanged;
+            // 已删除以下事件处理
+            // // chatModelComboBox模型选择事件
+            // chatModelComboBox.SelectedIndexChanged += ChatModelComboBox_SelectedIndexChanged;
 
-            // 调整模型选择器位置事件
-            inputPanel.Resize += (s, e) =>
-            {
-                // 调整comboBox1位置
-                chatModelComboBox.Location = new Point(10, 10);
-            };
+            // 已删除以下事件处理
+            // // 调整模型选择器位置事件
+            // inputPanel.Resize += (s, e) =>
+            // {
+            //     // 调整comboBox1位置
+            //     chatModelComboBox.Location = new Point(10, 10);
+            // };
 
             // 导航按钮事件
             avatarButton.Click += (s, e) => SwitchToPanel(userProfilePanel, avatarButton);
@@ -307,6 +311,11 @@ namespace llm_agent.UI.Forms
 
         private void InitializeChatPageModelSelector()
         {
+            // 此方法已不再使用chatModelComboBox控件
+            // 而是使用chatboxControl的模型选择器，但保留此方法以备将来引用
+            // 请使用UpdateChatboxModelList方法替代此方法
+            
+            /* 原代码如下：
             // 初始化聊天页面的模型选择下拉框
             chatModelComboBox.Items.Clear();
 
@@ -338,6 +347,13 @@ namespace llm_agent.UI.Forms
                 _currentModelId = chatModelComboBox.SelectedItem.ToString();
                 Properties.Settings.Default.LastSelectedModel = _currentModelId;
                 Properties.Settings.Default.Save();
+            }
+            */
+            
+            // 使用新的方法更新模型列表
+            if (chatboxControl != null)
+            {
+                UpdateChatboxModelList();
             }
         }
 
@@ -381,8 +397,9 @@ namespace llm_agent.UI.Forms
                 // 初始化聊天模型选择器
                 InitializeChatPageModelSelector();
 
+                // 已删除以下代码，不再使用streamCheckBox
                 // 设置流式响应复选框状态
-                streamCheckBox.Checked = _useStreamResponse;
+                // streamCheckBox.Checked = _useStreamResponse;
                 
                 DisplayChatInterface();
             }
@@ -432,6 +449,51 @@ namespace llm_agent.UI.Forms
 
         private void SetupUI()
         {
+            // 添加自定义字体支持
+            var fontCollection = new System.Drawing.Text.PrivateFontCollection();
+            var fontPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Fonts", "remixicon.ttf");
+            try
+            {
+                if (File.Exists(fontPath))
+                {
+                    fontCollection.AddFontFile(fontPath);
+                    if (fontCollection.Families.Length > 0)
+                    {
+                        Font remixIconFont = new Font(fontCollection.Families[0], 24);
+
+                        // 为导航按钮添加图标
+                        AddIconToNavButton(avatarButton, "\uef7c", remixIconFont);
+                        AddIconToNavButton(chatNavButton, "\uec2e", remixIconFont);
+                        AddIconToNavButton(promptsNavButton, "\ueda4", remixIconFont);
+                        AddIconToNavButton(websiteNavButton, "\ueb7c", remixIconFont);
+                        AddIconToNavButton(filesNavButton, "\ueccb", remixIconFont);
+                        AddIconToNavButton(channelNavButton, "\ueb5c", remixIconFont);
+                        AddIconToNavButton(settingsNavButton, "\uee4a", remixIconFont);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"加载字体时出错: {ex.Message}");
+            }
+
+            // 已移除以下代码，不再配置chatModelComboBox
+            // // 配置聊天模型下拉框
+            // chatModelComboBox.DropDownStyle = ComboBoxStyle.DropDownList;
+            // chatModelComboBox.Width = 180;
+            // chatModelComboBox.Location = new Point(10, 10);
+
+            // 创建并初始化头像图片
+            var avatarImage = new PictureBox
+            {
+                Width = 36,
+                Height = 36,
+                BackColor = Color.LightGray,
+                // 已移除此引用，使用纯色背景替代
+                // Image = Properties.Resources.defaultAvatar,
+                SizeMode = PictureBoxSizeMode.StretchImage
+            };
+
             try
             {
                 // 设置窗体标题
@@ -452,9 +514,10 @@ namespace llm_agent.UI.Forms
 
 
                 // 设置comboBox1的样式和位置
-                chatModelComboBox.DropDownStyle = ComboBoxStyle.DropDownList;
-                chatModelComboBox.Width = 180;
-                chatModelComboBox.Location = new Point(10, 10);
+                // 已删除以下代码，不再使用chatModelComboBox
+                // chatModelComboBox.DropDownStyle = ComboBoxStyle.DropDownList;
+                // chatModelComboBox.Width = 180;
+                // chatModelComboBox.Location = new Point(10, 10);
 
                 // 加载模型列表
                 UpdateModelList();
@@ -1154,30 +1217,51 @@ namespace llm_agent.UI.Forms
 
         private void LlmAgentMainForm_Load(object sender, EventArgs e)
         {
-            // 触发窗体加载逻辑
-            // 更新聊天会话列表
-            UpdateChatList();
-
-            // 获取当前会话，检查是否存在
-            var currentSession = _chatHistoryManager.GetCurrentSession();
-
-            // 更新聊天界面
-            if (currentSession != null)
-            {
-                DisplayChatInterface();
-            }
-            else
-            {
-                // 如果没有会话，显示空界面提示
-                InitializeChatbox();
-                InitializeChatboxForEmptySession(chatboxControl);
-            }
-
+            // 初始化HTTP客户端
+            InitializeHttpClient();
+            
+            // 初始化提供商工厂
+            InitializeProviderFactory();
+            
+            // 初始化聊天历史管理器
+            InitializeChatHistoryManager();
+            
+            // 初始化渠道管理器
+            InitializeChannelManager();
+            
+            // 初始化渠道服务
+            InitializeChannelService();
+            
+            // 配置界面元素
+            SetupUI();
+            
+            // 设置事件处理
+            SetupEvents();
+            
+            // 加载设置
+            LoadSettings();
+            
+            // 启用Markdown支持选项
+            chkEnableMarkdown.Checked = _enableMarkdown;
+            
+            // 已删除对streamCheckBox的初始化
+            // streamCheckBox.Checked = _useStreamResponse;
+            
             // 默认切换到聊天页面
             SwitchToPanel(chatPagePanel, chatNavButton);
-
-            // 更新模型选择器
-            UpdateChatProviderModels();
+            
+            // 更新界面标题
+            UpdateTitle();
+            
+            // 初始化聊天会话列表（左侧聊天历史）
+            InitializeChatTopics();
+            
+            // 初始化聊天界面
+            DisplayChatInterface();
+            
+            // 绑定表单快捷键
+            this.KeyDown += LlmAgentMainForm_KeyDown;
+            this.FormClosing += LlmAgentMainForm_FormClosing;
         }
 
         private void panel1_Paint(object sender, PaintEventArgs e)
@@ -1334,37 +1418,48 @@ namespace llm_agent.UI.Forms
         // 更新聊天区域的模型提供商选择列表
         private void UpdateChatProviderModels()
         {
-            // 获取所有已启用的渠道
-            var enabledChannels = _channelManager.GetEnabledChannels();
-
-            // 清空现有模型列表
-            chatModelComboBox.Items.Clear();
-
-            // 加载所有启用渠道的模型
-            foreach (var channel in enabledChannels)
+            // 此方法已不再使用chatModelComboBox控件
+            // 而是使用chatboxControl的模型选择器
+            
+            /* 原代码如下：
+            if (chatModelComboBox != null)
             {
-                // 获取渠道支持的模型列表
-                var availableModels = channel.SupportedModels;
+                chatModelComboBox.Items.Clear();
 
-                foreach (var model in availableModels)
+                // 获取所有已启用的渠道
+                var enabledChannels = _channelManager.GetEnabledChannels();
+
+                // 加载所有启用渠道的模型
+                foreach (var channel in enabledChannels)
                 {
-                    // 添加渠道前缀来区分不同渠道的模型
-                    string displayName = $"{channel.Name}: {model}";
-                    chatModelComboBox.Items.Add(displayName);
+                    // 获取渠道支持的模型列表
+                    var availableModels = channel.SupportedModels;
+
+                    foreach (var model in availableModels)
+                    {
+                        // 添加渠道前缀来区分不同渠道的模型
+                        string displayName = $"{channel.Name}: {model}";
+                        chatModelComboBox.Items.Add(displayName);
+                    }
+                }
+
+                // 选择上次使用的模型
+                if (!string.IsNullOrEmpty(_currentModelId) && chatModelComboBox.Items.Contains(_currentModelId))
+                {
+                    chatModelComboBox.SelectedItem = _currentModelId;
+                }
+                else if (chatModelComboBox.Items.Count > 0)
+                {
+                    chatModelComboBox.SelectedIndex = 0;
+                    _currentModelId = chatModelComboBox.SelectedItem.ToString();
                 }
             }
-
-            // 选择上次使用的模型
-            if (!string.IsNullOrEmpty(_currentModelId) && chatModelComboBox.Items.Contains(_currentModelId))
+            */
+            
+            // 使用新的chatboxControl控件更新模型列表
+            if (chatboxControl != null)
             {
-                chatModelComboBox.SelectedItem = _currentModelId;
-            }
-            else if (chatModelComboBox.Items.Count > 0)
-            {
-                chatModelComboBox.SelectedIndex = 0;
-                _currentModelId = chatModelComboBox.SelectedItem.ToString();
-                Properties.Settings.Default.LastSelectedModel = _currentModelId;
-                Properties.Settings.Default.Save();
+                UpdateChatboxModelList();
             }
         }
 
@@ -2510,167 +2605,6 @@ namespace llm_agent.UI.Forms
         }
 
         /// <summary>
-        /// 处理聊天模型下拉框选择变更事件
-        /// </summary>
-        private void ChatModelComboBox_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (chatModelComboBox.SelectedItem != null)
-            {
-                string selectedModel = chatModelComboBox.SelectedItem.ToString();
-                if (!string.IsNullOrEmpty(selectedModel))
-                {
-                    // 解析渠道名称和模型名称
-                    string[] parts = selectedModel.Split(new[] { ':' }, 2);
-                    if (parts.Length == 2)
-                    {
-                        string channelName = parts[0].Trim();
-                        string modelName = parts[1].Trim();
-
-                        // 从渠道管理器中获取对应的渠道
-                        var channel = _channelManager.GetEnabledChannels()
-                            .FirstOrDefault(c => c.Name.Equals(channelName, StringComparison.OrdinalIgnoreCase));
-
-                        if (channel != null)
-                        {
-                            // 如果之前有选择其他渠道，先从活跃列表中移除
-                            if (_currentChannelId != Guid.Empty && _currentChannelId != channel.Id)
-                            {
-                                RemoveActiveChannel(_currentChannelId);
-                            }
-
-                            // 更新当前渠道ID和模型
-                            _currentChannelId = channel.Id;
-                            _currentModelId = selectedModel;
-                            // 更新当前提供商类型，确保API调用使用正确的提供商
-                            _currentProviderType = channel.ProviderType;
-
-                            // 将新渠道添加到活跃列表
-                            AddActiveChannel(_currentChannelId);
-
-                            // 保存设置
-                            Properties.Settings.Default.LastSelectedModel = _currentModelId;
-                            Properties.Settings.Default.Save();
-
-                            // 更新窗体标题
-                            UpdateTitle();
-                        }
-                    }
-                }
-            }
-        }
-
-        private void streamCheckBox_CheckedChanged(object sender, EventArgs e)
-        {
-            // 更新流式响应设置
-            _useStreamResponse = streamCheckBox.Checked;
-            
-            // 同步到Chatbox控件
-            if (chatboxControl != null)
-            {
-                chatboxControl.SetStreamResponse(_useStreamResponse);
-            }
-            
-            // 保存设置
-            Properties.Settings.Default.EnableStreamResponse = _useStreamResponse;
-            Properties.Settings.Default.Save();
-        }
-
-        /// <summary>
-        /// 刷新聊天消息，将ChatMessage集合加载到Chatbox控件中显示
-        /// </summary>
-        /// <param name="chatbox">目标Chatbox控件</param>
-        /// <param name="messages">要显示的消息集合</param>
-        private void RefreshChatMessages(Chatbox chatbox, IEnumerable<ChatMessage> messages)
-        {
-            if (chatbox == null || messages == null)
-                return;
-
-            // 清空现有消息
-            chatbox.ClearMessages();
-            
-            // 没有消息的情况，显示欢迎界面
-            if (!messages.Any())
-            {
-                InitializeChatboxForEmptySession(chatbox);
-                return;
-            }
-            
-            // 转换并添加所有消息
-            foreach (var message in messages)
-            {
-                // 使用适配器将ChatMessage转换为TextChatModel
-                var chatModel = ChatModelAdapter.ToTextChatModel(message);
-                if (chatModel != null)
-                {
-                    chatbox.AddMessage(chatModel);
-                }
-            }
-            
-            // 确保滚动到最新消息
-            if (chatbox.GetMessageCount() > 0)
-            {
-                var lastMessage = chatbox.GetMessageAt(0);
-                chatbox.ScrollToMessage(lastMessage);
-            }
-        }
-        
-        /// <summary>
-        /// 查找并刷新最后一条助手消息
-        /// </summary>
-        /// <param name="chatbox">目标Chatbox控件</param>
-        /// <returns>找到的最后一条助手消息对应的ChatItem控件，如果没有找到则返回null</returns>
-        private ChatItem RefreshLastAssistantMessage(Chatbox chatbox)
-        {
-            if (chatbox == null || chatbox.GetMessageCount() == 0)
-                return null;
-                
-            // 寻找最后一条助手消息
-            // 注意：控件是按照添加顺序倒序排列的，所以最新的消息在顶部
-            for (int i = 0; i < chatbox.GetMessageCount(); i++)
-            {
-                var chatItem = chatbox.GetMessageAt(i);
-                if (chatItem != null)
-                {
-                    // 检查是否是助手消息（TextChatModel且Author为助手）
-                    if (chatItem.Message is TextChatModel textModel && 
-                        textModel.Inbound && 
-                        textModel.Author == "助手")
-                    {
-                        // 找到最后一条助手消息，滚动到该消息
-                        chatbox.ScrollToMessage(chatItem);
-                        return chatItem;
-                    }
-                }
-            }
-            
-            // 未找到助手消息
-            return null;
-        }
-        
-        /// <summary>
-        /// 更新最后一条助手消息的内容
-        /// </summary>
-        /// <param name="chatbox">目标Chatbox控件</param>
-        /// <param name="content">新的消息内容</param>
-        /// <returns>是否成功更新</returns>
-        private bool UpdateLastAssistantMessageContent(Chatbox chatbox, string content)
-        {
-            // 查找最后一条助手消息
-            ChatItem lastAssistantItem = RefreshLastAssistantMessage(chatbox);
-            if (lastAssistantItem == null)
-                return false;
-                
-            // 更新消息内容
-            if (lastAssistantItem.Message is TextChatModel textModel)
-            {
-                // 使用Chatbox的UpdateLastMessage方法更新内容
-                return chatbox.UpdateLastMessage("助手", content);
-            }
-            
-            return false;
-        }
-
-        /// <summary>
         /// 初始化聊天面板现代化控件
         /// </summary>
         private void InitializeChatbox()
@@ -2935,6 +2869,101 @@ namespace llm_agent.UI.Forms
                     UpdateTitle();
                 }
             }
+        }
+
+        /// <summary>
+        /// 刷新聊天消息，将ChatMessage集合加载到Chatbox控件中显示
+        /// </summary>
+        /// <param name="chatbox">目标Chatbox控件</param>
+        /// <param name="messages">要显示的消息集合</param>
+        private void RefreshChatMessages(Chatbox chatbox, IEnumerable<ChatMessage> messages)
+        {
+            if (chatbox == null || messages == null)
+                return;
+
+            // 清空现有消息
+            chatbox.ClearMessages();
+            
+            // 没有消息的情况，显示欢迎界面
+            if (!messages.Any())
+            {
+                InitializeChatboxForEmptySession(chatbox);
+                return;
+            }
+            
+            // 转换并添加所有消息
+            foreach (var message in messages)
+            {
+                // 使用适配器将ChatMessage转换为TextChatModel
+                var chatModel = ChatModelAdapter.ToTextChatModel(message);
+                if (chatModel != null)
+                {
+                    chatbox.AddMessage(chatModel);
+                }
+            }
+            
+            // 确保滚动到最新消息
+            if (chatbox.GetMessageCount() > 0)
+            {
+                var lastMessage = chatbox.GetMessageAt(0);
+                chatbox.ScrollToMessage(lastMessage);
+            }
+        }
+        
+        /// <summary>
+        /// 查找并刷新最后一条助手消息
+        /// </summary>
+        /// <param name="chatbox">目标Chatbox控件</param>
+        /// <returns>找到的最后一条助手消息对应的ChatItem控件，如果没有找到则返回null</returns>
+        private ChatItem RefreshLastAssistantMessage(Chatbox chatbox)
+        {
+            if (chatbox == null || chatbox.GetMessageCount() == 0)
+                return null;
+                
+            // 寻找最后一条助手消息
+            // 注意：控件是按照添加顺序倒序排列的，所以最新的消息在顶部
+            for (int i = 0; i < chatbox.GetMessageCount(); i++)
+            {
+                var chatItem = chatbox.GetMessageAt(i);
+                if (chatItem != null)
+                {
+                    // 检查是否是助手消息（TextChatModel且Author为助手）
+                    if (chatItem.Message is TextChatModel textModel && 
+                        textModel.Inbound && 
+                        textModel.Author == "助手")
+                    {
+                        // 找到最后一条助手消息，滚动到该消息
+                        chatbox.ScrollToMessage(chatItem);
+                        return chatItem;
+                    }
+                }
+            }
+            
+            // 未找到助手消息
+            return null;
+        }
+        
+        /// <summary>
+        /// 更新最后一条助手消息的内容
+        /// </summary>
+        /// <param name="chatbox">目标Chatbox控件</param>
+        /// <param name="content">新的消息内容</param>
+        /// <returns>是否成功更新</returns>
+        private bool UpdateLastAssistantMessageContent(Chatbox chatbox, string content)
+        {
+            // 查找最后一条助手消息
+            ChatItem lastAssistantItem = RefreshLastAssistantMessage(chatbox);
+            if (lastAssistantItem == null)
+                return false;
+                
+            // 更新消息内容
+            if (lastAssistantItem.Message is TextChatModel textModel)
+            {
+                // 使用Chatbox的UpdateLastMessage方法更新内容
+                return chatbox.UpdateLastMessage("助手", content);
+            }
+            
+            return false;
         }
     }
 }
