@@ -11,15 +11,15 @@ using System.Windows.Forms;
 
 namespace llm_agent.UI.Controls.ChatForm
 {
-	public partial class Chatbox : UserControl
-	{
+    public partial class Chatbox : UserControl
+    {
         public ChatboxInfo chatbox_info;
         public OpenFileDialog fileDialog = new OpenFileDialog();
         public string initialdirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-        
+
         // 流式响应控制属性
         public bool UseStreamResponse { get; set; } = true;
-        
+
         // 模型选择相关事件
         public event EventHandler ModelSelectionChanged;
         public event EventHandler StreamResponseToggled;
@@ -40,7 +40,7 @@ namespace llm_agent.UI.Controls.ChatForm
             sendButton.Click += SendMessage;
             attachButton.Click += BuildAttachment;
             removeButton.Click += CancelAttachment;
-            
+
             // 添加流式响应和模型选择事件处理
             streamCheckBox.CheckedChanged += StreamCheckBox_CheckedChanged;
             modelComboBox.SelectedIndexChanged += ModelComboBox_SelectedIndexChanged;
@@ -49,14 +49,14 @@ namespace llm_agent.UI.Controls.ChatForm
 
             AddMessage(null);
         }
-        
+
         // 流式响应复选框事件处理
         private void StreamCheckBox_CheckedChanged(object sender, EventArgs e)
         {
             UseStreamResponse = streamCheckBox.Checked;
             StreamResponseToggled?.Invoke(this, EventArgs.Empty);
         }
-        
+
         // 模型选择下拉框事件处理
         private void ModelComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -65,7 +65,7 @@ namespace llm_agent.UI.Controls.ChatForm
                 ModelSelectionChanged?.Invoke(this, EventArgs.Empty);
             }
         }
-        
+
         /// <summary>
         /// 获取当前选中的模型
         /// </summary>
@@ -73,7 +73,7 @@ namespace llm_agent.UI.Controls.ChatForm
         {
             return modelComboBox.SelectedItem?.ToString();
         }
-        
+
         /// <summary>
         /// 设置模型列表
         /// </summary>
@@ -82,12 +82,12 @@ namespace llm_agent.UI.Controls.ChatForm
         public void SetModelList(IEnumerable<string> models, string? selectedModel = null)
         {
             modelComboBox.Items.Clear();
-            
+
             foreach (var model in models)
             {
                 modelComboBox.Items.Add(model);
             }
-            
+
             if (selectedModel != null && modelComboBox.Items.Contains(selectedModel))
             {
                 modelComboBox.SelectedItem = selectedModel;
@@ -97,7 +97,7 @@ namespace llm_agent.UI.Controls.ChatForm
                 modelComboBox.SelectedIndex = 0;
             }
         }
-        
+
         /// <summary>
         /// 设置流式响应状态
         /// </summary>
@@ -144,33 +144,33 @@ namespace llm_agent.UI.Controls.ChatForm
                     {
                         // 更新内容
                         textModel.Body = content;
-                        
+
                         // 查找bodyTextBox控件并更新
                         var bodyTextBox = chatItem.Controls.Find("bodyTextBox", true).FirstOrDefault() as TextBox;
                         if (bodyTextBox != null)
                         {
                             // 更新文本框内容
                             bodyTextBox.Text = content;
-                            
+
                             // 调整气泡大小以适应新内容
                             chatItem.ResizeBubbles((int)(itemsPanel.Width * 0.6));
-                            
+
                             // 确保视图滚动到该消息
                             itemsPanel.ScrollControlIntoView(chatItem);
-                            
+
                             return true;
                         }
-                        
+
                         // 找到了消息但无法更新文本框
                         return false;
                     }
                 }
             }
-            
+
             // 未找到指定作者的消息
             return false;
         }
-        
+
         /// <summary>
         /// 清除所有消息
         /// </summary>
@@ -178,7 +178,7 @@ namespace llm_agent.UI.Controls.ChatForm
         {
             itemsPanel.Controls.Clear();
         }
-        
+
         /// <summary>
         /// 滚动到指定消息
         /// </summary>
@@ -190,7 +190,7 @@ namespace llm_agent.UI.Controls.ChatForm
                 itemsPanel.ScrollControlIntoView(chatItem);
             }
         }
-        
+
         /// <summary>
         /// 获取消息项数量
         /// </summary>
@@ -199,7 +199,7 @@ namespace llm_agent.UI.Controls.ChatForm
         {
             return itemsPanel.Controls.Count;
         }
-        
+
         /// <summary>
         /// 获取指定索引的消息项
         /// </summary>
@@ -401,6 +401,11 @@ namespace llm_agent.UI.Controls.ChatForm
         }
 
         private void topPanel_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
+
+        private void statusLabel_Click(object sender, EventArgs e)
         {
 
         }
