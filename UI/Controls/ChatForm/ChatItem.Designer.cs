@@ -2,12 +2,12 @@
 {
 	partial class ChatItem
 	{
-		/// <summary> 
+		/// <summary>
 		/// Required designer variable.
 		/// </summary>
 		private System.ComponentModel.IContainer components = null;
 
-		/// <summary> 
+		/// <summary>
 		/// Clean up any resources being used.
 		/// </summary>
 		/// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
@@ -22,8 +22,8 @@
 
 		#region Component Designer generated code
 
-		/// <summary> 
-		/// Required method for Designer support - do not modify 
+		/// <summary>
+		/// Required method for Designer support - do not modify
 		/// the contents of this method with the code editor.
 		/// </summary>
 		private void InitializeComponent()
@@ -31,13 +31,13 @@
 			this.authorPanel = new System.Windows.Forms.Panel();
 			this.authorLabel = new System.Windows.Forms.Label();
 			this.bodyPanel = new System.Windows.Forms.Panel();
-			this.bodyTextBox = new System.Windows.Forms.TextBox();
+			this.bodyTextBox = new System.Windows.Forms.RichTextBox();
 			this.authorPanel.SuspendLayout();
 			this.bodyPanel.SuspendLayout();
 			this.SuspendLayout();
-			// 
+			//
 			// authorPanel
-			// 
+			//
 			this.authorPanel.Controls.Add(this.authorLabel);
 			this.authorPanel.Dock = System.Windows.Forms.DockStyle.Bottom;
 			this.authorPanel.Font = new System.Drawing.Font("Segoe UI Semibold", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
@@ -48,9 +48,9 @@
 			this.authorPanel.Padding = new System.Windows.Forms.Padding(0, 6, 0, 0);
 			this.authorPanel.Size = new System.Drawing.Size(683, 30);
 			this.authorPanel.TabIndex = 8;
-			// 
+			//
 			// authorLabel
-			// 
+			//
 			this.authorLabel.AutoSize = true;
 			this.authorLabel.Dock = System.Windows.Forms.DockStyle.Left;
 			this.authorLabel.Font = new System.Drawing.Font("Segoe UI Semibold", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
@@ -60,9 +60,9 @@
 			this.authorLabel.Size = new System.Drawing.Size(110, 13);
 			this.authorLabel.TabIndex = 0;
 			this.authorLabel.Text = "System - 10/22/2020";
-			// 
+			//
 			// bodyPanel
-			// 
+			//
 			this.bodyPanel.BackColor = System.Drawing.Color.RoyalBlue;
 			this.bodyPanel.Controls.Add(this.bodyTextBox);
 			this.bodyPanel.Dock = System.Windows.Forms.DockStyle.Left;
@@ -72,11 +72,11 @@
 			this.bodyPanel.Padding = new System.Windows.Forms.Padding(2);
 			this.bodyPanel.Size = new System.Drawing.Size(424, 46);
 			this.bodyPanel.TabIndex = 9;
-			// 
+			//
 			// bodyTextBox
-			// 
-			this.bodyTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+			//
+			this.bodyTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.bodyTextBox.BackColor = System.Drawing.Color.RoyalBlue;
 			this.bodyTextBox.BorderStyle = System.Windows.Forms.BorderStyle.None;
@@ -84,15 +84,20 @@
 			this.bodyTextBox.ForeColor = System.Drawing.Color.White;
 			this.bodyTextBox.Location = new System.Drawing.Point(6, 6);
 			this.bodyTextBox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-			this.bodyTextBox.Multiline = true;
 			this.bodyTextBox.Name = "bodyTextBox";
 			this.bodyTextBox.ReadOnly = true;
 			this.bodyTextBox.Size = new System.Drawing.Size(412, 35);
 			this.bodyTextBox.TabIndex = 4;
 			this.bodyTextBox.Text = "Hello there. This is a test for the longer word usage.";
-			// 
+			this.bodyTextBox.WordWrap = true;
+			this.bodyTextBox.DetectUrls = true;
+			this.bodyTextBox.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
+			this.bodyTextBox.AcceptsTab = false;
+			this.bodyTextBox.AutoSize = false;
+			this.bodyTextBox.Multiline = true;
+			//
 			// ChatItem
-			// 
+			//
 			this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.BackColor = System.Drawing.SystemColors.ControlLightLight;
@@ -116,6 +121,6 @@
 		private System.Windows.Forms.Panel authorPanel;
 		private System.Windows.Forms.Label authorLabel;
 		private System.Windows.Forms.Panel bodyPanel;
-		private System.Windows.Forms.TextBox bodyTextBox;
+		private System.Windows.Forms.RichTextBox bodyTextBox;
 	}
 }

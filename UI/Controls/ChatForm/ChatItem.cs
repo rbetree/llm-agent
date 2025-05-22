@@ -13,7 +13,7 @@ namespace llm_agent.UI.Controls.ChatForm
 	public partial class ChatItem : UserControl
 	{
         public IChatModel ChatModel { get; set; }
-        
+
         /// <summary>
         /// 提供ChatModel的便捷访问属性
         /// </summary>
@@ -54,10 +54,10 @@ namespace llm_agent.UI.Controls.ChatForm
             {
                 bodyPanel.Dock = DockStyle.Right;
                 authorLabel.Dock = DockStyle.Right;
-                bodyTextBox.TextAlign = HorizontalAlignment.Right;
+                bodyTextBox.SelectionAlignment = HorizontalAlignment.Right;
             }
 
-            //Fills in the label. 
+            //Fills in the label.
             if (chatModel.Time > DateTime.Today)
             {
                 authorLabel.Text = $"{chatModel.Author ?? "System"}, {chatModel.Time.ToShortTimeString()}";
@@ -71,7 +71,8 @@ namespace llm_agent.UI.Controls.ChatForm
             {
                 case "text":
                     var textmodel = chatModel as TextChatModel;
-                    bodyTextBox.Text = textmodel.Body.Trim();
+                    // 保留原始文本格式，包括换行符
+                    bodyTextBox.Text = textmodel.Body;
                     break;
                 case "image":
                     var imagemodel = chatModel as ImageChatModel;
@@ -176,50 +177,72 @@ namespace llm_agent.UI.Controls.ChatForm
 
             void TextChange(string body)
             {
+                // 使用RichTextBox的自动换行和测量功能
                 int fontheight = bodyTextBox.Font.Height;
+
+                // 确保文本已设置到RichTextBox，并保留换行符
+                bodyTextBox.Text = body;
+
+                // 计算文本宽度
                 var gfx = this.CreateGraphics();
-                int lines = 1;
                 double stringwidth = gfx.MeasureString(body, bodyTextBox.Font).Width;
 
-                //The system is as follows. The box width can only go to MaxWidth, if it goes to MaxWidth, then wordwrap will bring the text down to a new line.
-                //In order to fit it, we'll need to adjust the height by a certain amount of units.
+                // 设置气泡宽度
                 if (stringwidth < maxwidth + bodyPanel.Width - bodyTextBox.Width)
                 {
-                    //This is great, we can set the width to be a small as the actual text.
-                    bodyPanel.Width = (int)(stringwidth + bodyPanel.Width - bodyTextBox.Width + 5);
+                    // 设置宽度为文本宽度加上一些边距
+                    bodyPanel.Width = (int)(stringwidth + bodyPanel.Width - bodyTextBox.Width + 15);
                 }
                 else
                 {
-                    lines = 0;
+                    // 设置为最大宽度
                     bodyPanel.Width = maxwidth + bodyPanel.Width - bodyTextBox.Width;
-                    string noescapebody = body.Replace("\r\n", string.Empty).Replace("\r\n", string.Empty);
-                    stringwidth = gfx.MeasureString(noescapebody, bodyTextBox.Font).Width;
-
-                    while (stringwidth > 0)
-                    {
-                        stringwidth -= bodyPanel.Width;
-                        lines++;
-                    }
-                }
-                if (body.Contains("\n"))
-                {
-                    while (body.Contains("\r\n"))
-                    {
-                        body = body.Remove(body.IndexOf("\r\n"), "\r\n".Length);
-                        lines++;
-                    }
-                    while (body.Contains("\n"))
-                    {
-                        body = body.Remove(body.IndexOf("\n"), "\n".Length);
-                        lines++;
-                    }
                 }
 
-                //Adjusts the height based on the number of lines.
-                Height = (lines * fontheight) + Height - bodyTextBox.Height;
+                // 使用更准确的方法计算实际行数
+                int actualLines = CalculateActualLines(body, bodyTextBox);
+
+                // 调整控件高度，确保有足够空间显示所有行
+                // 使用1.1的系数来增加一些额外空间
+                int calculatedHeight = (int)(actualLines * fontheight * 1.2) + (Height - bodyTextBox.Height) + 12;
+                
+                // 设置最大高度限制，避免气泡过大
+                // 如果内容太长，将显示滚动条
+                int maxHeight = 500; // 最大高度限制
+                Height = Math.Min(calculatedHeight, maxHeight);
+                
+                // 如果内容太长需要滚动条，则确保滚动条可见
+                bodyTextBox.ScrollBars = (calculatedHeight > maxHeight) 
+                    ? RichTextBoxScrollBars.Vertical 
+                    : RichTextBoxScrollBars.None;
             }
         }
 
+        /// <summary>
+        /// 计算文本在RichTextBox中实际占用的行数
+        /// </summary>
+        /// <param name="text">要计算的文本</param>
+        /// <param name="rtb">RichTextBox控件</param>
+        /// <returns>实际行数</returns>
+        private int CalculateActualLines(string text, RichTextBox rtb)
+        {
+            if (string.IsNullOrEmpty(text))
+                return 1;
+
+            // 计算自动换行导致的行数
+            int textLength = rtb.TextLength;
+            int lineCount = 1;  // 至少有一行
+
+            if (textLength > 0)
+            {
+                // 使用RichTextBox的GetLineFromCharIndex方法获取行数
+                // 这个方法会考虑自动换行和显式换行
+                int lastLine = rtb.GetLineFromCharIndex(textLength - 1);
+                lineCount = lastLine + 1;  // 行索引从0开始，所以加1得到行数
+            }
+
+            return lineCount;
+        }
         private void ChatItem_Load(object sender, EventArgs e)
         {
 

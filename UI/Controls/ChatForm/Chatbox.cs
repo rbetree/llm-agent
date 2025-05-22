@@ -146,10 +146,10 @@ namespace llm_agent.UI.Controls.ChatForm
                         textModel.Body = content;
 
                         // 查找bodyTextBox控件并更新
-                        var bodyTextBox = chatItem.Controls.Find("bodyTextBox", true).FirstOrDefault() as TextBox;
+                        var bodyTextBox = chatItem.Controls.Find("bodyTextBox", true).FirstOrDefault() as RichTextBox;
                         if (bodyTextBox != null)
                         {
-                            // 更新文本框内容
+                            // 更新文本框内容，保留原始格式包括换行符
                             bodyTextBox.Text = content;
 
                             // 调整气泡大小以适应新内容
