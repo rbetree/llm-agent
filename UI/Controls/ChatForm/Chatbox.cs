@@ -409,5 +409,16 @@ namespace llm_agent.UI.Controls.ChatForm
         {
 
         }
+
+        /// <summary>
+        /// 移除发送消息按钮的Click事件处理程序
+        /// </summary>
+        public void RemoveSendMessageHandler()
+        {
+            if (sendButton != null)
+            {
+                sendButton.Click -= SendMessage;
+            }
+        }
     }
 }

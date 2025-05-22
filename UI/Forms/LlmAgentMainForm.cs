@@ -2682,7 +2682,10 @@ namespace llm_agent.UI.Forms
             var sendButton = chatboxControl.Controls.Find("sendButton", true).FirstOrDefault() as Button;
             if (sendButton != null)
             {
-                // 直接添加新的发送事件处理，不移除原有事件
+                // 先移除原有的SendMessage事件处理程序
+                chatboxControl.RemoveSendMessageHandler();
+                
+                // 添加新的发送事件处理
                 sendButton.Click += async (s, e) => {
                     await SendMessage();
                 };
