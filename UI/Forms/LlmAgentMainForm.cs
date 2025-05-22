@@ -2421,8 +2421,15 @@ namespace llm_agent.UI.Forms
             // 添加大小改变事件
             chatListPanel.SizeChanged += ChatListPanel_SizeChanged;
 
-            // 确保newChatButton事件已绑定
-            newChatButton.Click += (s, e) => CreateNewChat();
+            // 清除现有事件并重新绑定
+            newChatButton.Click -= NewChatButton_Click;
+            newChatButton.Click += NewChatButton_Click;
+        }
+        
+        // 提取为单独的方法，以便可以明确地添加和移除
+        private void NewChatButton_Click(object sender, EventArgs e)
+        {
+            CreateNewChat();
         }
         
         private void ChatListPanel_SizeChanged(object sender, EventArgs e)
