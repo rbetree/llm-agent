@@ -117,7 +117,6 @@ namespace llm_agent.UI.Forms
             ((System.ComponentModel.ISupportInitialize)chatContainer).BeginInit();
             chatContainer.Panel1.SuspendLayout();
             chatContainer.SuspendLayout();
-            inputPanel.SuspendLayout();
             settingsPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)settingsPageSplitContainer).BeginInit();
             settingsPageSplitContainer.Panel1.SuspendLayout();
@@ -359,7 +358,7 @@ namespace llm_agent.UI.Forms
             // newChatButton
             // 
             newChatButton.AutoSize = true;
-            newChatButton.BackColor = System.Drawing.Color.LightGray;
+            newChatButton.BackColor = System.Drawing.Color.LightSlateGray;
             newChatButton.Cursor = System.Windows.Forms.Cursors.Hand;
             newChatButton.Dock = System.Windows.Forms.DockStyle.Top;
             newChatButton.FlatAppearance.BorderSize = 0;
@@ -398,7 +397,7 @@ namespace llm_agent.UI.Forms
             // 
             chatContainer.Panel1.Controls.Add(inputPanel);
             chatContainer.Size = new System.Drawing.Size(669, 653);
-            chatContainer.SplitterDistance = 386;
+            chatContainer.SplitterDistance = 377;
             chatContainer.SplitterWidth = 5;
             chatContainer.TabIndex = 1;
             // 
@@ -409,7 +408,7 @@ namespace llm_agent.UI.Forms
             inputPanel.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             inputPanel.Name = "inputPanel";
             inputPanel.Padding = new System.Windows.Forms.Padding(3, 0, 3, 0);
-            inputPanel.Size = new System.Drawing.Size(669, 386);
+            inputPanel.Size = new System.Drawing.Size(669, 377);
             inputPanel.TabIndex = 0;
             // 
             // settingsPanel
@@ -1205,8 +1204,6 @@ namespace llm_agent.UI.Forms
             chatContainer.Panel1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)chatContainer).EndInit();
             chatContainer.ResumeLayout(false);
-            inputPanel.ResumeLayout(false);
-            inputPanel.PerformLayout();
             settingsPanel.ResumeLayout(false);
             settingsPageSplitContainer.Panel1.ResumeLayout(false);
             settingsPageSplitContainer.Panel2.ResumeLayout(false);

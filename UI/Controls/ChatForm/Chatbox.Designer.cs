@@ -47,7 +47,7 @@
             // 
             // topPanel
             // 
-            topPanel.BackColor = System.Drawing.Color.RoyalBlue;
+            topPanel.BackColor = System.Drawing.Color.FromArgb(100, 101, 165);
             topPanel.Controls.Add(streamCheckBox);
             topPanel.Controls.Add(modelComboBox);
             topPanel.Controls.Add(statusLabel);
@@ -59,7 +59,7 @@
             topPanel.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             topPanel.Name = "topPanel";
             topPanel.Padding = new System.Windows.Forms.Padding(23);
-            topPanel.Size = new System.Drawing.Size(616, 111);
+            topPanel.Size = new System.Drawing.Size(616, 75);
             topPanel.TabIndex = 0;
             topPanel.Paint += topPanel_Paint;
             // 
@@ -69,7 +69,7 @@
             streamCheckBox.Checked = true;
             streamCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
             streamCheckBox.Font = new System.Drawing.Font("Segoe UI", 9F);
-            streamCheckBox.Location = new System.Drawing.Point(399, 31);
+            streamCheckBox.Location = new System.Drawing.Point(261, 6);
             streamCheckBox.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             streamCheckBox.Name = "streamCheckBox";
             streamCheckBox.Size = new System.Drawing.Size(95, 24);
@@ -82,10 +82,10 @@
             modelComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             modelComboBox.Font = new System.Drawing.Font("Segoe UI", 9F);
             modelComboBox.FormattingEnabled = true;
-            modelComboBox.Location = new System.Drawing.Point(176, 64);
+            modelComboBox.Location = new System.Drawing.Point(184, 36);
             modelComboBox.Margin = new System.Windows.Forms.Padding(0);
             modelComboBox.Name = "modelComboBox";
-            modelComboBox.Size = new System.Drawing.Size(417, 28);
+            modelComboBox.Size = new System.Drawing.Size(409, 28);
             modelComboBox.TabIndex = 3;
             // 
             // statusLabel
@@ -93,7 +93,7 @@
             statusLabel.AutoSize = true;
             statusLabel.Font = new System.Drawing.Font("Segoe UI Semibold", 9F, System.Drawing.FontStyle.Bold);
             statusLabel.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            statusLabel.Location = new System.Drawing.Point(508, 32);
+            statusLabel.Location = new System.Drawing.Point(177, 7);
             statusLabel.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
             statusLabel.Name = "statusLabel";
             statusLabel.Size = new System.Drawing.Size(85, 20);
@@ -104,10 +104,9 @@
             // phoneLabel
             // 
             phoneLabel.AutoSize = true;
-            phoneLabel.Dock = System.Windows.Forms.DockStyle.Bottom;
             phoneLabel.Font = new System.Drawing.Font("Segoe UI Semibold", 12F, System.Drawing.FontStyle.Bold);
             phoneLabel.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            phoneLabel.Location = new System.Drawing.Point(23, 60);
+            phoneLabel.Location = new System.Drawing.Point(28, 0);
             phoneLabel.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
             phoneLabel.Name = "phoneLabel";
             phoneLabel.Size = new System.Drawing.Size(148, 28);
@@ -117,19 +116,19 @@
             // clientnameLabel
             // 
             clientnameLabel.AutoSize = true;
-            clientnameLabel.Dock = System.Windows.Forms.DockStyle.Top;
             clientnameLabel.Font = new System.Drawing.Font("Segoe UI Semibold", 14F, System.Drawing.FontStyle.Bold);
             clientnameLabel.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            clientnameLabel.Location = new System.Drawing.Point(23, 23);
+            clientnameLabel.Location = new System.Drawing.Point(23, 30);
             clientnameLabel.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
             clientnameLabel.Name = "clientnameLabel";
             clientnameLabel.Size = new System.Drawing.Size(149, 32);
             clientnameLabel.TabIndex = 0;
             clientnameLabel.Text = "Client Name";
+            clientnameLabel.Click += clientnameLabel_Click;
             // 
             // bottomPanel
             // 
-            bottomPanel.BackColor = System.Drawing.Color.RoyalBlue;
+            bottomPanel.BackColor = System.Drawing.Color.FromArgb(100, 101, 165);
             bottomPanel.Controls.Add(chatTextbox);
             bottomPanel.Controls.Add(attachButton);
             bottomPanel.Controls.Add(removeButton);
@@ -188,7 +187,7 @@
             // 
             // sendButton
             // 
-            sendButton.BackColor = System.Drawing.Color.RoyalBlue;
+            sendButton.BackColor = System.Drawing.Color.LightSlateGray;
             sendButton.Dock = System.Windows.Forms.DockStyle.Right;
             sendButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             sendButton.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold);
@@ -204,10 +203,10 @@
             // 
             itemsPanel.AutoScroll = true;
             itemsPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            itemsPanel.Location = new System.Drawing.Point(0, 111);
+            itemsPanel.Location = new System.Drawing.Point(0, 75);
             itemsPanel.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             itemsPanel.Name = "itemsPanel";
-            itemsPanel.Size = new System.Drawing.Size(616, 733);
+            itemsPanel.Size = new System.Drawing.Size(616, 769);
             itemsPanel.TabIndex = 2;
             // 
             // Chatbox

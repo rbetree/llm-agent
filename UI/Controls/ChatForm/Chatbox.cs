@@ -420,5 +420,10 @@ namespace llm_agent.UI.Controls.ChatForm
                 sendButton.Click -= SendMessage;
             }
         }
+
+        private void clientnameLabel_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }
