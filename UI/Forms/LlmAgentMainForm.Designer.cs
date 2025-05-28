@@ -7,8 +7,6 @@ namespace llm_agent.UI.Forms
         /// </summary>
         private System.ComponentModel.IContainer components = null;
 
-        private System.Windows.Forms.CheckBox chkEnableMarkdown;
-
         /// <summary>
         ///  Clean up any resources being used.
         /// </summary>
@@ -95,11 +93,22 @@ namespace llm_agent.UI.Forms
             filesPageSplitContainer = new System.Windows.Forms.SplitContainer();
             filesMenuPanel = new System.Windows.Forms.Panel();
             filesContentPanel = new System.Windows.Forms.Panel();
+            promptsPanel = new System.Windows.Forms.Panel();
+            promptsPageSplitContainer = new System.Windows.Forms.SplitContainer();
+            promptsListContainer = new System.Windows.Forms.SplitContainer();
+            promptsListPanel = new System.Windows.Forms.FlowLayoutPanel();
+            promptsContentPanel = new System.Windows.Forms.Panel();
+            aiWebsitePanel = new System.Windows.Forms.Panel();
+            aiWebsitePageSplitContainer = new System.Windows.Forms.SplitContainer();
+            aiWebsiteMenuPanel = new System.Windows.Forms.Panel();
+            aiWebsiteContentPanel = new System.Windows.Forms.Panel();
             settingsContentPanel = new System.Windows.Forms.Panel();
             generalSettingsGroup = new System.Windows.Forms.GroupBox();
             chkEnableMarkdown = new System.Windows.Forms.CheckBox();
             btnSaveSettings = new System.Windows.Forms.Button();
             chkStreamResponse = new System.Windows.Forms.CheckBox();
+            promptSearchBox = new System.Windows.Forms.TextBox();
+            newPromptButton = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)mainSplitContainer).BeginInit();
             mainSplitContainer.Panel1.SuspendLayout();
             mainSplitContainer.Panel2.SuspendLayout();
@@ -1048,7 +1057,7 @@ namespace llm_agent.UI.Forms
             // 
             // promptsPageSplitContainer.Panel1
             // 
-            promptsPageSplitContainer.Panel1.Controls.Add(promptsMenuPanel);
+            promptsPageSplitContainer.Panel1.Controls.Add(promptsListContainer);
             // 
             // promptsPageSplitContainer.Panel2
             // 
@@ -1057,16 +1066,66 @@ namespace llm_agent.UI.Forms
             promptsPageSplitContainer.SplitterDistance = 283;
             promptsPageSplitContainer.TabIndex = 0;
             // 
-            // promptsMenuPanel
+            // promptsListContainer
             // 
-            promptsMenuPanel.AutoScroll = true;
-            promptsMenuPanel.BackColor = System.Drawing.Color.FromArgb(247, 247, 247);
-            promptsMenuPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            promptsMenuPanel.Location = new System.Drawing.Point(0, 0);
-            promptsMenuPanel.Margin = new System.Windows.Forms.Padding(4);
-            promptsMenuPanel.Name = "promptsMenuPanel";
-            promptsMenuPanel.Size = new System.Drawing.Size(283, 653);
-            promptsMenuPanel.TabIndex = 0;
+            promptsListContainer.Dock = System.Windows.Forms.DockStyle.Fill;
+            promptsListContainer.Location = new System.Drawing.Point(0, 0);
+            promptsListContainer.Margin = new System.Windows.Forms.Padding(2);
+            promptsListContainer.Name = "promptsListContainer";
+            promptsListContainer.Orientation = System.Windows.Forms.Orientation.Horizontal;
+            // 
+            // promptsListContainer.Panel1
+            // 
+            promptsListContainer.Panel1.Controls.Add(promptSearchBox);
+            promptsListContainer.Panel1.Controls.Add(newPromptButton);
+            // 
+            // promptsListContainer.Panel2
+            // 
+            promptsListContainer.Panel2.Controls.Add(promptsListPanel);
+            promptsListContainer.Size = new System.Drawing.Size(283, 653);
+            promptsListContainer.SplitterDistance = 73;
+            promptsListContainer.SplitterWidth = 3;
+            promptsListContainer.TabIndex = 2;
+            // 
+            // promptSearchBox
+            // 
+            promptSearchBox.BackColor = System.Drawing.Color.WhiteSmoke;
+            promptSearchBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            promptSearchBox.Location = new System.Drawing.Point(0, 52);
+            promptSearchBox.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            promptSearchBox.Name = "promptSearchBox";
+            promptSearchBox.PlaceholderText = "搜索提示词...";
+            promptSearchBox.Size = new System.Drawing.Size(283, 27);
+            promptSearchBox.TabIndex = 1;
+            // 
+            // newPromptButton
+            // 
+            newPromptButton.AutoSize = true;
+            newPromptButton.BackColor = System.Drawing.Color.LightSlateGray;
+            newPromptButton.Cursor = System.Windows.Forms.Cursors.Hand;
+            newPromptButton.Dock = System.Windows.Forms.DockStyle.Top;
+            newPromptButton.FlatAppearance.BorderSize = 0;
+            newPromptButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            newPromptButton.Font = new System.Drawing.Font("Microsoft YaHei UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 134);
+            newPromptButton.Location = new System.Drawing.Point(0, 0);
+            newPromptButton.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            newPromptButton.Name = "newPromptButton";
+            newPromptButton.Size = new System.Drawing.Size(283, 52);
+            newPromptButton.TabIndex = 0;
+            newPromptButton.Text = "+ 新建提示词";
+            newPromptButton.UseVisualStyleBackColor = false;
+            // 
+            // promptsListPanel
+            // 
+            promptsListPanel.AutoScroll = true;
+            promptsListPanel.AutoSize = true;
+            promptsListPanel.BackColor = System.Drawing.Color.FromArgb(247, 247, 247);
+            promptsListPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            promptsListPanel.Location = new System.Drawing.Point(0, 0);
+            promptsListPanel.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            promptsListPanel.Name = "promptsListPanel";
+            promptsListPanel.Size = new System.Drawing.Size(283, 577);
+            promptsListPanel.TabIndex = 0;
             // 
             // promptsContentPanel
             // 
@@ -1241,6 +1300,12 @@ namespace llm_agent.UI.Forms
             promptsPageSplitContainer.Panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)promptsPageSplitContainer).EndInit();
             promptsPageSplitContainer.ResumeLayout(false);
+            promptsListContainer.Panel1.ResumeLayout(false);
+            promptsListContainer.Panel1.PerformLayout();
+            promptsListContainer.Panel2.ResumeLayout(false);
+            promptsListContainer.Panel2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)promptsListContainer).EndInit();
+            promptsListContainer.ResumeLayout(false);
             aiWebsitePanel.ResumeLayout(false);
             aiWebsitePageSplitContainer.Panel1.ResumeLayout(false);
             aiWebsitePageSplitContainer.Panel2.ResumeLayout(false);
@@ -1310,7 +1375,7 @@ namespace llm_agent.UI.Forms
         private System.Windows.Forms.Panel promptsPanel;
         private System.Windows.Forms.SplitContainer promptsPageSplitContainer;
         private System.Windows.Forms.SplitContainer promptsListContainer;
-        private llm_agent.UI.Controls.HiddenScrollBarFlowLayoutPanel promptsListPanel;
+        private System.Windows.Forms.FlowLayoutPanel promptsListPanel;
         private System.Windows.Forms.TextBox promptSearchBox;
         private System.Windows.Forms.Button newPromptButton;
         private System.Windows.Forms.TextBox txtApiHost;
@@ -1324,7 +1389,12 @@ namespace llm_agent.UI.Forms
         private System.Windows.Forms.Panel aiWebsiteContentPanel;
         private System.Windows.Forms.Panel settingsContentPanel;
         private System.Windows.Forms.GroupBox generalSettingsGroup;
+        private System.Windows.Forms.CheckBox chkEnableMarkdown;
         private System.Windows.Forms.Button btnSaveSettings;
         private System.Windows.Forms.CheckBox chkStreamResponse;
+        private System.Windows.Forms.Panel promptsContentPanel;
+        private System.Windows.Forms.Panel chatPagePanel;
+        private System.Windows.Forms.SplitContainer chatContainer;
+        private System.Windows.Forms.Button channelNavButton;
     }
 }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -69,6 +69,7 @@ namespace llm_agent.UI.Forms
         private string _systemPrompt = "";      // 系统提示内容
         private bool _isUpdatingChannelDetails = false; // 用于防止界面更新时触发事件处理
         private bool _enableMarkdown = false; // 用于Markdown支持设置
+        private PromptManager _promptManager = null!; // 提示词管理器
 
         protected FlowLayoutPanel chatListPanel;
         protected TextBox searchBox;
@@ -83,6 +84,7 @@ namespace llm_agent.UI.Forms
             InitializeChatHistoryManager();
             InitializeChannelManager();
             InitializeChannelService();
+            InitializePromptManager();
             LoadSettings();
 
             // 设置KeyPreview为true，使窗体可以在控件之前处理键盘事件
@@ -124,53 +126,11 @@ namespace llm_agent.UI.Forms
         }
 
         /// <summary>
-        /// 初始化Chatbox信息对象，配置正确的用户名和样式
+        /// 初始化提示词管理器
         /// </summary>
-        /// <returns>配置好的ChatboxInfo对象</returns>
-        private ChatboxInfo InitializeChatboxInfo()
+        private void InitializePromptManager()
         {
-            return new ChatboxInfo
-            {
-                User = "用户", // 或从配置获取用户名
-                NamePlaceholder = "LLM助手", // 聊天对象名称
-                StatusPlaceholder = "在线", // 聊天对象状态
-                PhonePlaceholder = _currentModelId, // 显示当前使用的模型
-                ChatPlaceholder = "请输入消息..." // 输入框占位文本
-            };
-        }
-
-        /// <summary>
-        /// 为空会话配置Chatbox，提供良好的空会话体验
-        /// </summary>
-        /// <param name="chatbox">要配置的Chatbox控件</param>
-        private void InitializeChatboxForEmptySession(Chatbox chatbox)
-        {
-            if (chatbox == null) return;
-            
-            // 创建系统欢迎消息
-            var welcomeMessage = new TextChatModel
-            {
-                Author = "系统",
-                Body = "欢迎使用LLM助手！您可以在这里开始一段新的对话。",
-                Inbound = true,
-                Read = true,
-                Time = DateTime.Now
-            };
-            
-            // 添加欢迎消息到聊天界面
-            chatbox.AddMessage(welcomeMessage);
-            
-            // 添加使用指南
-            var guideMessage = new TextChatModel
-            {
-                Author = "系统",
-                Body = "您可以:\n- 输入问题并按Enter发送\n- 使用Shift+Enter发送消息\n- 勾选流式响应选项启用实时回复",
-                Inbound = true,
-                Read = true,
-                Time = DateTime.Now
-            };
-            
-            chatbox.AddMessage(guideMessage);
+            _promptManager = new PromptManager();
         }
 
         private void LoadSettings()
@@ -428,7 +388,7 @@ namespace llm_agent.UI.Forms
             else if (targetPanel == promptsPanel)
             {
                 // 初始化提示词库面板
-                // 待实现
+                InitializePromptsPanel();
             }
             else if (targetPanel == filesPanel)
             {
@@ -444,6 +404,356 @@ namespace llm_agent.UI.Forms
             {
                 // 初始化用户资料面板
                 // 待实现
+            }
+        }
+
+        private void InitializePromptsPanel()
+        {
+            // 初始化提示词列表
+            InitializePromptsList();
+
+            // 初始化搜索框
+            InitializePromptSearchBox();
+
+            // 初始化新建按钮
+            InitializeNewPromptButton();
+        }
+
+        private void InitializePromptsList()
+        {
+            try
+            {
+                // 获取所有提示词
+                var prompts = _promptManager.GetAllPrompts();
+
+                // 清空现有的提示词卡片
+                promptsListPanel.Controls.Clear();
+
+                // 添加各个提示词的卡片
+                foreach (var prompt in prompts)
+                {
+                    var promptCard = new PromptCardItem
+                    {
+                        Prompt = prompt,
+                        Width = promptsListPanel.Width - SystemInformation.VerticalScrollBarWidth - 5,
+                        Height = 100,
+                        Margin = new Padding(0, 1, 0, 1)
+                    };
+
+                    // 添加点击事件
+                    promptCard.PromptClicked += (s, e) =>
+                    {
+                        DisplayPromptDetail(e.Prompt);
+                    };
+
+                    // 添加使用提示词事件
+                    promptCard.UsePromptClicked += (s, e) =>
+                    {
+                        UsePrompt(e.Prompt);
+                    };
+
+                    promptsListPanel.Controls.Add(promptCard);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"初始化提示词列表时出错: {ex.Message}");
+                MessageBox.Show($"加载提示词列表时出错: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void InitializePromptSearchBox()
+        {
+            // 设置搜索框事件处理
+            promptSearchBox.TextChanged += PromptSearchBox_TextChanged;
+        }
+
+        private void InitializeNewPromptButton()
+        {
+            // 设置新建按钮事件处理
+            newPromptButton.Click += NewPromptButton_Click;
+        }
+
+        private void PromptSearchBox_TextChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                // 获取搜索框文本
+                string searchText = promptSearchBox.Text.Trim();
+
+                List<Prompt> prompts;
+                
+                // 根据搜索文本获取提示词
+                if (string.IsNullOrEmpty(searchText))
+                {
+                    prompts = _promptManager.GetAllPrompts();
+                }
+                else
+                {
+                    prompts = _promptManager.SearchPrompts(searchText);
+                }
+
+                // 清空现有的提示词卡片
+                promptsListPanel.Controls.Clear();
+
+                // 添加匹配搜索文本的提示词卡片
+                foreach (var prompt in prompts)
+                {
+                    var promptCard = new PromptCardItem
+                    {
+                        Prompt = prompt,
+                        Width = promptsListPanel.Width - SystemInformation.VerticalScrollBarWidth - 5,
+                        Height = 100,
+                        Margin = new Padding(0, 1, 0, 1)
+                    };
+
+                    // 添加点击事件
+                    promptCard.PromptClicked += (s, args) =>
+                    {
+                        DisplayPromptDetail(args.Prompt);
+                    };
+
+                    // 添加使用提示词事件
+                    promptCard.UsePromptClicked += (s, args) =>
+                    {
+                        UsePrompt(args.Prompt);
+                    };
+
+                    promptsListPanel.Controls.Add(promptCard);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"搜索提示词时出错: {ex.Message}");
+            }
+        }
+
+        private void NewPromptButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                // 创建新的提示词
+                var newPrompt = new Prompt
+                {
+                    Title = "新提示词",
+                    Content = "请在此处输入提示词内容",
+                    Category = "默认分类"
+                };
+
+                // 添加到提示词管理器
+                _promptManager.CreatePrompt(newPrompt.Title, newPrompt.Content, newPrompt.Category);
+
+                // 刷新提示词列表
+                InitializePromptsList();
+
+                MessageBox.Show("已创建新提示词，请在右侧编辑其内容。", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"创建新提示词时出错: {ex.Message}");
+                MessageBox.Show($"创建新提示词时出错: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void DisplayPromptDetail(Prompt prompt)
+        {
+            try
+            {
+                if (prompt == null) return;
+
+                // 清空现有内容
+                promptsContentPanel.Controls.Clear();
+
+                // 创建标题文本框
+                var titleLabel = new Label
+                {
+                    Text = "标题:",
+                    AutoSize = true,
+                    Location = new Point(10, 10)
+                };
+
+                var titleTextBox = new TextBox
+                {
+                    Text = prompt.Title,
+                    Width = promptsContentPanel.Width - 40,
+                    Location = new Point(10, 40),
+                    Font = new Font("Microsoft YaHei UI", 10F)
+                };
+
+                // 创建分类文本框
+                var categoryLabel = new Label
+                {
+                    Text = "分类:",
+                    AutoSize = true,
+                    Location = new Point(10, 80)
+                };
+
+                var categoryTextBox = new TextBox
+                {
+                    Text = prompt.Category,
+                    Width = promptsContentPanel.Width - 40,
+                    Location = new Point(10, 110),
+                    Font = new Font("Microsoft YaHei UI", 10F)
+                };
+
+                // 创建内容文本框
+                var contentLabel = new Label
+                {
+                    Text = "内容:",
+                    AutoSize = true,
+                    Location = new Point(10, 150)
+                };
+
+                var contentTextBox = new TextBox
+                {
+                    Text = prompt.Content,
+                    Multiline = true,
+                    ScrollBars = ScrollBars.Vertical,
+                    Width = promptsContentPanel.Width - 40,
+                    Height = 300,
+                    Location = new Point(10, 180),
+                    Font = new Font("Microsoft YaHei UI", 9.75F)
+                };
+
+                // 创建保存按钮
+                var saveButton = new Button
+                {
+                    Text = "保存",
+                    Location = new Point(10, 500),
+                    Width = 100,
+                    BackColor = Color.LightSlateGray,
+                    ForeColor = Color.White,
+                    FlatStyle = FlatStyle.Flat
+                };
+                saveButton.FlatAppearance.BorderSize = 0;
+
+                // 创建使用按钮
+                var useButton = new Button
+                {
+                    Text = "使用",
+                    Location = new Point(120, 500),
+                    Width = 100,
+                    BackColor = Color.CornflowerBlue,
+                    ForeColor = Color.White,
+                    FlatStyle = FlatStyle.Flat
+                };
+                useButton.FlatAppearance.BorderSize = 0;
+
+                // 创建删除按钮
+                var deleteButton = new Button
+                {
+                    Text = "删除",
+                    Location = new Point(230, 500),
+                    Width = 100,
+                    BackColor = Color.IndianRed,
+                    ForeColor = Color.White,
+                    FlatStyle = FlatStyle.Flat
+                };
+                deleteButton.FlatAppearance.BorderSize = 0;
+
+                // 添加保存按钮点击事件
+                saveButton.Click += (s, e) => 
+                {
+                    try
+                    {
+                        // 更新提示词数据
+                        _promptManager.UpdatePrompt(
+                            prompt.Id, 
+                            titleTextBox.Text, 
+                            contentTextBox.Text, 
+                            categoryTextBox.Text
+                        );
+                        
+                        // 刷新列表
+                        InitializePromptsList();
+                        
+                        MessageBox.Show("提示词已保存。", "保存成功", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"保存提示词时出错: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                };
+
+                // 添加使用按钮点击事件
+                useButton.Click += (s, e) => 
+                {
+                    UsePrompt(prompt);
+                };
+
+                // 添加删除按钮点击事件
+                deleteButton.Click += (s, e) => 
+                {
+                    try
+                    {
+                        // 确认删除
+                        var result = MessageBox.Show(
+                            $"确定要删除提示词 \"{prompt.Title}\" 吗？此操作不可恢复。", 
+                            "确认删除", 
+                            MessageBoxButtons.YesNo, 
+                            MessageBoxIcon.Warning
+                        );
+                        
+                        if (result == DialogResult.Yes)
+                        {
+                            // 删除提示词
+                            _promptManager.DeletePrompt(prompt.Id);
+                            
+                            // 刷新列表
+                            InitializePromptsList();
+                            
+                            // 清空详情面板
+                            promptsContentPanel.Controls.Clear();
+                            
+                            MessageBox.Show("提示词已删除。", "删除成功", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"删除提示词时出错: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                };
+
+                // 将控件添加到面板
+                promptsContentPanel.Controls.Add(titleLabel);
+                promptsContentPanel.Controls.Add(titleTextBox);
+                promptsContentPanel.Controls.Add(categoryLabel);
+                promptsContentPanel.Controls.Add(categoryTextBox);
+                promptsContentPanel.Controls.Add(contentLabel);
+                promptsContentPanel.Controls.Add(contentTextBox);
+                promptsContentPanel.Controls.Add(saveButton);
+                promptsContentPanel.Controls.Add(useButton);
+                promptsContentPanel.Controls.Add(deleteButton);
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"显示提示词详情时出错: {ex.Message}");
+                MessageBox.Show($"显示提示词详情时出错: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void UsePrompt(Prompt prompt)
+        {
+            try
+            {
+                if (prompt == null) return;
+
+                // 增加使用次数
+                _promptManager.UsePrompt(prompt.Id);
+                
+                // 将提示词内容复制到剪贴板
+                Clipboard.SetText(prompt.Content);
+                
+                // 切换到聊天面板
+                SwitchToPanel(chatPagePanel, chatNavButton);
+                
+                // 通知用户
+                MessageBox.Show("提示词已复制到剪贴板，已切换到聊天界面。", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"使用提示词时出错: {ex.Message}");
+                MessageBox.Show($"使用提示词时出错: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -1231,6 +1541,9 @@ namespace llm_agent.UI.Forms
             
             // 初始化渠道服务
             InitializeChannelService();
+            
+            // 初始化提示词管理器
+            InitializePromptManager();
             
             // 配置界面元素
             SetupUI();
@@ -2974,6 +3287,33 @@ namespace llm_agent.UI.Forms
             }
             
             return false;
+        }
+
+        private void InitializeChatboxForEmptySession(Chatbox chatbox)
+        {
+            if (chatbox == null) return;
+
+            chatbox.ClearMessages();
+
+            var welcomeMessage = new ChatMessage
+            {
+                Role = ChatRole.System, // 或者 Assistant
+                Content = "当前没有活动的聊天。您可以开始新的对话或选择一个现有对话。",
+                Timestamp = DateTime.Now
+            };
+            // 确保 ChatModelAdapter.ToTextChatModel 不会返回 null
+            var chatModel = ChatModelAdapter.ToTextChatModel(welcomeMessage);
+            if (chatModel != null) // 添加 null 检查
+            {
+                chatbox.AddMessage(chatModel);
+            }
+            
+            // 确保 Chatbox 的输入框有焦点，如果适用
+            var chatTextbox = chatbox.Controls.Find("chatTextbox", true).FirstOrDefault() as TextBox;
+            if (chatTextbox != null)
+            {
+                chatTextbox.Focus();
+            }
         }
     }
 }
