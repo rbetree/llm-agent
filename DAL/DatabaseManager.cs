@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data.SQLite;
 using System.IO;
 using llm_agent.Models;
+using llm_agent.Model;
 
 namespace llm_agent.DAL
 {
@@ -41,6 +42,23 @@ namespace llm_agent.DAL
                     );";
 
                 using (var command = new SQLiteCommand(createModelsTableSql, connection))
+                {
+                    command.ExecuteNonQuery();
+                }
+                
+                // 创建提示词表
+                string createPromptsTableSql = @"
+                    CREATE TABLE IF NOT EXISTS Prompts (
+                        Id TEXT PRIMARY KEY,
+                        Title TEXT NOT NULL,
+                        Content TEXT NOT NULL,
+                        Category TEXT NOT NULL,
+                        CreatedAt TEXT NOT NULL,
+                        UpdatedAt TEXT NOT NULL,
+                        UsageCount INTEGER DEFAULT 0
+                    );";
+                
+                using (var command = new SQLiteCommand(createPromptsTableSql, connection))
                 {
                     command.ExecuteNonQuery();
                 }
