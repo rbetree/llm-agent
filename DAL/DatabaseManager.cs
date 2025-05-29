@@ -45,7 +45,7 @@ namespace llm_agent.DAL
                 {
                     command.ExecuteNonQuery();
                 }
-                
+
                 // 创建提示词表
                 string createPromptsTableSql = @"
                     CREATE TABLE IF NOT EXISTS Prompts (
@@ -57,8 +57,47 @@ namespace llm_agent.DAL
                         UpdatedAt TEXT NOT NULL,
                         UsageCount INTEGER DEFAULT 0
                     );";
-                
+
                 using (var command = new SQLiteCommand(createPromptsTableSql, connection))
+                {
+                    command.ExecuteNonQuery();
+                }
+
+                // 创建AI网站表
+                string createAiWebsitesTableSql = @"
+                    CREATE TABLE IF NOT EXISTS AiWebsites (
+                        Id TEXT PRIMARY KEY,
+                        Name TEXT NOT NULL,
+                        Description TEXT,
+                        Url TEXT NOT NULL,
+                        IconUrl TEXT,
+                        Category TEXT,
+                        SortOrder INTEGER DEFAULT 0,
+                        IsActive INTEGER DEFAULT 1,
+                        CreatedAt TEXT NOT NULL,
+                        UpdatedAt TEXT NOT NULL,
+                        LastVisitedAt TEXT
+                    );";
+
+                using (var command = new SQLiteCommand(createAiWebsitesTableSql, connection))
+                {
+                    command.ExecuteNonQuery();
+                }
+
+                // 创建网站凭据表
+                string createWebsiteCredentialsTableSql = @"
+                    CREATE TABLE IF NOT EXISTS WebsiteCredentials (
+                        Id TEXT PRIMARY KEY,
+                        WebsiteId TEXT NOT NULL,
+                        Username TEXT,
+                        Password TEXT,
+                        Notes TEXT,
+                        CreatedAt TEXT NOT NULL,
+                        UpdatedAt TEXT NOT NULL,
+                        FOREIGN KEY (WebsiteId) REFERENCES AiWebsites(Id) ON DELETE CASCADE
+                    );";
+
+                using (var command = new SQLiteCommand(createWebsiteCredentialsTableSql, connection))
                 {
                     command.ExecuteNonQuery();
                 }
@@ -157,4 +196,4 @@ namespace llm_agent.DAL
             return models;
         }
     }
-} 
+}
