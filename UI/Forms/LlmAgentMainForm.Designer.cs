@@ -201,7 +201,7 @@ namespace llm_agent.UI.Forms
             mainSplitContainer.Panel2.Controls.Add(userProfilePanel);
             mainSplitContainer.Panel2.Controls.Add(filesPanel);
             mainSplitContainer.Panel2.Controls.Add(promptsPanel);
-            mainSplitContainer.Size = new System.Drawing.Size(1030, 653);
+            mainSplitContainer.Size = new System.Drawing.Size(1300, 800);
             mainSplitContainer.SplitterDistance = 70;
             mainSplitContainer.SplitterWidth = 1;
             mainSplitContainer.TabIndex = 0;
@@ -343,7 +343,7 @@ namespace llm_agent.UI.Forms
             // aiWebsitePageSplitContainer.Panel2
             //
             aiWebsitePageSplitContainer.Panel2.Controls.Add(aiWebsiteContentPanel);
-            aiWebsitePageSplitContainer.Size = new System.Drawing.Size(959, 653);
+            aiWebsitePageSplitContainer.Size = new System.Drawing.Size(1230, 800);
             aiWebsitePageSplitContainer.SplitterDistance = 283;
             aiWebsitePageSplitContainer.SplitterWidth = 1;
             aiWebsitePageSplitContainer.TabIndex = 0;
@@ -377,7 +377,7 @@ namespace llm_agent.UI.Forms
             // websiteListContainer.Panel2
             //
             websiteListContainer.Panel2.Controls.Add(websiteListPanel);
-            websiteListContainer.Size = new System.Drawing.Size(283, 653);
+            websiteListContainer.Size = new System.Drawing.Size(283, 800);
             websiteListContainer.SplitterDistance = 73;
             websiteListContainer.SplitterWidth = 1;
             websiteListContainer.TabIndex = 0;
@@ -463,7 +463,7 @@ namespace llm_agent.UI.Forms
             // chatPageSplitContainer.Panel2
             //
             chatPageSplitContainer.Panel2.Controls.Add(chatContainer);
-            chatPageSplitContainer.Size = new System.Drawing.Size(959, 653);
+            chatPageSplitContainer.Size = new System.Drawing.Size(1230, 800);
             chatPageSplitContainer.SplitterDistance = 283;
             chatPageSplitContainer.SplitterWidth = 1;
             chatPageSplitContainer.TabIndex = 0;
@@ -484,7 +484,7 @@ namespace llm_agent.UI.Forms
             // chatListContainer.Panel2
             //
             chatListContainer.Panel2.Controls.Add(chatListPanel);
-            chatListContainer.Size = new System.Drawing.Size(283, 653);
+            chatListContainer.Size = new System.Drawing.Size(283, 800);
             chatListContainer.SplitterDistance = 73;
             chatListContainer.SplitterWidth = 1;
             chatListContainer.TabIndex = 2;
@@ -543,7 +543,7 @@ namespace llm_agent.UI.Forms
             // chatContainer.Panel1
             //
             chatContainer.Panel1.Controls.Add(inputPanel);
-            chatContainer.Size = new System.Drawing.Size(675, 653);
+            chatContainer.Size = new System.Drawing.Size(947, 800);
             chatContainer.SplitterDistance = 382;
             chatContainer.SplitterWidth = 1;
             chatContainer.TabIndex = 1;
@@ -584,7 +584,7 @@ namespace llm_agent.UI.Forms
             // settingsPageSplitContainer.Panel2
             //
             settingsPageSplitContainer.Panel2.Controls.Add(settingsContentContainer);
-            settingsPageSplitContainer.Size = new System.Drawing.Size(959, 653);
+            settingsPageSplitContainer.Size = new System.Drawing.Size(1230, 800);
             settingsPageSplitContainer.SplitterDistance = 283;
             settingsPageSplitContainer.SplitterWidth = 1;
             settingsPageSplitContainer.TabIndex = 0;
@@ -1182,7 +1182,7 @@ namespace llm_agent.UI.Forms
             promptsPanel.Location = new System.Drawing.Point(0, 0);
             promptsPanel.Margin = new System.Windows.Forms.Padding(4);
             promptsPanel.Name = "promptsPanel";
-            promptsPanel.Size = new System.Drawing.Size(959, 653);
+            promptsPanel.Size = new System.Drawing.Size(1230, 800);
             promptsPanel.TabIndex = 3;
             promptsPanel.Visible = false;
             //
@@ -1201,7 +1201,7 @@ namespace llm_agent.UI.Forms
             // promptsPageSplitContainer.Panel2
             //
             promptsPageSplitContainer.Panel2.Controls.Add(promptsContentPanel);
-            promptsPageSplitContainer.Size = new System.Drawing.Size(959, 653);
+            promptsPageSplitContainer.Size = new System.Drawing.Size(1230, 800);
             promptsPageSplitContainer.SplitterDistance = 283;
             promptsPageSplitContainer.SplitterWidth = 1;
             promptsPageSplitContainer.TabIndex = 0;
@@ -1222,7 +1222,7 @@ namespace llm_agent.UI.Forms
             // promptsListContainer.Panel2
             //
             promptsListContainer.Panel2.Controls.Add(promptsListPanel);
-            promptsListContainer.Size = new System.Drawing.Size(283, 653);
+            promptsListContainer.Size = new System.Drawing.Size(283, 800);
             promptsListContainer.SplitterDistance = 73;
             promptsListContainer.SplitterWidth = 1;
             promptsListContainer.TabIndex = 2;
@@ -1275,7 +1275,7 @@ namespace llm_agent.UI.Forms
             promptsContentPanel.Margin = new System.Windows.Forms.Padding(0);
             promptsContentPanel.Name = "promptsContentPanel";
             promptsContentPanel.Padding = new System.Windows.Forms.Padding(4);
-            promptsContentPanel.Size = new System.Drawing.Size(675, 653);
+            promptsContentPanel.Size = new System.Drawing.Size(947, 800);
             promptsContentPanel.TabIndex = 0;
             //
             // settingsContentPanel
@@ -1323,7 +1323,7 @@ namespace llm_agent.UI.Forms
             AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             BackColor = System.Drawing.Color.White;
-            ClientSize = new System.Drawing.Size(1030, 653);
+            ClientSize = new System.Drawing.Size(1300, 800);
             Controls.Add(mainSplitContainer);
             Icon = (System.Drawing.Icon)resources.GetObject("$this.Icon");
             Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
