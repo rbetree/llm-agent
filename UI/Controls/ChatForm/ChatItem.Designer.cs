@@ -35,9 +35,9 @@
             authorPanel.SuspendLayout();
             bodyPanel.SuspendLayout();
             SuspendLayout();
-            // 
+            //
             // authorPanel
-            // 
+            //
             authorPanel.Controls.Add(authorLabel);
             authorPanel.Dock = System.Windows.Forms.DockStyle.Bottom;
             authorPanel.Font = new System.Drawing.Font("Segoe UI Semibold", 9F, System.Drawing.FontStyle.Bold);
@@ -48,9 +48,9 @@
             authorPanel.Padding = new System.Windows.Forms.Padding(0, 8, 0, 0);
             authorPanel.Size = new System.Drawing.Size(879, 40);
             authorPanel.TabIndex = 8;
-            // 
+            //
             // authorLabel
-            // 
+            //
             authorLabel.AutoSize = true;
             authorLabel.Dock = System.Windows.Forms.DockStyle.Left;
             authorLabel.Font = new System.Drawing.Font("Segoe UI Semibold", 8.25F, System.Drawing.FontStyle.Bold);
@@ -60,45 +60,45 @@
             authorLabel.Size = new System.Drawing.Size(142, 19);
             authorLabel.TabIndex = 0;
             authorLabel.Text = "System - 10/22/2020";
-            // 
+            //
             // bodyPanel
-            // 
+            //
             bodyPanel.BackColor = System.Drawing.Color.SlateGray;
             bodyPanel.Controls.Add(bodyTextBox);
             bodyPanel.Dock = System.Windows.Forms.DockStyle.Left;
             bodyPanel.Location = new System.Drawing.Point(15, 8);
-            bodyPanel.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
+            bodyPanel.Margin = new System.Windows.Forms.Padding(0);
             bodyPanel.Name = "bodyPanel";
-            bodyPanel.Padding = new System.Windows.Forms.Padding(3);
+            bodyPanel.Padding = new System.Windows.Forms.Padding(2);
             bodyPanel.Size = new System.Drawing.Size(545, 61);
             bodyPanel.TabIndex = 9;
-            // 
+            //
             // bodyTextBox
-            // 
+            //
             bodyTextBox.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
             bodyTextBox.BackColor = System.Drawing.Color.LightSlateGray;
             bodyTextBox.BorderStyle = System.Windows.Forms.BorderStyle.None;
             bodyTextBox.Font = new System.Drawing.Font("Segoe UI Emoji", 9F);
             bodyTextBox.ForeColor = System.Drawing.Color.White;
-            bodyTextBox.Location = new System.Drawing.Point(8, 8);
-            bodyTextBox.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
+            bodyTextBox.Location = new System.Drawing.Point(4, 4);
+            bodyTextBox.Margin = new System.Windows.Forms.Padding(0);
             bodyTextBox.Name = "bodyTextBox";
             bodyTextBox.ReadOnly = true;
             bodyTextBox.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
             bodyTextBox.Size = new System.Drawing.Size(530, 47);
             bodyTextBox.TabIndex = 4;
             bodyTextBox.Text = "Hello there. This is a test for the longer word usage.";
-            // 
+            //
             // ChatItem
-            // 
+            //
             AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             BackColor = System.Drawing.SystemColors.ControlLightLight;
             Controls.Add(bodyPanel);
             Controls.Add(authorPanel);
-            Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
+            Margin = new System.Windows.Forms.Padding(0, 2, 0, 2);
             Name = "ChatItem";
-            Padding = new System.Windows.Forms.Padding(15, 8, 15, 8);
+            Padding = new System.Windows.Forms.Padding(8, 4, 8, 4);
             Size = new System.Drawing.Size(909, 117);
             Load += ChatItem_Load;
             authorPanel.ResumeLayout(false);

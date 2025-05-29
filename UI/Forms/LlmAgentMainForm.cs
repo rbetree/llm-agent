@@ -75,7 +75,7 @@ namespace llm_agent.UI.Forms
         private WebsiteCardItem _selectedWebsiteCard = null!; // 当前选中的网站卡片
         private WebsiteBrowser _websiteBrowser = null!; // 内置浏览器控件
 
-        protected FlowLayoutPanel chatListPanel;
+        protected llm_agent.UI.Controls.HiddenScrollBarFlowLayoutPanel chatListPanel;
         protected TextBox searchBox;
         private Panel searchPanel;
         private Chatbox chatboxControl; // 新集成的现代化聊天控件
@@ -383,12 +383,16 @@ namespace llm_agent.UI.Forms
                     var promptCard = new PromptCardItem
                     {
                         Prompt = prompt,
-                        Height = 100,
                         Margin = new Padding(0, 1, 0, 1)
                     };
 
                     // 设置宽度，与ChatSessionItem保持一致的计算方式
                     promptCard.Width = promptsListPanel.ClientSize.Width - promptCard.Margin.Horizontal;
+
+                    // 添加DPI缩放的高度计算，与ChatSessionItem保持一致
+                    float dpiScaleFactor = promptCard.CreateGraphics().DpiX / 96f;
+                    int scaledHeight = (int)(85 * dpiScaleFactor);
+                    promptCard.Height = scaledHeight;
 
                     // 添加点击事件
                     promptCard.PromptClicked += (s, e) =>
@@ -469,12 +473,16 @@ namespace llm_agent.UI.Forms
                     var promptCard = new PromptCardItem
                     {
                         Prompt = prompt,
-                        Height = 100,
                         Margin = new Padding(0, 1, 0, 1)
                     };
 
                     // 设置宽度，与ChatSessionItem保持一致的计算方式
                     promptCard.Width = promptsListPanel.ClientSize.Width - promptCard.Margin.Horizontal;
+
+                    // 添加DPI缩放的高度计算，与ChatSessionItem保持一致
+                    float dpiScaleFactor = promptCard.CreateGraphics().DpiX / 96f;
+                    int scaledHeight = (int)(85 * dpiScaleFactor);
+                    promptCard.Height = scaledHeight;
 
                     // 添加点击事件
                     promptCard.PromptClicked += (s, args) =>
@@ -2723,7 +2731,7 @@ namespace llm_agent.UI.Forms
 
                 // 在控件添加后再次调整大小，确保适应当前DPI设置
                 float dpiScaleFactor = sessionItem.CreateGraphics().DpiX / 96f;
-                int scaledHeight = (int)(100 * dpiScaleFactor);
+                int scaledHeight = (int)(85 * dpiScaleFactor);
                 sessionItem.Height = scaledHeight;
 
                 // 确保内部控件也正确调整大小
@@ -3265,6 +3273,18 @@ namespace llm_agent.UI.Forms
         #region AI网站面板相关方法
 
         /// <summary>
+        /// 计算DPI缩放后的高度
+        /// </summary>
+        /// <param name="baseHeight">基础高度</param>
+        /// <param name="control">用于获取DPI的控件</param>
+        /// <returns>缩放后的高度</returns>
+        private int GetScaledHeight(int baseHeight, Control control)
+        {
+            float dpiScaleFactor = control.CreateGraphics().DpiX / 96f;
+            return (int)(baseHeight * dpiScaleFactor);
+        }
+
+        /// <summary>
         /// 初始化AI网站面板
         /// </summary>
         private void InitializeAiWebsitePanel()
@@ -3279,6 +3299,9 @@ namespace llm_agent.UI.Forms
 
                 // 初始化新建按钮
                 InitializeNewWebsiteButton();
+
+                // 添加大小改变事件处理，与其他页面保持一致
+                websiteListPanel.SizeChanged += WebsiteListPanel_SizeChanged;
 
                 // 初始化内置浏览器
                 InitializeWebsiteBrowser();
@@ -3312,10 +3335,12 @@ namespace llm_agent.UI.Forms
                     var websiteCard = new WebsiteCardItem
                     {
                         Website = website,
-                        Width = websiteListPanel.Width - SystemInformation.VerticalScrollBarWidth - 5,
-                        Height = 85,
                         Margin = new Padding(0, 1, 0, 1)
                     };
+
+                    // 设置宽度和高度
+                    websiteCard.Width = websiteListPanel.ClientSize.Width - websiteCard.Margin.Horizontal;
+                    websiteCard.Height = GetScaledHeight(85, websiteListPanel);
 
                     // 添加点击事件
                     websiteCard.WebsiteClicked += (s, e) =>
@@ -3454,10 +3479,12 @@ namespace llm_agent.UI.Forms
                     var websiteCard = new WebsiteCardItem
                     {
                         Website = website,
-                        Width = websiteListPanel.Width - SystemInformation.VerticalScrollBarWidth - 5,
-                        Height = 65,
                         Margin = new Padding(0, 1, 0, 1)
                     };
+
+                    // 设置宽度和高度
+                    websiteCard.Width = websiteListPanel.ClientSize.Width - websiteCard.Margin.Horizontal;
+                    websiteCard.Height = GetScaledHeight(85, websiteListPanel);
 
                     // 添加点击事件
                     websiteCard.WebsiteClicked += (s, args) =>
@@ -3500,6 +3527,27 @@ namespace llm_agent.UI.Forms
             catch (Exception ex)
             {
                 Console.Error.WriteLine($"搜索网站时出错: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// 网站列表面板大小改变事件
+        /// </summary>
+        private void WebsiteListPanel_SizeChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                foreach (Control control in websiteListPanel.Controls)
+                {
+                    if (control is WebsiteCardItem websiteCard)
+                    {
+                        websiteCard.Width = websiteListPanel.ClientSize.Width - websiteCard.Margin.Horizontal;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"调整网站卡片大小时出错: {ex.Message}");
             }
         }
 

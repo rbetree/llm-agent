@@ -61,9 +61,9 @@ namespace llm_agent.UI.Forms
             ((System.ComponentModel.ISupportInitialize)numTokenPrice).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numContextLength).BeginInit();
             SuspendLayout();
-            // 
+            //
             // lblProvider
-            // 
+            //
             lblProvider.AutoSize = true;
             lblProvider.Location = new Point(21, 25);
             lblProvider.Margin = new Padding(5, 0, 5, 0);
@@ -71,18 +71,18 @@ namespace llm_agent.UI.Forms
             lblProvider.Size = new Size(140, 31);
             lblProvider.TabIndex = 0;
             lblProvider.Text = "服务提供商:";
-            // 
+            //
             // txtProvider
-            // 
+            //
             txtProvider.Location = new Point(184, 20);
             txtProvider.Margin = new Padding(5, 5, 5, 5);
             txtProvider.Name = "txtProvider";
             txtProvider.ReadOnly = true;
             txtProvider.Size = new Size(392, 38);
             txtProvider.TabIndex = 1;
-            // 
+            //
             // modelListView
-            // 
+            //
             modelListView.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             modelListView.CheckBoxes = true;
             modelListView.Columns.AddRange(new ColumnHeader[] { columnHeader1, columnHeader2, columnHeader3, columnHeader4 });
@@ -96,28 +96,28 @@ namespace llm_agent.UI.Forms
             modelListView.View = View.Details;
             modelListView.ItemChecked += modelListView_ItemChecked;
             modelListView.SelectedIndexChanged += modelListView_SelectedIndexChanged;
-            // 
+            //
             // columnHeader1
-            // 
+            //
             columnHeader1.Text = "启用";
-            // 
+            //
             // columnHeader2
-            // 
+            //
             columnHeader2.Text = "模型ID";
             columnHeader2.Width = 500;
-            // 
+            //
             // columnHeader3
-            // 
+            //
             columnHeader3.Text = "模型名称";
             columnHeader3.Width = 500;
-            // 
+            //
             // columnHeader4
-            // 
+            //
             columnHeader4.Text = "分类";
             columnHeader4.Width = 100;
-            // 
+            //
             // btnSave
-            // 
+            //
             btnSave.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             btnSave.Location = new Point(1043, 829);
             btnSave.Margin = new Padding(5, 5, 5, 5);
@@ -127,9 +127,9 @@ namespace llm_agent.UI.Forms
             btnSave.Text = "保存";
             btnSave.UseVisualStyleBackColor = true;
             btnSave.Click += btnSave_Click;
-            // 
+            //
             // btnCancel
-            // 
+            //
             btnCancel.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             btnCancel.DialogResult = DialogResult.Cancel;
             btnCancel.Location = new Point(1214, 829);
@@ -139,9 +139,9 @@ namespace llm_agent.UI.Forms
             btnCancel.TabIndex = 4;
             btnCancel.Text = "取消";
             btnCancel.UseVisualStyleBackColor = true;
-            // 
+            //
             // btnFetchModels
-            // 
+            //
             btnFetchModels.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             btnFetchModels.Location = new Point(1111, 19);
             btnFetchModels.Margin = new Padding(5, 5, 5, 5);
@@ -151,9 +151,9 @@ namespace llm_agent.UI.Forms
             btnFetchModels.Text = "从API获取模型列表";
             btnFetchModels.UseVisualStyleBackColor = true;
             btnFetchModels.Click += btnFetchModels_Click;
-            // 
+            //
             // groupBoxModelDetails
-            // 
+            //
             groupBoxModelDetails.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             groupBoxModelDetails.Controls.Add(btnUpdateModel);
             groupBoxModelDetails.Controls.Add(chkEnabled);
@@ -168,38 +168,38 @@ namespace llm_agent.UI.Forms
             groupBoxModelDetails.Controls.Add(txtModelId);
             groupBoxModelDetails.Controls.Add(label1);
             groupBoxModelDetails.Location = new Point(21, 501);
-            groupBoxModelDetails.Margin = new Padding(5, 5, 5, 5);
+            groupBoxModelDetails.Margin = new Padding(2, 2, 2, 2);
             groupBoxModelDetails.Name = "groupBoxModelDetails";
-            groupBoxModelDetails.Padding = new Padding(5, 5, 5, 5);
+            groupBoxModelDetails.Padding = new Padding(2, 2, 2, 2);
             groupBoxModelDetails.Size = new Size(1358, 299);
             groupBoxModelDetails.TabIndex = 6;
             groupBoxModelDetails.TabStop = false;
             groupBoxModelDetails.Text = "模型详情";
-            // 
+            //
             // btnUpdateModel
-            // 
+            //
             btnUpdateModel.Location = new Point(1138, 231);
-            btnUpdateModel.Margin = new Padding(5, 5, 5, 5);
+            btnUpdateModel.Margin = new Padding(2, 2, 2, 2);
             btnUpdateModel.Name = "btnUpdateModel";
             btnUpdateModel.Size = new Size(164, 45);
             btnUpdateModel.TabIndex = 11;
             btnUpdateModel.Text = "更新";
             btnUpdateModel.UseVisualStyleBackColor = true;
             btnUpdateModel.Click += btnUpdateModel_Click;
-            // 
+            //
             // chkEnabled
-            // 
+            //
             chkEnabled.AutoSize = true;
             chkEnabled.Location = new Point(1138, 50);
-            chkEnabled.Margin = new Padding(5, 5, 5, 5);
+            chkEnabled.Margin = new Padding(2, 2, 2, 2);
             chkEnabled.Name = "chkEnabled";
             chkEnabled.Size = new Size(94, 35);
             chkEnabled.TabIndex = 10;
             chkEnabled.Text = "启用";
             chkEnabled.UseVisualStyleBackColor = true;
-            // 
+            //
             // numTokenPrice
-            // 
+            //
             numTokenPrice.DecimalPlaces = 5;
             numTokenPrice.Increment = new decimal(new int[] { 1, 0, 0, 196608 });
             numTokenPrice.Location = new Point(310, 231);
@@ -208,9 +208,9 @@ namespace llm_agent.UI.Forms
             numTokenPrice.Name = "numTokenPrice";
             numTokenPrice.Size = new Size(612, 38);
             numTokenPrice.TabIndex = 9;
-            // 
+            //
             // label5
-            // 
+            //
             label5.AutoSize = true;
             label5.Location = new Point(40, 234);
             label5.Margin = new Padding(5, 0, 5, 0);
@@ -218,18 +218,18 @@ namespace llm_agent.UI.Forms
             label5.Size = new Size(253, 31);
             label5.TabIndex = 8;
             label5.Text = "Token价格($/1000)：";
-            // 
+            //
             // numContextLength
-            // 
+            //
             numContextLength.Location = new Point(310, 175);
             numContextLength.Margin = new Padding(5, 5, 5, 5);
             numContextLength.Maximum = new decimal(new int[] { 1000000, 0, 0, 0 });
             numContextLength.Name = "numContextLength";
             numContextLength.Size = new Size(612, 38);
             numContextLength.TabIndex = 7;
-            // 
+            //
             // label4
-            // 
+            //
             label4.AutoSize = true;
             label4.Location = new Point(40, 180);
             label4.Margin = new Padding(5, 0, 5, 0);
@@ -237,9 +237,9 @@ namespace llm_agent.UI.Forms
             label4.Size = new Size(251, 31);
             label4.TabIndex = 6;
             label4.Text = "上下文长度(tokens)：";
-            // 
+            //
             // cboCategory
-            // 
+            //
             cboCategory.DropDownStyle = ComboBoxStyle.DropDownList;
             cboCategory.FormattingEnabled = true;
             cboCategory.Location = new Point(310, 122);
@@ -247,9 +247,9 @@ namespace llm_agent.UI.Forms
             cboCategory.Name = "cboCategory";
             cboCategory.Size = new Size(610, 39);
             cboCategory.TabIndex = 5;
-            // 
+            //
             // label3
-            // 
+            //
             label3.AutoSize = true;
             label3.Location = new Point(40, 129);
             label3.Margin = new Padding(5, 0, 5, 0);
@@ -257,17 +257,17 @@ namespace llm_agent.UI.Forms
             label3.Size = new Size(134, 31);
             label3.TabIndex = 4;
             label3.Text = "模型分类：";
-            // 
+            //
             // txtModelName
-            // 
+            //
             txtModelName.Location = new Point(310, 71);
             txtModelName.Margin = new Padding(5, 5, 5, 5);
             txtModelName.Name = "txtModelName";
             txtModelName.Size = new Size(610, 38);
             txtModelName.TabIndex = 3;
-            // 
+            //
             // label2
-            // 
+            //
             label2.AutoSize = true;
             label2.Location = new Point(40, 76);
             label2.Margin = new Padding(5, 0, 5, 0);
@@ -275,17 +275,17 @@ namespace llm_agent.UI.Forms
             label2.Size = new Size(134, 31);
             label2.TabIndex = 2;
             label2.Text = "模型名称：";
-            // 
+            //
             // txtModelId
-            // 
+            //
             txtModelId.Location = new Point(310, 20);
             txtModelId.Margin = new Padding(5, 5, 5, 5);
             txtModelId.Name = "txtModelId";
             txtModelId.Size = new Size(610, 38);
             txtModelId.TabIndex = 1;
-            // 
+            //
             // label1
-            // 
+            //
             label1.AutoSize = true;
             label1.Location = new Point(40, 25);
             label1.Margin = new Padding(5, 0, 5, 0);
@@ -293,9 +293,9 @@ namespace llm_agent.UI.Forms
             label1.Size = new Size(111, 31);
             label1.TabIndex = 0;
             label1.Text = "模型ID：";
-            // 
+            //
             // btnClearAllModels
-            // 
+            //
             btnClearAllModels.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             btnClearAllModels.Location = new Point(833, 19);
             btnClearAllModels.Margin = new Padding(5, 5, 5, 5);
@@ -305,9 +305,9 @@ namespace llm_agent.UI.Forms
             btnClearAllModels.Text = "清除所有模型";
             btnClearAllModels.UseVisualStyleBackColor = true;
             btnClearAllModels.Click += btnClearAllModels_Click;
-            // 
+            //
             // ModelManagementForm
-            // 
+            //
             AcceptButton = btnSave;
             AutoScaleDimensions = new SizeF(8F, 16F);
             AutoScaleMode = AutoScaleMode.Font;
@@ -386,7 +386,7 @@ namespace llm_agent.UI.Forms
 
                 // 先从数据库获取模型配置
                 var dbModels = _dbManager.GetModels(providerStr);
-                
+
                 if (dbModels.Count > 0)
                 {
                     // 如果数据库中有数据，使用数据库中的配置
@@ -397,15 +397,15 @@ namespace llm_agent.UI.Forms
                 {
                     // 否则使用默认配置
                     _providerModels = ModelsConfig.GetModelsByProvider(providerStr);
-                    
+
                     // 从所有模型中克隆一份，用于显示
                     foreach (var model in _providerModels)
                     {
                         _allModels.Add(new ModelInfo(
-                            model.Id, 
-                            model.Name, 
-                            model.ProviderType, 
-                            model.Category, 
+                            model.Id,
+                            model.Name,
+                            model.ProviderType,
+                            model.Category,
                             model.ContextLength,
                             model.TokenPrice));
                     }
@@ -423,17 +423,17 @@ namespace llm_agent.UI.Forms
             {
                 // 设置提供商名称
                 txtProvider.Text = _providerName;
-                
+
                 // 加载模型分类下拉框
                 cboCategory.Items.Clear();
                 foreach (ModelCategory category in Enum.GetValues(typeof(ModelCategory)))
                 {
                     cboCategory.Items.Add(category);
                 }
-                
+
                 // 显示模型列表
                 RefreshModelListView();
-                
+
                 // 禁用详情区域，直到选中一个模型
                 EnableModelDetailsGroup(false);
             }
@@ -446,7 +446,7 @@ namespace llm_agent.UI.Forms
         private void RefreshModelListView()
         {
             modelListView.Items.Clear();
-            
+
             foreach (var model in _allModels)
             {
                 ListViewItem item = new ListViewItem("");
@@ -455,7 +455,7 @@ namespace llm_agent.UI.Forms
                 item.SubItems.Add(model.Category.ToString());
                 item.Checked = model.Enabled; // 使用模型的启用状态
                 item.Tag = model;
-                
+
                 modelListView.Items.Add(item);
             }
         }
@@ -479,19 +479,19 @@ namespace llm_agent.UI.Forms
                 EnableModelDetailsGroup(false);
                 return;
             }
-            
+
             EnableModelDetailsGroup(true);
-            
+
             txtModelId.Text = model.Id;
             txtModelName.Text = model.Name;
-            
+
             // 设置分类
             cboCategory.SelectedItem = model.Category;
-            
+
             // 设置上下文长度和token价格
             numContextLength.Value = model.ContextLength ?? 0;
             numTokenPrice.Value = model.TokenPrice.HasValue ? (decimal)model.TokenPrice.Value : 0;
-            
+
             // 设置启用状态
             chkEnabled.Checked = model.Enabled;
         }
@@ -511,12 +511,12 @@ namespace llm_agent.UI.Forms
 
         private void modelListView_ItemChecked(object sender, ItemCheckedEventArgs e)
         {
-            if (modelListView.SelectedItems.Count > 0 && 
+            if (modelListView.SelectedItems.Count > 0 &&
                 modelListView.SelectedItems[0] == e.Item)
             {
                 chkEnabled.Checked = e.Item.Checked;
             }
-            
+
             // 标记为已修改
             if (e.Item.Tag is ModelInfo model)
             {
@@ -531,32 +531,32 @@ namespace llm_agent.UI.Forms
         {
             if (modelListView.SelectedItems.Count == 0)
                 return;
-                
+
             var selectedItem = modelListView.SelectedItems[0];
             var model = selectedItem.Tag as ModelInfo;
-            
+
             if (model == null)
                 return;
-                
+
             // 验证输入
             if (string.IsNullOrWhiteSpace(txtModelId.Text))
             {
                 MessageBox.Show("模型ID不能为空", "验证错误", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
-            
+
             if (string.IsNullOrWhiteSpace(txtModelName.Text))
             {
                 MessageBox.Show("模型名称不能为空", "验证错误", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
-            
+
             if (cboCategory.SelectedItem == null)
             {
                 MessageBox.Show("请选择模型分类", "验证错误", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
-            
+
             // 更新模型信息
             model.Id = txtModelId.Text;
             model.Name = txtModelName.Text;
@@ -564,19 +564,19 @@ namespace llm_agent.UI.Forms
             model.ContextLength = (int)numContextLength.Value;
             model.TokenPrice = (double)numTokenPrice.Value;
             model.Enabled = chkEnabled.Checked;
-            
+
             // 更新列表项
             selectedItem.SubItems[1].Text = model.Id;
             selectedItem.SubItems[2].Text = model.Name;
             selectedItem.SubItems[3].Text = model.Category.ToString();
             selectedItem.Checked = chkEnabled.Checked;
-            
+
             // 标记为已修改
             if (!_modifiedModels.Contains(model))
             {
                 _modifiedModels.Add(model);
             }
-            
+
             MessageBox.Show("模型信息已更新", "成功", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
@@ -587,7 +587,7 @@ namespace llm_agent.UI.Forms
                 Cursor = Cursors.WaitCursor;
                 btnFetchModels.Enabled = false;
                 btnFetchModels.Text = "获取中...";
-                
+
                 // 显示进度条
                 ProgressBar progressBar = new ProgressBar();
                 progressBar.Style = ProgressBarStyle.Marquee;
@@ -597,7 +597,7 @@ namespace llm_agent.UI.Forms
                 progressBar.BringToFront();
                 progressBar.Visible = true;
                 Application.DoEvents();
-                
+
                 // 获取提供商实例
                 var provider = _providerFactory.GetProvider(_providerType);
                 if (provider == null)
@@ -605,7 +605,7 @@ namespace llm_agent.UI.Forms
                     MessageBox.Show($"无法获取提供商: {_providerType}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
-                
+
                 // 更新API密钥和主机
                 string apiKey = GetProviderApiKey(_providerType);
                 string apiHost = GetProviderApiHost(_providerType);
@@ -614,13 +614,13 @@ namespace llm_agent.UI.Forms
                     MessageBox.Show("API密钥未设置，无法从API获取模型列表", "错误", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
-                
+
                 provider.UpdateApiKey(apiKey);
                 if (!string.IsNullOrEmpty(apiHost))
                 {
                     provider.UpdateApiHost(apiHost);
                 }
-                
+
                 // 获取支持的模型列表 - 使用不同提供商特定的API方法
                 List<string> supportedModels;
 
@@ -654,20 +654,20 @@ namespace llm_agent.UI.Forms
                     // 通用方法，仅使用硬编码的支持列表
                     supportedModels = provider.GetSupportedModels();
                 }
-                
+
                 if (supportedModels == null || supportedModels.Count == 0)
                 {
                     MessageBox.Show("从API获取模型列表失败。请检查网络连接、API密钥和主机设置是否正确。", "API调用失败", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
-                
+
                 // 整合新模型到列表中
                 string providerStr = _providerType.ToString().ToLower();
                 if (providerStr == "azureopenai")
                     providerStr = "openai"; // 特殊处理Azure OpenAI
-                
+
                 int newModelsCount = 0;
-                
+
                 foreach (var modelId in supportedModels)
                 {
                     // 检查是否已存在
@@ -680,26 +680,26 @@ namespace llm_agent.UI.Forms
                             break;
                         }
                     }
-                    
+
                     // 如果不存在，则添加
                     if (!exists)
                     {
                         var newModel = new ModelInfo(
-                            modelId, 
+                            modelId,
                             modelId, // 初始时名称与ID相同
-                            providerStr, 
+                            providerStr,
                             ModelCategory.Chat
                         );
-                        
+
                         newModel.Enabled = true; // 确保新添加的模型默认启用
                         _allModels.Add(newModel);
                         newModelsCount++;
                     }
                 }
-                
+
                 // 刷新列表
                 RefreshModelListView();
-                
+
                 if (newModelsCount > 0)
                 {
                     MessageBox.Show($"成功添加{newModelsCount}个新模型", "成功", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -725,7 +725,7 @@ namespace llm_agent.UI.Forms
                         break;
                     }
                 }
-                
+
                 btnFetchModels.Text = "从API获取模型列表";
                 btnFetchModels.Enabled = true;
                 Cursor = Cursors.Default;
@@ -786,7 +786,7 @@ namespace llm_agent.UI.Forms
             {
                 // 准备要保存的模型列表
                 List<ModelInfo> modelsToSave = new List<ModelInfo>();
-                
+
                 foreach (ListViewItem item in modelListView.Items)
                 {
                     if (item.Tag is ModelInfo model)
@@ -796,25 +796,25 @@ namespace llm_agent.UI.Forms
                         modelsToSave.Add(model);
                     }
                 }
-                
+
                 // 获取提供商类型字符串
                 string providerStr = _providerType.ToString().ToLower();
                 if (providerStr == "azureopenai")
                     providerStr = "openai"; // 特殊处理Azure OpenAI
-                
+
                 // 保存到SQLite数据库
                 _dbManager.SaveModels(modelsToSave, providerStr);
-                
+
                 int enabledCount = modelsToSave.Count(m => m.Enabled);
                 int disabledCount = modelsToSave.Count - enabledCount;
-                
+
                 MessageBox.Show(
                     $"模型配置已更新并永久保存到数据库。共{enabledCount}个启用，{disabledCount}个禁用。",
-                    "保存成功", 
-                    MessageBoxButtons.OK, 
+                    "保存成功",
+                    MessageBoxButtons.OK,
                     MessageBoxIcon.Information
                 );
-                
+
                 // 设置对话框结果为OK并关闭
                 this.DialogResult = DialogResult.OK;
                 this.Close();
@@ -885,23 +885,23 @@ namespace llm_agent.UI.Forms
                     string providerStr = _providerType.ToString().ToLower();
                     if (providerStr == "azureopenai")
                         providerStr = "openai"; // 特殊处理Azure OpenAI
-                    
+
                     // 记录当前模型数量
                     int modelCount = _allModels.Count;
-                    
+
                     // 保存空的模型列表，相当于清除该渠道的所有模型
                     _dbManager.SaveModels(new List<ModelInfo>(), providerStr);
-                    
+
                     // 直接清空当前模型列表，而不是重新加载（避免加载默认模型）
                     _allModels.Clear();
                     _providerModels.Clear();
-                    
+
                     // 刷新列表视图
                     RefreshModelListView();
-                    
+
                     // 禁用详情区域
                     EnableModelDetailsGroup(false);
-                    
+
                     MessageBox.Show(
                         $"{_providerName}的所有模型已被清除，共删除{modelCount}个模型记录。",
                         "清除成功",
@@ -916,4 +916,4 @@ namespace llm_agent.UI.Forms
             }
         }
     }
-} 
+}
