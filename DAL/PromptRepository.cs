@@ -56,7 +56,7 @@ namespace llm_agent.DAL
                         else
                         {
                             sql = @"
-                                UPDATE Prompts SET 
+                                UPDATE Prompts SET
                                 Title = @title,
                                 Content = @content,
                                 Category = @category,
@@ -136,7 +136,7 @@ namespace llm_agent.DAL
             using (var connection = new SQLiteConnection(ConnectionString))
             {
                 connection.Open();
-                string sql = "SELECT * FROM Prompts ORDER BY UsageCount DESC, UpdatedAt DESC";
+                string sql = "SELECT * FROM Prompts ORDER BY CreatedAt DESC";
 
                 using (var command = new SQLiteCommand(sql, connection))
                 {
@@ -174,7 +174,7 @@ namespace llm_agent.DAL
             using (var connection = new SQLiteConnection(ConnectionString))
             {
                 connection.Open();
-                string sql = "SELECT * FROM Prompts WHERE Category = @category ORDER BY UsageCount DESC, UpdatedAt DESC";
+                string sql = "SELECT * FROM Prompts WHERE Category = @category ORDER BY CreatedAt DESC";
 
                 using (var command = new SQLiteCommand(sql, connection))
                 {
@@ -217,9 +217,9 @@ namespace llm_agent.DAL
             {
                 connection.Open();
                 string sql = @"
-                    SELECT * FROM Prompts 
-                    WHERE Title LIKE @searchPattern OR Content LIKE @searchPattern 
-                    ORDER BY UsageCount DESC, UpdatedAt DESC";
+                    SELECT * FROM Prompts
+                    WHERE Title LIKE @searchPattern OR Content LIKE @searchPattern
+                    ORDER BY CreatedAt DESC";
 
                 using (var command = new SQLiteCommand(sql, connection))
                 {
@@ -275,7 +275,7 @@ namespace llm_agent.DAL
             {
                 connection.Open();
                 string sql = @"
-                    UPDATE Prompts SET 
+                    UPDATE Prompts SET
                     UsageCount = UsageCount + 1,
                     UpdatedAt = @updatedAt
                     WHERE Id = @id";
@@ -317,4 +317,4 @@ namespace llm_agent.DAL
             return categories;
         }
     }
-} 
+}

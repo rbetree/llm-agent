@@ -70,6 +70,7 @@ namespace llm_agent.UI.Forms
         private bool _isUpdatingChannelDetails = false; // 用于防止界面更新时触发事件处理
         private bool _enableMarkdown = false; // 用于Markdown支持设置
         private PromptManager _promptManager = null!; // 提示词管理器
+        private PromptCardItem _selectedPromptCard = null!; // 当前选中的提示词卡片
 
         protected FlowLayoutPanel chatListPanel;
         protected TextBox searchBox;
@@ -138,15 +139,12 @@ namespace llm_agent.UI.Forms
             try
             {
                 _systemPrompt = Properties.Settings.Default.SystemPrompt;
-                
+
                 // 加载流式响应设置
                 _useStreamResponse = Properties.Settings.Default.EnableStreamResponse;
-                
+
                 // 加载Markdown支持设置
                 _enableMarkdown = Properties.Settings.Default.EnableMarkdown;
-
-                // 已删除以下控件初始化
-                // streamCheckBox.Checked = _useStreamResponse;
 
                 // 加载上次使用的模型
                 if (Enum.TryParse<ProviderType>(Properties.Settings.Default.ProviderType, out var providerType))
@@ -157,10 +155,10 @@ namespace llm_agent.UI.Forms
                 {
                     _currentProviderType = providerType;
                 }
-                
+
                 Properties.Settings.Default.ProviderType = providerType.ToString();
                 Properties.Settings.Default.Save();
-                
+
                 // 加载上次使用的模型
                 _currentModelId = Properties.Settings.Default.LastSelectedModel;
             }
@@ -174,19 +172,6 @@ namespace llm_agent.UI.Forms
         {
             // 添加缺失的变量声明
             TextBox txtSystemPrompt = settingsContentContainer.Controls.Find("txtSystemPrompt", true).FirstOrDefault() as TextBox;
-
-            // 初始化聊天页面的模型选择器
-            // 已移除旧控件方法
-            // InitializeChatPageModelSelector();
-
-            // 已删除以下事件处理
-            // // 添加聊天页面中streamCheckBox的事件处理
-            // streamCheckBox.CheckedChanged += (s, e) =>
-            // {
-            //     _useStreamResponse = streamCheckBox.Checked;
-            //     Properties.Settings.Default.EnableStreamResponse = _useStreamResponse;
-            //     Properties.Settings.Default.Save();
-            // };
 
             // Markdown支持复选框事件处理
             chkEnableMarkdown.CheckedChanged += (s, e) =>
@@ -206,18 +191,6 @@ namespace llm_agent.UI.Forms
                     Properties.Settings.Default.Save();
                 };
             }
-
-            // 已删除以下事件处理
-            // // chatModelComboBox模型选择事件
-            // chatModelComboBox.SelectedIndexChanged += ChatModelComboBox_SelectedIndexChanged;
-
-            // 已删除以下事件处理
-            // // 调整模型选择器位置事件
-            // inputPanel.Resize += (s, e) =>
-            // {
-            //     // 调整comboBox1位置
-            //     chatModelComboBox.Location = new Point(10, 10);
-            // };
 
             // 导航按钮事件
             avatarButton.Click += (s, e) => SwitchToPanel(userProfilePanel, avatarButton);
@@ -271,45 +244,6 @@ namespace llm_agent.UI.Forms
 
         private void InitializeChatPageModelSelector()
         {
-            // 此方法已不再使用chatModelComboBox控件
-            // 而是使用chatboxControl的模型选择器，但保留此方法以备将来引用
-            // 请使用UpdateChatboxModelList方法替代此方法
-            
-            /* 原代码如下：
-            // 初始化聊天页面的模型选择下拉框
-            chatModelComboBox.Items.Clear();
-
-            // 获取所有已启用的渠道
-            var enabledChannels = _channelManager.GetEnabledChannels();
-
-            // 加载所有启用渠道的模型
-            foreach (var channel in enabledChannels)
-            {
-                // 获取渠道支持的模型列表
-                var availableModels = channel.SupportedModels;
-
-                foreach (var model in availableModels)
-                {
-                    // 添加渠道前缀来区分不同渠道的模型
-                    string displayName = $"{channel.Name}: {model}";
-                    chatModelComboBox.Items.Add(displayName);
-                }
-            }
-
-            // 选择上次使用的模型
-            if (!string.IsNullOrEmpty(_currentModelId) && chatModelComboBox.Items.Contains(_currentModelId))
-            {
-                chatModelComboBox.SelectedItem = _currentModelId;
-            }
-            else if (chatModelComboBox.Items.Count > 0)
-            {
-                chatModelComboBox.SelectedIndex = 0;
-                _currentModelId = chatModelComboBox.SelectedItem.ToString();
-                Properties.Settings.Default.LastSelectedModel = _currentModelId;
-                Properties.Settings.Default.Save();
-            }
-            */
-            
             // 使用新的方法更新模型列表
             if (chatboxControl != null)
             {
@@ -353,14 +287,10 @@ namespace llm_agent.UI.Forms
             {
                 // 初始化聊天选择器（左侧列表）
                 InitializeChatTopics();
-                
+
                 // 初始化聊天模型选择器
                 InitializeChatPageModelSelector();
 
-                // 已删除以下代码，不再使用streamCheckBox
-                // 设置流式响应复选框状态
-                // streamCheckBox.Checked = _useStreamResponse;
-                
                 DisplayChatInterface();
             }
             else if (targetPanel == channelPanel)
@@ -377,10 +307,10 @@ namespace llm_agent.UI.Forms
                     {
                         chkEnableMarkdown.Checked = _enableMarkdown;
                     }
-                    
+
                     // 其他设置页面初始化...
                 }
-                
+
                 // 默认选中通用设置按钮
                 SwitchSettingsPage(generalSettingsContainer);
                 generalSettingsButton.BackColor = Color.FromArgb(230, 230, 230);
@@ -429,6 +359,9 @@ namespace llm_agent.UI.Forms
                 // 清空现有的提示词卡片
                 promptsListPanel.Controls.Clear();
 
+                // 重置选中状态
+                _selectedPromptCard = null;
+
                 // 添加各个提示词的卡片
                 foreach (var prompt in prompts)
                 {
@@ -443,6 +376,16 @@ namespace llm_agent.UI.Forms
                     // 添加点击事件
                     promptCard.PromptClicked += (s, e) =>
                     {
+                        // 取消之前选中卡片的高亮状态
+                        if (_selectedPromptCard != null)
+                        {
+                            _selectedPromptCard.IsSelected = false;
+                        }
+
+                        // 设置当前卡片为选中状态
+                        _selectedPromptCard = promptCard;
+                        promptCard.IsSelected = true;
+
                         DisplayPromptDetail(e.Prompt);
                     };
 
@@ -464,12 +407,16 @@ namespace llm_agent.UI.Forms
 
         private void InitializePromptSearchBox()
         {
+            // 先解除旧的事件绑定，防止重复绑定
+            promptSearchBox.TextChanged -= PromptSearchBox_TextChanged;
             // 设置搜索框事件处理
             promptSearchBox.TextChanged += PromptSearchBox_TextChanged;
         }
 
         private void InitializeNewPromptButton()
         {
+            // 先解除旧的事件绑定，防止重复绑定
+            newPromptButton.Click -= NewPromptButton_Click;
             // 设置新建按钮事件处理
             newPromptButton.Click += NewPromptButton_Click;
         }
@@ -482,7 +429,7 @@ namespace llm_agent.UI.Forms
                 string searchText = promptSearchBox.Text.Trim();
 
                 List<Prompt> prompts;
-                
+
                 // 根据搜索文本获取提示词
                 if (string.IsNullOrEmpty(searchText))
                 {
@@ -495,6 +442,9 @@ namespace llm_agent.UI.Forms
 
                 // 清空现有的提示词卡片
                 promptsListPanel.Controls.Clear();
+
+                // 重置选中状态
+                _selectedPromptCard = null;
 
                 // 添加匹配搜索文本的提示词卡片
                 foreach (var prompt in prompts)
@@ -510,6 +460,16 @@ namespace llm_agent.UI.Forms
                     // 添加点击事件
                     promptCard.PromptClicked += (s, args) =>
                     {
+                        // 取消之前选中卡片的高亮状态
+                        if (_selectedPromptCard != null)
+                        {
+                            _selectedPromptCard.IsSelected = false;
+                        }
+
+                        // 设置当前卡片为选中状态
+                        _selectedPromptCard = promptCard;
+                        promptCard.IsSelected = true;
+
                         DisplayPromptDetail(args.Prompt);
                     };
 
@@ -652,21 +612,21 @@ namespace llm_agent.UI.Forms
                 deleteButton.FlatAppearance.BorderSize = 0;
 
                 // 添加保存按钮点击事件
-                saveButton.Click += (s, e) => 
+                saveButton.Click += (s, e) =>
                 {
                     try
                     {
                         // 更新提示词数据
                         _promptManager.UpdatePrompt(
-                            prompt.Id, 
-                            titleTextBox.Text, 
-                            contentTextBox.Text, 
+                            prompt.Id,
+                            titleTextBox.Text,
+                            contentTextBox.Text,
                             categoryTextBox.Text
                         );
-                        
+
                         // 刷新列表
                         InitializePromptsList();
-                        
+
                         MessageBox.Show("提示词已保存。", "保存成功", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
                     catch (Exception ex)
@@ -676,35 +636,35 @@ namespace llm_agent.UI.Forms
                 };
 
                 // 添加使用按钮点击事件
-                useButton.Click += (s, e) => 
+                useButton.Click += (s, e) =>
                 {
                     UsePrompt(prompt);
                 };
 
                 // 添加删除按钮点击事件
-                deleteButton.Click += (s, e) => 
+                deleteButton.Click += (s, e) =>
                 {
                     try
                     {
                         // 确认删除
                         var result = MessageBox.Show(
-                            $"确定要删除提示词 \"{prompt.Title}\" 吗？此操作不可恢复。", 
-                            "确认删除", 
-                            MessageBoxButtons.YesNo, 
+                            $"确定要删除提示词 \"{prompt.Title}\" 吗？此操作不可恢复。",
+                            "确认删除",
+                            MessageBoxButtons.YesNo,
                             MessageBoxIcon.Warning
                         );
-                        
+
                         if (result == DialogResult.Yes)
                         {
                             // 删除提示词
                             _promptManager.DeletePrompt(prompt.Id);
-                            
+
                             // 刷新列表
                             InitializePromptsList();
-                            
+
                             // 清空详情面板
                             promptsContentPanel.Controls.Clear();
-                            
+
                             MessageBox.Show("提示词已删除。", "删除成功", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         }
                     }
@@ -740,15 +700,15 @@ namespace llm_agent.UI.Forms
 
                 // 增加使用次数
                 _promptManager.UsePrompt(prompt.Id);
-                
-                // 将提示词内容复制到剪贴板
-                Clipboard.SetText(prompt.Content);
-                
+
                 // 切换到聊天面板
                 SwitchToPanel(chatPagePanel, chatNavButton);
-                
-                // 通知用户
-                MessageBox.Show("提示词已复制到剪贴板，已切换到聊天界面。", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                // 将提示词内容填入聊天输入框
+                if (chatboxControl != null)
+                {
+                    chatboxControl.SetInputText(prompt.Content);
+                }
             }
             catch (Exception ex)
             {
@@ -808,26 +768,6 @@ namespace llm_agent.UI.Forms
             {
                 // 设置窗体标题
                 UpdateTitle();
-
-                // 设置提供商选择下拉框
-                // 不再使用cboProvider
-                // cboProvider.Items.Clear();
-                // foreach (ProviderType type in Enum.GetValues(typeof(ProviderType)))
-                // {
-                //     string displayName = GetProviderDisplayName(type);
-                //     cboProvider.Items.Add(displayName);
-                // }
-
-                // 选择当前提供商
-                // string currentProviderName = GetProviderDisplayName(_currentProviderType);
-                // cboProvider.SelectedItem = currentProviderName;
-
-
-                // 设置comboBox1的样式和位置
-                // 已删除以下代码，不再使用chatModelComboBox
-                // chatModelComboBox.DropDownStyle = ComboBoxStyle.DropDownList;
-                // chatModelComboBox.Width = 180;
-                // chatModelComboBox.Location = new Point(10, 10);
 
                 // 加载模型列表
                 UpdateModelList();
@@ -1041,7 +981,7 @@ namespace llm_agent.UI.Forms
 
             // 使用Chatbox显示当前会话的所有消息
             RefreshChatMessages(chatboxControl, currentSession.Messages);
-            
+
             // 将焦点设置到Chatbox的输入框
             var chatTextbox = chatboxControl.Controls.Find("chatTextbox", true).FirstOrDefault() as TextBox;
             if (chatTextbox != null)
@@ -1078,7 +1018,7 @@ namespace llm_agent.UI.Forms
 
             // 确保切换到聊天界面
             SwitchToPanel(chatPagePanel, chatNavButton);
-            
+
             // 设置Chatbox输入框焦点
             var chatTextbox = chatboxControl.Controls.Find("chatTextbox", true).FirstOrDefault() as TextBox;
             if (chatTextbox != null)
@@ -1190,31 +1130,6 @@ namespace llm_agent.UI.Forms
         private void UpdateSettingsModelList()
         {
             // 该方法不再需要，因为已删除modelListBox控件
-            // 清空模型列表框
-            // if (modelListBox != null)
-            // {
-            //     modelListBox.Items.Clear();
-
-            //     // 根据当前提供商类型填充模型列表
-            //     var provider = _providerFactory.GetProvider(_currentProviderType);
-            //     if (provider != null)
-            //     {
-            //         var availableModels = provider.GetAvailableModels();
-            //         foreach (var model in availableModels)
-            //         {
-            //             modelListBox.Items.Add(model);
-            //         }
-
-            //         // 如果有模型，则默认选中第一个
-            //         if (modelListBox.Items.Count > 0)
-            //         {
-            //             modelListBox.SelectedIndex = 0;
-            //         }
-            //     }
-
-            //     // 更新标题
-            //     modelListGroup.Text = $"{GetProviderDisplayName(_currentProviderType)}支持的模型";
-            // }
         }
 
         private void UpdateTitle()
@@ -1382,7 +1297,7 @@ namespace llm_agent.UI.Forms
 
                 // 保存用户消息到会话
                 _chatHistoryManager.AddMessageToSession(session, userMessage);
-                
+
                 // 使用Chatbox显示用户消息
                 chatboxControl.AddMessage(ChatModelAdapter.ToTextChatModel(userMessage));
 
@@ -1396,7 +1311,7 @@ namespace llm_agent.UI.Forms
 
                 // 保存占位消息到会话
                 _chatHistoryManager.AddMessageToSession(session, waitingMessage);
-                
+
                 // 使用Chatbox显示占位消息
                 chatboxControl.AddMessage(ChatModelAdapter.ToTextChatModel(waitingMessage));
 
@@ -1411,7 +1326,7 @@ namespace llm_agent.UI.Forms
                     string apiKey = GetApiKey();
                     string apiHost = GetApiHost();
                     string modelId = string.Empty;
-                    
+
                     // 从_currentModelId中提取真正的模型名称
                     // _currentModelId的格式为"渠道名: 模型名"
                     if (!string.IsNullOrEmpty(_currentModelId) && _currentModelId.Contains(":"))
@@ -1422,14 +1337,14 @@ namespace llm_agent.UI.Forms
                             modelId = parts[1].Trim(); // 提取模型名称部分
                         }
                     }
-                    
+
                     // 获取提供商实例
                     var provider = _providerFactory.GetProvider(_currentProviderType);
                     if (provider == null)
                     {
                         throw new InvalidOperationException($"无法创建提供商实例: {_currentProviderType}");
                     }
-                    
+
                     // 处理特定渠道模型
                     if (_currentChannelId != Guid.Empty)
                     {
@@ -1439,7 +1354,7 @@ namespace llm_agent.UI.Forms
                             // 使用渠道的配置
                             apiKey = channel.ApiKey;
                             apiHost = channel.ApiHost;
-                            
+
                             // 如果未能从_currentModelId提取模型名称，使用第一个可用模型作为备选
                             if (string.IsNullOrEmpty(modelId))
                             {
@@ -1507,14 +1422,14 @@ namespace llm_agent.UI.Forms
                 {
                     // 处理API请求错误
                     string errorContent = $"请求出错：{ex.Message}";
-                    
+
                     // 使用错误消息替换"思考中..."
                     waitingMessage.Content = errorContent;
                     waitingMessage.UpdatedAt = DateTime.Now;
-                    
+
                     // 更新UI上的错误消息
                     UpdateLastAssistantMessageContent(chatboxControl, errorContent);
-                    
+
                     // 保存更新后的会话
                     _chatHistoryManager.SaveSession(session);
                 }
@@ -1529,49 +1444,49 @@ namespace llm_agent.UI.Forms
         {
             // 初始化HTTP客户端
             InitializeHttpClient();
-            
+
             // 初始化提供商工厂
             InitializeProviderFactory();
-            
+
             // 初始化聊天历史管理器
             InitializeChatHistoryManager();
-            
+
             // 初始化渠道管理器
             InitializeChannelManager();
-            
+
             // 初始化渠道服务
             InitializeChannelService();
-            
+
             // 初始化提示词管理器
             InitializePromptManager();
-            
+
             // 配置界面元素
             SetupUI();
-            
+
             // 设置事件处理
             SetupEvents();
-            
+
             // 加载设置
             LoadSettings();
-            
+
             // 启用Markdown支持选项
             chkEnableMarkdown.Checked = _enableMarkdown;
-            
+
             // 已删除对streamCheckBox的初始化
             // streamCheckBox.Checked = _useStreamResponse;
-            
+
             // 默认切换到聊天页面
             SwitchToPanel(chatPagePanel, chatNavButton);
-            
+
             // 更新界面标题
             UpdateTitle();
-            
+
             // 初始化聊天会话列表（左侧聊天历史）
             InitializeChatTopics();
-            
+
             // 初始化聊天界面
             DisplayChatInterface();
-            
+
             // 绑定表单快捷键
             this.KeyDown += LlmAgentMainForm_KeyDown;
             this.FormClosing += LlmAgentMainForm_FormClosing;
@@ -1603,7 +1518,7 @@ namespace llm_agent.UI.Forms
                 if (chatTextbox != null && chatTextbox.Focused)
                 {
                     e.SuppressKeyPress = true;  // 阻止默认回车换行行为
-                    
+
                     // 触发发送消息
                     _ = SendMessage();
                 }
@@ -1733,7 +1648,7 @@ namespace llm_agent.UI.Forms
         {
             // 此方法已不再使用chatModelComboBox控件
             // 而是使用chatboxControl的模型选择器
-            
+
             /* 原代码如下：
             if (chatModelComboBox != null)
             {
@@ -1768,7 +1683,7 @@ namespace llm_agent.UI.Forms
                 }
             }
             */
-            
+
             // 使用新的chatboxControl控件更新模型列表
             if (chatboxControl != null)
             {
@@ -1847,14 +1762,14 @@ namespace llm_agent.UI.Forms
         //     if (modelListBox.SelectedItem != null)
         //     {
         //         string selectedModel = modelListBox.SelectedItem.ToString();
-        // 
+        //
         //         // 设置当前模型ID
         //         _currentModelId = selectedModel;
-        // 
+        //
         //         // 保存设置
         //         Properties.Settings.Default.LastSelectedModel = _currentModelId;
         //         Properties.Settings.Default.Save();
-        // 
+        //
         //         // 更新窗体标题
         //         UpdateTitle();
         //     }
@@ -2730,7 +2645,7 @@ namespace llm_agent.UI.Forms
             chatListPanel.AllowDrop = true;
             chatListPanel.DragEnter += ChatListPanel_DragEnter;
             chatListPanel.DragDrop += ChatListPanel_DragDrop;
-            
+
             // 添加大小改变事件
             chatListPanel.SizeChanged += ChatListPanel_SizeChanged;
 
@@ -2738,13 +2653,13 @@ namespace llm_agent.UI.Forms
             newChatButton.Click -= NewChatButton_Click;
             newChatButton.Click += NewChatButton_Click;
         }
-        
+
         // 提取为单独的方法，以便可以明确地添加和移除
         private void NewChatButton_Click(object sender, EventArgs e)
         {
             CreateNewChat();
         }
-        
+
         private void ChatListPanel_SizeChanged(object sender, EventArgs e)
         {
             // 当面板大小改变时调整所有ChatSessionItem的宽度
@@ -2768,25 +2683,25 @@ namespace llm_agent.UI.Forms
                 sessionItem.Session = session;
                 sessionItem.OnSessionSelected += (s, e) => SwitchToChat(e);
                 sessionItem.OnSessionDeleted += (s, e) => DeleteChatSession(e);
-                
+
                 // 添加到Panel之前先调整宽度
                 sessionItem.Width = chatListPanel.ClientSize.Width - sessionItem.Margin.Horizontal;
-                
+
                 // 添加到控件集合
                 chatListPanel.Controls.Add(sessionItem);
-                
+
                 // 在控件添加后再次调整大小，确保适应当前DPI设置
                 float dpiScaleFactor = sessionItem.CreateGraphics().DpiX / 96f;
                 int scaledHeight = (int)(100 * dpiScaleFactor);
                 sessionItem.Height = scaledHeight;
-                
+
                 // 确保内部控件也正确调整大小
                 if (sessionItem.IsHandleCreated)
                 {
-                    sessionItem.Invoke(new Action(() => 
+                    sessionItem.Invoke(new Action(() =>
                     {
-                        typeof(ChatSessionItem).GetMethod("AdjustControlSizes", 
-                            System.Reflection.BindingFlags.NonPublic | 
+                        typeof(ChatSessionItem).GetMethod("AdjustControlSizes",
+                            System.Reflection.BindingFlags.NonPublic |
                             System.Reflection.BindingFlags.Instance)?.Invoke(sessionItem, null);
                     }));
                 }
@@ -2939,7 +2854,7 @@ namespace llm_agent.UI.Forms
 
             // 使chatContainer变为普通的Panel（隐藏分割线）
             chatContainer.Panel2Collapsed = true;
-            
+
             // 创建 ChatboxInfo 对象配置 Chatbox
             var chatboxInfo = new ChatboxInfo
             {
@@ -2954,10 +2869,10 @@ namespace llm_agent.UI.Forms
             chatboxControl = new Chatbox(chatboxInfo);
             chatboxControl.Dock = DockStyle.Fill;
             chatboxControl.Name = "chatboxControl";
-            
+
             // 设置流式响应状态
             chatboxControl.SetStreamResponse(_useStreamResponse);
-            
+
             // 注册流式响应事件
             chatboxControl.StreamResponseToggled += (s, e) => {
                 _useStreamResponse = chatboxControl.UseStreamResponse;
@@ -2965,7 +2880,7 @@ namespace llm_agent.UI.Forms
                 Properties.Settings.Default.EnableStreamResponse = _useStreamResponse;
                 Properties.Settings.Default.Save();
             };
-            
+
             // 注册模型选择事件
             chatboxControl.ModelSelectionChanged += (s, e) => {
                 string selectedModel = chatboxControl.GetSelectedModel();
@@ -2975,7 +2890,7 @@ namespace llm_agent.UI.Forms
                     HandleModelSelection(selectedModel);
                 }
             };
-            
+
             // 重新配置附件上传功能
             // 移除原有的BuildAttachment事件处理
             var attachButton = chatboxControl.Controls.Find("attachButton", true).FirstOrDefault() as Button;
@@ -2983,27 +2898,27 @@ namespace llm_agent.UI.Forms
             {
                 // 清除原有的事件处理
                 attachButton.Click -= new EventHandler(chatboxControl.BuildAttachment);
-                
+
                 // 添加新的事件处理
                 attachButton.Click += (s, e) => {
                     // 调用文件上传功能
                     UploadAttachment();
                 };
             }
-            
+
             // 配置发送消息按钮
             var sendButton = chatboxControl.Controls.Find("sendButton", true).FirstOrDefault() as Button;
             if (sendButton != null)
             {
                 // 先移除原有的SendMessage事件处理程序
                 chatboxControl.RemoveSendMessageHandler();
-                
+
                 // 添加新的发送事件处理
                 sendButton.Click += async (s, e) => {
                     await SendMessage();
                 };
             }
-            
+
             // 配置输入框的按键事件（Shift+Enter发送）
             var chatTextbox = chatboxControl.Controls.Find("chatTextbox", true).FirstOrDefault() as TextBox;
             if (chatTextbox != null)
@@ -3019,11 +2934,11 @@ namespace llm_agent.UI.Forms
 
             // 将 Chatbox 添加到chatContainer的Panel1（主要面板）
             chatContainer.Panel1.Controls.Add(chatboxControl);
-            
+
             // 初始化模型列表
             UpdateChatboxModelList();
         }
-        
+
         /// <summary>
         /// 处理文件上传功能
         /// </summary>
@@ -3037,27 +2952,27 @@ namespace llm_agent.UI.Forms
                     openFileDialog.Filter = "所有文件|*.*|图片文件|*.jpg;*.jpeg;*.png;*.gif|文档文件|*.pdf;*.doc;*.docx;*.txt";
                     openFileDialog.Title = "选择要上传的文件";
                     openFileDialog.Multiselect = false;
-                    
+
                     // 显示文件选择对话框
                     if (openFileDialog.ShowDialog() == DialogResult.OK)
                     {
                         // 获取选择的文件路径
                         string filePath = openFileDialog.FileName;
                         string fileName = Path.GetFileName(filePath);
-                        
+
                         // 读取文件内容
                         byte[] fileContent = File.ReadAllBytes(filePath);
-                        
+
                         // 检查文件大小
                         if (fileContent.Length > 1450000) // 限制文件大小为1.45MB
                         {
                             MessageBox.Show($"文件 {fileName} 太大，无法上传。请选择小于1.45MB的文件。", "文件过大", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                             return;
                         }
-                        
+
                         // 获取文件扩展名
                         string extension = Path.GetExtension(filePath).ToLower();
-                        
+
                         // 根据文件类型处理
                         if (IsImageFile(extension))
                         {
@@ -3067,7 +2982,7 @@ namespace llm_agent.UI.Forms
                                 using (MemoryStream ms = new MemoryStream(fileContent))
                                 {
                                     Image image = Image.FromStream(ms);
-                                    
+
                                     // 创建图片消息模型
                                     var imageModel = new ImageChatModel
                                     {
@@ -3078,7 +2993,7 @@ namespace llm_agent.UI.Forms
                                         Image = image,
                                         ImageName = fileName
                                     };
-                                    
+
                                     // 添加到聊天界面
                                     chatboxControl.AddMessage(imageModel);
                                 }
@@ -3100,7 +3015,7 @@ namespace llm_agent.UI.Forms
                                 Attachment = fileContent,
                                 Filename = fileName
                             };
-                            
+
                             // 添加到聊天界面
                             chatboxControl.AddMessage(attachmentModel);
                         }
@@ -3112,7 +3027,7 @@ namespace llm_agent.UI.Forms
                 MessageBox.Show($"上传文件时出错: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-        
+
         /// <summary>
         /// 判断文件是否为图片
         /// </summary>
@@ -3121,7 +3036,7 @@ namespace llm_agent.UI.Forms
             string[] imageExtensions = { ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".tiff" };
             return imageExtensions.Contains(extension);
         }
-        
+
         /// <summary>
         /// 更新Chatbox控件的模型列表
         /// </summary>
@@ -3129,11 +3044,11 @@ namespace llm_agent.UI.Forms
         {
             if (chatboxControl == null)
                 return;
-                
+
             // 获取所有已启用的渠道的模型
             var models = new List<string>();
             var enabledChannels = _channelManager.GetEnabledChannels();
-            
+
             foreach (var channel in enabledChannels)
             {
                 foreach (var model in channel.SupportedModels)
@@ -3142,11 +3057,11 @@ namespace llm_agent.UI.Forms
                     models.Add(displayName);
                 }
             }
-            
+
             // 设置模型列表
             chatboxControl.SetModelList(models, _currentModelId);
         }
-        
+
         /// <summary>
         /// 处理模型选择逻辑
         /// </summary>
@@ -3155,7 +3070,7 @@ namespace llm_agent.UI.Forms
         {
             if (string.IsNullOrEmpty(selectedModel))
                 return;
-                
+
             // 解析渠道名称和模型名称
             string[] parts = selectedModel.Split(new[] { ':' }, 2);
             if (parts.Length == 2)
@@ -3206,14 +3121,14 @@ namespace llm_agent.UI.Forms
 
             // 清空现有消息
             chatbox.ClearMessages();
-            
+
             // 没有消息的情况，显示欢迎界面
             if (!messages.Any())
             {
                 InitializeChatboxForEmptySession(chatbox);
                 return;
             }
-            
+
             // 转换并添加所有消息
             foreach (var message in messages)
             {
@@ -3224,7 +3139,7 @@ namespace llm_agent.UI.Forms
                     chatbox.AddMessage(chatModel);
                 }
             }
-            
+
             // 确保滚动到最新消息
             if (chatbox.GetMessageCount() > 0)
             {
@@ -3232,7 +3147,7 @@ namespace llm_agent.UI.Forms
                 chatbox.ScrollToMessage(lastMessage);
             }
         }
-        
+
         /// <summary>
         /// 查找并刷新最后一条助手消息
         /// </summary>
@@ -3242,7 +3157,7 @@ namespace llm_agent.UI.Forms
         {
             if (chatbox == null || chatbox.GetMessageCount() == 0)
                 return null;
-                
+
             // 寻找最后一条助手消息
             // 注意：控件是按照添加顺序倒序排列的，所以最新的消息在顶部
             for (int i = 0; i < chatbox.GetMessageCount(); i++)
@@ -3251,8 +3166,8 @@ namespace llm_agent.UI.Forms
                 if (chatItem != null)
                 {
                     // 检查是否是助手消息（TextChatModel且Author为助手）
-                    if (chatItem.Message is TextChatModel textModel && 
-                        textModel.Inbound && 
+                    if (chatItem.Message is TextChatModel textModel &&
+                        textModel.Inbound &&
                         textModel.Author == "助手")
                     {
                         // 找到最后一条助手消息，滚动到该消息
@@ -3261,11 +3176,11 @@ namespace llm_agent.UI.Forms
                     }
                 }
             }
-            
+
             // 未找到助手消息
             return null;
         }
-        
+
         /// <summary>
         /// 更新最后一条助手消息的内容
         /// </summary>
@@ -3278,14 +3193,14 @@ namespace llm_agent.UI.Forms
             ChatItem lastAssistantItem = RefreshLastAssistantMessage(chatbox);
             if (lastAssistantItem == null)
                 return false;
-                
+
             // 更新消息内容
             if (lastAssistantItem.Message is TextChatModel textModel)
             {
                 // 使用Chatbox的UpdateLastMessage方法更新内容
                 return chatbox.UpdateLastMessage("助手", content);
             }
-            
+
             return false;
         }
 
@@ -3307,7 +3222,7 @@ namespace llm_agent.UI.Forms
             {
                 chatbox.AddMessage(chatModel);
             }
-            
+
             // 确保 Chatbox 的输入框有焦点，如果适用
             var chatTextbox = chatbox.Controls.Find("chatTextbox", true).FirstOrDefault() as TextBox;
             if (chatTextbox != null)

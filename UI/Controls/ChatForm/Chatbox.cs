@@ -226,6 +226,29 @@ namespace llm_agent.UI.Controls.ChatForm
             }
         }
 
+        /// <summary>
+        /// 设置输入框文本内容
+        /// </summary>
+        /// <param name="text">要设置的文本内容</param>
+        public void SetInputText(string text)
+        {
+            if (chatTextbox != null)
+            {
+                // 设置文本内容
+                chatTextbox.Text = text ?? string.Empty;
+
+                // 设置文本颜色为正常颜色（非占位符灰色）
+                chatTextbox.ForeColor = Color.Black;
+
+                // 让输入框获得焦点
+                chatTextbox.Focus();
+
+                // 将光标定位到文本末尾
+                chatTextbox.SelectionStart = chatTextbox.Text.Length;
+                chatTextbox.SelectionLength = 0;
+            }
+        }
+
         //Improves the chat UI slightly by having a placeholder text. Note that this is implemented because Winforms doesn't have a native "placeholder" UI. Can be buggy.
         void ChatLeave(object sender, EventArgs e)
         {

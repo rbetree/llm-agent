@@ -73,21 +73,17 @@ namespace llm_agent.UI.Controls
             InitializeComponent();
             _defaultBackColor = BackColor;
             SetStyle(ControlStyles.UserPaint | ControlStyles.ResizeRedraw | ControlStyles.DoubleBuffer | ControlStyles.AllPaintingInWmPaint, true);
-            
+
             // 注册事件处理
             this.MouseEnter += PromptCardItem_MouseEnter;
             this.MouseLeave += PromptCardItem_MouseLeave;
-            
-            // 确保点击事件能够正确触发
-            foreach (Control control in this.Controls)
-            {
-                // 为所有子控件添加点击事件处理
-                control.Click += PromptCardItem_Click;
-            }
-            
+
             this.Click += PromptCardItem_Click;
             this.DoubleClick += PromptCardItem_DoubleClick;
-            
+
+            // 递归为所有子控件绑定点击事件
+            BindClickEventsRecursively(this);
+
             // 设置控件可接收焦点
             this.SetStyle(ControlStyles.Selectable, true);
             this.TabStop = true;
@@ -113,13 +109,16 @@ namespace llm_agent.UI.Controls
             lblTitle.Text = _prompt.Title;
             lblCategory.Text = _prompt.Category;
             lblUsageCount.Text = $"使用次数: {_prompt.UsageCount}";
-            
+
             // 设置提示词内容的提示信息
-            string contentPreview = _prompt.Content.Length > 100 
-                ? _prompt.Content.Substring(0, 100) + "..." 
+            string contentPreview = _prompt.Content.Length > 100
+                ? _prompt.Content.Substring(0, 100) + "..."
                 : _prompt.Content;
-            
+
             toolTip.SetToolTip(this, contentPreview);
+
+            // 确保事件绑定正确（防止动态更新时丢失事件绑定）
+            BindClickEventsRecursively(this);
         }
 
         /// <summary>
@@ -151,13 +150,13 @@ namespace llm_agent.UI.Controls
         {
             // 添加调试输出
             Console.WriteLine($"PromptCardItem_Click: 提示词 {_prompt?.Title} 被点击");
-            
+
             // 触发点击事件
             PromptClicked?.Invoke(this, new PromptCardClickEventArgs(_prompt));
-            
+
             // 设置选中状态
             IsSelected = true;
-            
+
             // 触发选择事件
             PromptSelected?.Invoke(this, new PromptCardClickEventArgs(_prompt));
         }
@@ -176,6 +175,30 @@ namespace llm_agent.UI.Controls
         private void btnUse_Click(object sender, EventArgs e)
         {
             UsePromptClicked?.Invoke(this, new PromptCardClickEventArgs(_prompt));
+        }
+
+        /// <summary>
+        /// 递归为所有子控件绑定点击事件
+        /// </summary>
+        /// <param name="parent">父控件</param>
+        private void BindClickEventsRecursively(Control parent)
+        {
+            foreach (Control control in parent.Controls)
+            {
+                // 跳过使用按钮，避免干扰其原有功能
+                if (control == btnUse)
+                    continue;
+
+                // 为子控件绑定点击事件
+                control.Click -= PromptCardItem_Click; // 先解除绑定，避免重复
+                control.Click += PromptCardItem_Click;
+
+                // 递归处理子控件的子控件
+                if (control.HasChildren)
+                {
+                    BindClickEventsRecursively(control);
+                }
+            }
         }
     }
 
@@ -198,4 +221,4 @@ namespace llm_agent.UI.Controls
             Prompt = prompt;
         }
     }
-} 
+}

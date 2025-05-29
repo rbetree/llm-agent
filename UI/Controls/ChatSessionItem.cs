@@ -96,15 +96,15 @@ namespace llm_agent.UI.Controls
 
             // 计算DPI缩放因子
             float dpiScaleFactor = this.CreateGraphics().DpiX / 96f;
-            
+
             // 调整标题标签高度
             _titleLabel.Height = (int)(30 * dpiScaleFactor);
-            
+
             // 调整预览标签高度和位置
             _previewLabel.Height = (int)(30 * dpiScaleFactor);
             _previewLabel.Width = this.ClientSize.Width - 20; // 考虑Padding
             _previewLabel.Location = new Point(10, _titleLabel.Bottom);
-            
+
             // 调整时间标签高度
             _timeLabel.Height = (int)(20 * dpiScaleFactor);
         }
@@ -116,9 +116,6 @@ namespace llm_agent.UI.Controls
             this.MouseDown += ChatSessionItem_MouseDown;
             this.MouseMove += ChatSessionItem_MouseMove;
             this.MouseUp += ChatSessionItem_MouseUp;
-
-            // 添加大小变化事件
-            this.SizeChanged += (s, e) => AdjustControlSizes();
 
             // 递归为所有子控件绑定点击事件
             BindClickEventsRecursively(this);
@@ -168,7 +165,7 @@ namespace llm_agent.UI.Controls
         {
             if (_session == null) return;
 
-            lblTitle.Text = _session.Title ?? "新会话";
+            _titleLabel.Text = _session.Title ?? "新会话";
 
             if (_session.Messages.Count > 0)
             {
@@ -179,11 +176,14 @@ namespace llm_agent.UI.Controls
             {
                 _previewLabel.Text = "无消息";
             }
-            
+
             _timeLabel.Text = _session.UpdatedAt.ToString("MM-dd HH:mm");
-            
+
             // 调整控件大小
             AdjustControlSizes();
+
+            // 确保事件绑定正确（防止动态更新时丢失事件绑定）
+            BindClickEventsRecursively(this);
         }
 
         // 文本截断
