@@ -21,7 +21,8 @@ namespace llm_agent.DAL
         /// </summary>
         public WebsiteRepository()
         {
-            // 数据库初始化由DatabaseManager处理
+            // 确保数据库和表已初始化
+            var databaseManager = new DatabaseManager();
         }
 
         #region AI网站管理
@@ -547,6 +548,86 @@ namespace llm_agent.DAL
                 website.Credential = GetWebsiteCredentialByWebsiteId(websiteId);
             }
             return website;
+        }
+
+        /// <summary>
+        /// 获取最近访问的网站
+        /// </summary>
+        /// <param name="count">返回数量</param>
+        /// <returns>最近访问的网站列表</returns>
+        public List<AiWebsite> GetRecentlyVisitedWebsites(int count = 10)
+        {
+            var websites = new List<AiWebsite>();
+
+            using (var connection = new SQLiteConnection(ConnectionString))
+            {
+                connection.Open();
+
+                string sql = @"
+                    SELECT * FROM AiWebsites
+                    WHERE IsActive = 1 AND LastVisitedAt IS NOT NULL
+                    ORDER BY LastVisitedAt DESC
+                    LIMIT @count";
+
+                using (var command = new SQLiteCommand(sql, connection))
+                {
+                    command.Parameters.AddWithValue("@count", count);
+
+                    using (var reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            websites.Add(MapWebsiteFromReader(reader));
+                        }
+                    }
+                }
+            }
+
+            return websites;
+        }
+
+        /// <summary>
+        /// 初始化默认网站数据
+        /// </summary>
+        public void InitializeDefaultWebsites()
+        {
+            var defaultWebsites = new List<AiWebsite>
+            {
+                new AiWebsite("ChatGPT", "https://chat.openai.com", "OpenAI的ChatGPT官方网站", "对话AI"),
+                new AiWebsite("Claude", "https://claude.ai", "Anthropic的Claude AI助手", "对话AI"),
+                new AiWebsite("Gemini", "https://gemini.google.com", "Google的Gemini AI助手", "对话AI"),
+                new AiWebsite("文心一言", "https://yiyan.baidu.com", "百度的文心一言AI助手", "对话AI"),
+                new AiWebsite("通义千问", "https://tongyi.aliyun.com", "阿里巴巴的通义千问AI助手", "对话AI"),
+                new AiWebsite("智谱清言", "https://chatglm.cn", "智谱AI的ChatGLM助手", "对话AI"),
+                new AiWebsite("Midjourney", "https://www.midjourney.com", "AI图像生成工具", "图像生成"),
+                new AiWebsite("DALL-E", "https://labs.openai.com", "OpenAI的图像生成工具", "图像生成"),
+                new AiWebsite("Stable Diffusion", "https://stablediffusionweb.com", "开源AI图像生成工具", "图像生成"),
+                new AiWebsite("GitHub Copilot", "https://github.com/features/copilot", "AI代码助手", "编程工具"),
+                new AiWebsite("Cursor", "https://cursor.sh", "AI代码编辑器", "编程工具"),
+                new AiWebsite("Perplexity", "https://www.perplexity.ai", "AI搜索引擎", "搜索工具"),
+                new AiWebsite("You.com", "https://you.com", "AI搜索引擎", "搜索工具"),
+                new AiWebsite("Hugging Face", "https://huggingface.co", "AI模型和数据集平台", "AI平台"),
+                new AiWebsite("Replicate", "https://replicate.com", "AI模型运行平台", "AI平台")
+            };
+
+            // 设置排序顺序
+            for (int i = 0; i < defaultWebsites.Count; i++)
+            {
+                defaultWebsites[i].SortOrder = i + 1;
+            }
+
+            // 保存默认网站
+            foreach (var website in defaultWebsites)
+            {
+                try
+                {
+                    SaveWebsite(website);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"初始化默认网站 {website.Name} 失败: {ex.Message}");
+                }
+            }
         }
 
         #endregion

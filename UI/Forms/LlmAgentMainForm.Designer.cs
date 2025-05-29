@@ -96,19 +96,23 @@ namespace llm_agent.UI.Forms
             promptsPanel = new System.Windows.Forms.Panel();
             promptsPageSplitContainer = new System.Windows.Forms.SplitContainer();
             promptsListContainer = new System.Windows.Forms.SplitContainer();
-            promptsListPanel = new System.Windows.Forms.FlowLayoutPanel();
+            promptSearchBox = new System.Windows.Forms.TextBox();
+            newPromptButton = new System.Windows.Forms.Button();
+            promptsListPanel = new llm_agent.UI.Controls.HiddenScrollBarFlowLayoutPanel();
             promptsContentPanel = new System.Windows.Forms.Panel();
             aiWebsitePanel = new System.Windows.Forms.Panel();
             aiWebsitePageSplitContainer = new System.Windows.Forms.SplitContainer();
             aiWebsiteMenuPanel = new System.Windows.Forms.Panel();
+            websiteListContainer = new System.Windows.Forms.SplitContainer();
+            websiteSearchBox = new System.Windows.Forms.TextBox();
+            newWebsiteButton = new System.Windows.Forms.Button();
+            websiteListPanel = new System.Windows.Forms.FlowLayoutPanel();
             aiWebsiteContentPanel = new System.Windows.Forms.Panel();
             settingsContentPanel = new System.Windows.Forms.Panel();
             generalSettingsGroup = new System.Windows.Forms.GroupBox();
             chkEnableMarkdown = new System.Windows.Forms.CheckBox();
             btnSaveSettings = new System.Windows.Forms.Button();
             chkStreamResponse = new System.Windows.Forms.CheckBox();
-            promptSearchBox = new System.Windows.Forms.TextBox();
-            newPromptButton = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)mainSplitContainer).BeginInit();
             mainSplitContainer.Panel1.SuspendLayout();
             mainSplitContainer.Panel2.SuspendLayout();
@@ -158,42 +162,51 @@ namespace llm_agent.UI.Forms
             promptsPageSplitContainer.Panel1.SuspendLayout();
             promptsPageSplitContainer.Panel2.SuspendLayout();
             promptsPageSplitContainer.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)promptsListContainer).BeginInit();
+            promptsListContainer.Panel1.SuspendLayout();
+            promptsListContainer.Panel2.SuspendLayout();
+            promptsListContainer.SuspendLayout();
             aiWebsitePanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)aiWebsitePageSplitContainer).BeginInit();
             aiWebsitePageSplitContainer.Panel1.SuspendLayout();
             aiWebsitePageSplitContainer.Panel2.SuspendLayout();
             aiWebsitePageSplitContainer.SuspendLayout();
+            aiWebsiteMenuPanel.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)websiteListContainer).BeginInit();
+            websiteListContainer.Panel1.SuspendLayout();
+            websiteListContainer.Panel2.SuspendLayout();
+            websiteListContainer.SuspendLayout();
             generalSettingsGroup.SuspendLayout();
             SuspendLayout();
-            // 
+            //
             // mainSplitContainer
-            // 
+            //
             mainSplitContainer.Dock = System.Windows.Forms.DockStyle.Fill;
             mainSplitContainer.FixedPanel = System.Windows.Forms.FixedPanel.Panel1;
             mainSplitContainer.IsSplitterFixed = true;
             mainSplitContainer.Location = new System.Drawing.Point(0, 0);
             mainSplitContainer.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             mainSplitContainer.Name = "mainSplitContainer";
-            // 
+            //
             // mainSplitContainer.Panel1
-            // 
+            //
             mainSplitContainer.Panel1.Controls.Add(navPanel);
-            // 
+            //
             // mainSplitContainer.Panel2
-            // 
+            //
+            mainSplitContainer.Panel2.Controls.Add(aiWebsitePanel);
             mainSplitContainer.Panel2.Controls.Add(chatPagePanel);
             mainSplitContainer.Panel2.Controls.Add(settingsPanel);
             mainSplitContainer.Panel2.Controls.Add(channelPanel);
             mainSplitContainer.Panel2.Controls.Add(userProfilePanel);
             mainSplitContainer.Panel2.Controls.Add(filesPanel);
             mainSplitContainer.Panel2.Controls.Add(promptsPanel);
-            mainSplitContainer.Panel2.Controls.Add(aiWebsitePanel);
             mainSplitContainer.Size = new System.Drawing.Size(1030, 653);
             mainSplitContainer.SplitterDistance = 70;
             mainSplitContainer.TabIndex = 0;
-            // 
+            //
             // navPanel
-            // 
+            //
             navPanel.BackColor = System.Drawing.Color.FromArgb(100, 101, 165);
             navPanel.Controls.Add(settingsNavButton);
             navPanel.Controls.Add(filesNavButton);
@@ -208,9 +221,9 @@ namespace llm_agent.UI.Forms
             navPanel.Name = "navPanel";
             navPanel.Size = new System.Drawing.Size(70, 653);
             navPanel.TabIndex = 0;
-            // 
+            //
             // settingsNavButton
-            // 
+            //
             settingsNavButton.BackColor = System.Drawing.Color.Transparent;
             settingsNavButton.Cursor = System.Windows.Forms.Cursors.Hand;
             settingsNavButton.Dock = System.Windows.Forms.DockStyle.Bottom;
@@ -223,9 +236,9 @@ namespace llm_agent.UI.Forms
             settingsNavButton.TabIndex = 6;
             settingsNavButton.UseVisualStyleBackColor = false;
             settingsNavButton.Click += settingsNavButton_Click;
-            // 
+            //
             // filesNavButton
-            // 
+            //
             filesNavButton.BackColor = System.Drawing.Color.Transparent;
             filesNavButton.Cursor = System.Windows.Forms.Cursors.Hand;
             filesNavButton.FlatAppearance.BorderSize = 0;
@@ -236,9 +249,9 @@ namespace llm_agent.UI.Forms
             filesNavButton.Size = new System.Drawing.Size(70, 70);
             filesNavButton.TabIndex = 5;
             filesNavButton.UseVisualStyleBackColor = false;
-            // 
+            //
             // chatNavButton
-            // 
+            //
             chatNavButton.BackColor = System.Drawing.Color.Transparent;
             chatNavButton.Cursor = System.Windows.Forms.Cursors.Hand;
             chatNavButton.FlatAppearance.BorderSize = 0;
@@ -249,9 +262,9 @@ namespace llm_agent.UI.Forms
             chatNavButton.Size = new System.Drawing.Size(70, 70);
             chatNavButton.TabIndex = 4;
             chatNavButton.UseVisualStyleBackColor = false;
-            // 
+            //
             // websiteNavButton
-            // 
+            //
             websiteNavButton.BackColor = System.Drawing.Color.Transparent;
             websiteNavButton.Cursor = System.Windows.Forms.Cursors.Hand;
             websiteNavButton.FlatAppearance.BorderSize = 0;
@@ -262,9 +275,9 @@ namespace llm_agent.UI.Forms
             websiteNavButton.Size = new System.Drawing.Size(70, 70);
             websiteNavButton.TabIndex = 3;
             websiteNavButton.UseVisualStyleBackColor = false;
-            // 
+            //
             // promptsNavButton
-            // 
+            //
             promptsNavButton.BackColor = System.Drawing.Color.Transparent;
             promptsNavButton.Cursor = System.Windows.Forms.Cursors.Hand;
             promptsNavButton.FlatAppearance.BorderSize = 0;
@@ -275,9 +288,9 @@ namespace llm_agent.UI.Forms
             promptsNavButton.Size = new System.Drawing.Size(70, 70);
             promptsNavButton.TabIndex = 2;
             promptsNavButton.UseVisualStyleBackColor = false;
-            // 
+            //
             // avatarButton
-            // 
+            //
             avatarButton.BackColor = System.Drawing.Color.Transparent;
             avatarButton.Cursor = System.Windows.Forms.Cursors.Hand;
             avatarButton.FlatAppearance.BorderSize = 0;
@@ -288,9 +301,9 @@ namespace llm_agent.UI.Forms
             avatarButton.Size = new System.Drawing.Size(70, 70);
             avatarButton.TabIndex = 1;
             avatarButton.UseVisualStyleBackColor = false;
-            // 
+            //
             // channelNavButton
-            // 
+            //
             channelNavButton.BackColor = System.Drawing.Color.Transparent;
             channelNavButton.Cursor = System.Windows.Forms.Cursors.Hand;
             channelNavButton.FlatAppearance.BorderSize = 0;
@@ -302,9 +315,9 @@ namespace llm_agent.UI.Forms
             channelNavButton.TabIndex = 8;
             channelNavButton.UseVisualStyleBackColor = false;
             channelNavButton.Click += channelNavButton_Click;
-            // 
+            //
             // chatPagePanel
-            // 
+            //
             chatPagePanel.Controls.Add(chatPageSplitContainer);
             chatPagePanel.Dock = System.Windows.Forms.DockStyle.Fill;
             chatPagePanel.Location = new System.Drawing.Point(0, 0);
@@ -312,49 +325,49 @@ namespace llm_agent.UI.Forms
             chatPagePanel.Name = "chatPagePanel";
             chatPagePanel.Size = new System.Drawing.Size(956, 653);
             chatPagePanel.TabIndex = 2;
-            // 
+            //
             // chatPageSplitContainer
-            // 
+            //
             chatPageSplitContainer.Dock = System.Windows.Forms.DockStyle.Fill;
             chatPageSplitContainer.FixedPanel = System.Windows.Forms.FixedPanel.Panel1;
             chatPageSplitContainer.Location = new System.Drawing.Point(0, 0);
             chatPageSplitContainer.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             chatPageSplitContainer.Name = "chatPageSplitContainer";
-            // 
+            //
             // chatPageSplitContainer.Panel1
-            // 
+            //
             chatPageSplitContainer.Panel1.Controls.Add(chatListContainer);
-            // 
+            //
             // chatPageSplitContainer.Panel2
-            // 
+            //
             chatPageSplitContainer.Panel2.Controls.Add(chatContainer);
             chatPageSplitContainer.Size = new System.Drawing.Size(956, 653);
             chatPageSplitContainer.SplitterDistance = 283;
             chatPageSplitContainer.TabIndex = 0;
-            // 
+            //
             // chatListContainer
-            // 
+            //
             chatListContainer.Dock = System.Windows.Forms.DockStyle.Fill;
             chatListContainer.Location = new System.Drawing.Point(0, 0);
             chatListContainer.Margin = new System.Windows.Forms.Padding(2);
             chatListContainer.Name = "chatListContainer";
             chatListContainer.Orientation = System.Windows.Forms.Orientation.Horizontal;
-            // 
+            //
             // chatListContainer.Panel1
-            // 
+            //
             chatListContainer.Panel1.Controls.Add(searchBox);
             chatListContainer.Panel1.Controls.Add(newChatButton);
-            // 
+            //
             // chatListContainer.Panel2
-            // 
+            //
             chatListContainer.Panel2.Controls.Add(chatListPanel);
             chatListContainer.Size = new System.Drawing.Size(283, 653);
             chatListContainer.SplitterDistance = 73;
             chatListContainer.SplitterWidth = 3;
             chatListContainer.TabIndex = 2;
-            // 
+            //
             // searchBox
-            // 
+            //
             searchBox.BackColor = System.Drawing.Color.WhiteSmoke;
             searchBox.Dock = System.Windows.Forms.DockStyle.Fill;
             searchBox.Location = new System.Drawing.Point(0, 52);
@@ -363,9 +376,9 @@ namespace llm_agent.UI.Forms
             searchBox.PlaceholderText = "搜索会话标题...";
             searchBox.Size = new System.Drawing.Size(283, 27);
             searchBox.TabIndex = 0;
-            // 
+            //
             // newChatButton
-            // 
+            //
             newChatButton.AutoSize = true;
             newChatButton.BackColor = System.Drawing.Color.LightSlateGray;
             newChatButton.Cursor = System.Windows.Forms.Cursors.Hand;
@@ -380,9 +393,9 @@ namespace llm_agent.UI.Forms
             newChatButton.TabIndex = 0;
             newChatButton.Text = "+ 新对话";
             newChatButton.UseVisualStyleBackColor = false;
-            // 
+            //
             // chatListPanel
-            // 
+            //
             chatListPanel.AutoScroll = true;
             chatListPanel.AutoSize = true;
             chatListPanel.BackColor = System.Drawing.Color.FromArgb(247, 247, 247);
@@ -392,36 +405,36 @@ namespace llm_agent.UI.Forms
             chatListPanel.Name = "chatListPanel";
             chatListPanel.Size = new System.Drawing.Size(283, 577);
             chatListPanel.TabIndex = 0;
-            // 
+            //
             // chatContainer
-            // 
+            //
             chatContainer.Dock = System.Windows.Forms.DockStyle.Fill;
             chatContainer.FixedPanel = System.Windows.Forms.FixedPanel.Panel2;
             chatContainer.Location = new System.Drawing.Point(0, 0);
             chatContainer.Margin = new System.Windows.Forms.Padding(4);
             chatContainer.Name = "chatContainer";
             chatContainer.Orientation = System.Windows.Forms.Orientation.Horizontal;
-            // 
+            //
             // chatContainer.Panel1
-            // 
+            //
             chatContainer.Panel1.Controls.Add(inputPanel);
             chatContainer.Size = new System.Drawing.Size(669, 653);
-            chatContainer.SplitterDistance = 377;
+            chatContainer.SplitterDistance = 376;
             chatContainer.SplitterWidth = 5;
             chatContainer.TabIndex = 1;
-            // 
+            //
             // inputPanel
-            // 
+            //
             inputPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             inputPanel.Location = new System.Drawing.Point(0, 0);
             inputPanel.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             inputPanel.Name = "inputPanel";
             inputPanel.Padding = new System.Windows.Forms.Padding(3, 0, 3, 0);
-            inputPanel.Size = new System.Drawing.Size(669, 377);
+            inputPanel.Size = new System.Drawing.Size(669, 376);
             inputPanel.TabIndex = 0;
-            // 
+            //
             // settingsPanel
-            // 
+            //
             settingsPanel.AutoScroll = true;
             settingsPanel.Controls.Add(settingsPageSplitContainer);
             settingsPanel.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -431,28 +444,28 @@ namespace llm_agent.UI.Forms
             settingsPanel.Size = new System.Drawing.Size(956, 653);
             settingsPanel.TabIndex = 1;
             settingsPanel.Visible = false;
-            // 
+            //
             // settingsPageSplitContainer
-            // 
+            //
             settingsPageSplitContainer.Dock = System.Windows.Forms.DockStyle.Fill;
             settingsPageSplitContainer.FixedPanel = System.Windows.Forms.FixedPanel.Panel1;
             settingsPageSplitContainer.Location = new System.Drawing.Point(0, 0);
             settingsPageSplitContainer.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             settingsPageSplitContainer.Name = "settingsPageSplitContainer";
-            // 
+            //
             // settingsPageSplitContainer.Panel1
-            // 
+            //
             settingsPageSplitContainer.Panel1.Controls.Add(settingsMenuPanel);
-            // 
+            //
             // settingsPageSplitContainer.Panel2
-            // 
+            //
             settingsPageSplitContainer.Panel2.Controls.Add(settingsContentContainer);
             settingsPageSplitContainer.Size = new System.Drawing.Size(956, 653);
             settingsPageSplitContainer.SplitterDistance = 283;
             settingsPageSplitContainer.TabIndex = 0;
-            // 
+            //
             // settingsMenuPanel
-            // 
+            //
             settingsMenuPanel.BackColor = System.Drawing.Color.FromArgb(248, 249, 250);
             settingsMenuPanel.Controls.Add(aboutSettingsButton);
             settingsMenuPanel.Controls.Add(dataSettingsButton);
@@ -465,9 +478,9 @@ namespace llm_agent.UI.Forms
             settingsMenuPanel.Padding = new System.Windows.Forms.Padding(0, 20, 0, 0);
             settingsMenuPanel.Size = new System.Drawing.Size(283, 653);
             settingsMenuPanel.TabIndex = 0;
-            // 
+            //
             // aboutSettingsButton
-            // 
+            //
             aboutSettingsButton.BackColor = System.Drawing.Color.FromArgb(248, 249, 250);
             aboutSettingsButton.Cursor = System.Windows.Forms.Cursors.Hand;
             aboutSettingsButton.FlatAppearance.BorderSize = 0;
@@ -482,9 +495,9 @@ namespace llm_agent.UI.Forms
             aboutSettingsButton.Text = "关于";
             aboutSettingsButton.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             aboutSettingsButton.UseVisualStyleBackColor = false;
-            // 
+            //
             // dataSettingsButton
-            // 
+            //
             dataSettingsButton.BackColor = System.Drawing.Color.FromArgb(248, 249, 250);
             dataSettingsButton.Cursor = System.Windows.Forms.Cursors.Hand;
             dataSettingsButton.FlatAppearance.BorderSize = 0;
@@ -499,9 +512,9 @@ namespace llm_agent.UI.Forms
             dataSettingsButton.Text = "数据设置";
             dataSettingsButton.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             dataSettingsButton.UseVisualStyleBackColor = false;
-            // 
+            //
             // generalSettingsButton
-            // 
+            //
             generalSettingsButton.BackColor = System.Drawing.Color.FromArgb(248, 249, 250);
             generalSettingsButton.Cursor = System.Windows.Forms.Cursors.Hand;
             generalSettingsButton.Dock = System.Windows.Forms.DockStyle.Top;
@@ -517,9 +530,9 @@ namespace llm_agent.UI.Forms
             generalSettingsButton.Text = "常规设置";
             generalSettingsButton.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             generalSettingsButton.UseVisualStyleBackColor = false;
-            // 
+            //
             // shortcutSettingsButton
-            // 
+            //
             shortcutSettingsButton.BackColor = System.Drawing.Color.FromArgb(248, 249, 250);
             shortcutSettingsButton.Cursor = System.Windows.Forms.Cursors.Hand;
             shortcutSettingsButton.FlatAppearance.BorderSize = 0;
@@ -534,9 +547,9 @@ namespace llm_agent.UI.Forms
             shortcutSettingsButton.Text = "快捷方式设置";
             shortcutSettingsButton.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             shortcutSettingsButton.UseVisualStyleBackColor = false;
-            // 
+            //
             // settingsContentContainer
-            // 
+            //
             settingsContentContainer.Controls.Add(dataSettingsContainer);
             settingsContentContainer.Controls.Add(aboutContainer);
             settingsContentContainer.Controls.Add(generalSettingsContainer);
@@ -547,9 +560,9 @@ namespace llm_agent.UI.Forms
             settingsContentContainer.Name = "settingsContentContainer";
             settingsContentContainer.Size = new System.Drawing.Size(669, 653);
             settingsContentContainer.TabIndex = 0;
-            // 
+            //
             // dataSettingsContainer
-            // 
+            //
             dataSettingsContainer.Controls.Add(clearChatHistoryButton);
             dataSettingsContainer.Dock = System.Windows.Forms.DockStyle.Fill;
             dataSettingsContainer.Location = new System.Drawing.Point(0, 0);
@@ -558,9 +571,9 @@ namespace llm_agent.UI.Forms
             dataSettingsContainer.Size = new System.Drawing.Size(669, 653);
             dataSettingsContainer.TabIndex = 4;
             dataSettingsContainer.Visible = false;
-            // 
+            //
             // clearChatHistoryButton
-            // 
+            //
             clearChatHistoryButton.BackColor = System.Drawing.Color.FromArgb(220, 53, 69);
             clearChatHistoryButton.Cursor = System.Windows.Forms.Cursors.Hand;
             clearChatHistoryButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
@@ -573,9 +586,9 @@ namespace llm_agent.UI.Forms
             clearChatHistoryButton.TabIndex = 0;
             clearChatHistoryButton.Text = "清除所有聊天记录";
             clearChatHistoryButton.UseVisualStyleBackColor = false;
-            // 
+            //
             // aboutContainer
-            // 
+            //
             aboutContainer.Dock = System.Windows.Forms.DockStyle.Fill;
             aboutContainer.Location = new System.Drawing.Point(0, 0);
             aboutContainer.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
@@ -583,9 +596,9 @@ namespace llm_agent.UI.Forms
             aboutContainer.Size = new System.Drawing.Size(669, 653);
             aboutContainer.TabIndex = 5;
             aboutContainer.Visible = false;
-            // 
+            //
             // generalSettingsContainer
-            // 
+            //
             generalSettingsContainer.Dock = System.Windows.Forms.DockStyle.Fill;
             generalSettingsContainer.Location = new System.Drawing.Point(0, 0);
             generalSettingsContainer.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
@@ -593,9 +606,9 @@ namespace llm_agent.UI.Forms
             generalSettingsContainer.Size = new System.Drawing.Size(669, 653);
             generalSettingsContainer.TabIndex = 3;
             generalSettingsContainer.Visible = false;
-            // 
+            //
             // shortcutSettingsContainer
-            // 
+            //
             shortcutSettingsContainer.Dock = System.Windows.Forms.DockStyle.Fill;
             shortcutSettingsContainer.Location = new System.Drawing.Point(0, 0);
             shortcutSettingsContainer.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
@@ -603,9 +616,9 @@ namespace llm_agent.UI.Forms
             shortcutSettingsContainer.Size = new System.Drawing.Size(669, 653);
             shortcutSettingsContainer.TabIndex = 2;
             shortcutSettingsContainer.Visible = false;
-            // 
+            //
             // channelPanel
-            // 
+            //
             channelPanel.BackColor = System.Drawing.Color.White;
             channelPanel.Controls.Add(channelPageSplitContainer);
             channelPanel.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -615,28 +628,28 @@ namespace llm_agent.UI.Forms
             channelPanel.Size = new System.Drawing.Size(956, 653);
             channelPanel.TabIndex = 8;
             channelPanel.Visible = false;
-            // 
+            //
             // channelPageSplitContainer
-            // 
+            //
             channelPageSplitContainer.Dock = System.Windows.Forms.DockStyle.Fill;
             channelPageSplitContainer.FixedPanel = System.Windows.Forms.FixedPanel.Panel1;
             channelPageSplitContainer.Location = new System.Drawing.Point(0, 0);
             channelPageSplitContainer.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             channelPageSplitContainer.Name = "channelPageSplitContainer";
-            // 
+            //
             // channelPageSplitContainer.Panel1
-            // 
+            //
             channelPageSplitContainer.Panel1.Controls.Add(channelListPanel);
-            // 
+            //
             // channelPageSplitContainer.Panel2
-            // 
+            //
             channelPageSplitContainer.Panel2.Controls.Add(channelContentPanel);
             channelPageSplitContainer.Size = new System.Drawing.Size(956, 653);
             channelPageSplitContainer.SplitterDistance = 283;
             channelPageSplitContainer.TabIndex = 0;
-            // 
+            //
             // channelListPanel
-            // 
+            //
             channelListPanel.BackColor = System.Drawing.Color.FromArgb(248, 249, 250);
             channelListPanel.Controls.Add(channelListBox);
             channelListPanel.Controls.Add(deleteChannelButton);
@@ -648,9 +661,9 @@ namespace llm_agent.UI.Forms
             channelListPanel.Name = "channelListPanel";
             channelListPanel.Size = new System.Drawing.Size(283, 653);
             channelListPanel.TabIndex = 0;
-            // 
+            //
             // channelListBox
-            // 
+            //
             channelListBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             channelListBox.Dock = System.Windows.Forms.DockStyle.Fill;
             channelListBox.Font = new System.Drawing.Font("Microsoft YaHei UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 134);
@@ -662,9 +675,9 @@ namespace llm_agent.UI.Forms
             channelListBox.Size = new System.Drawing.Size(283, 533);
             channelListBox.TabIndex = 0;
             channelListBox.SelectedIndexChanged += channelListBox_SelectedIndexChanged;
-            // 
+            //
             // deleteChannelButton
-            // 
+            //
             deleteChannelButton.BackColor = System.Drawing.Color.White;
             deleteChannelButton.Cursor = System.Windows.Forms.Cursors.Hand;
             deleteChannelButton.Dock = System.Windows.Forms.DockStyle.Bottom;
@@ -678,9 +691,9 @@ namespace llm_agent.UI.Forms
             deleteChannelButton.Text = "删除渠道";
             deleteChannelButton.UseVisualStyleBackColor = false;
             deleteChannelButton.Click += deleteChannelButton_Click;
-            // 
+            //
             // testChannelButton
-            // 
+            //
             testChannelButton.BackColor = System.Drawing.Color.FromArgb(26, 147, 254);
             testChannelButton.Cursor = System.Windows.Forms.Cursors.Hand;
             testChannelButton.Dock = System.Windows.Forms.DockStyle.Bottom;
@@ -696,9 +709,9 @@ namespace llm_agent.UI.Forms
             testChannelButton.Text = "批量渠道联通测试";
             testChannelButton.UseVisualStyleBackColor = false;
             testChannelButton.Click += testChannelButton_Click;
-            // 
+            //
             // addChannelButton
-            // 
+            //
             addChannelButton.BackColor = System.Drawing.Color.White;
             addChannelButton.Cursor = System.Windows.Forms.Cursors.Hand;
             addChannelButton.Dock = System.Windows.Forms.DockStyle.Bottom;
@@ -712,9 +725,9 @@ namespace llm_agent.UI.Forms
             addChannelButton.Text = "添加渠道";
             addChannelButton.UseVisualStyleBackColor = false;
             addChannelButton.Click += addChannelButton_Click;
-            // 
+            //
             // channelContentPanel
-            // 
+            //
             channelContentPanel.BackColor = System.Drawing.Color.White;
             channelContentPanel.Controls.Add(testChannelModelButton);
             channelContentPanel.Controls.Add(manageChannelModelsButton);
@@ -729,9 +742,9 @@ namespace llm_agent.UI.Forms
             channelContentPanel.Padding = new System.Windows.Forms.Padding(21, 20, 21, 20);
             channelContentPanel.Size = new System.Drawing.Size(669, 653);
             channelContentPanel.TabIndex = 0;
-            // 
+            //
             // testChannelModelButton
-            // 
+            //
             testChannelModelButton.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right;
             testChannelModelButton.BackColor = System.Drawing.Color.FromArgb(26, 147, 254);
             testChannelModelButton.Cursor = System.Windows.Forms.Cursors.Hand;
@@ -746,9 +759,9 @@ namespace llm_agent.UI.Forms
             testChannelModelButton.TabIndex = 6;
             testChannelModelButton.Text = "测试模型";
             testChannelModelButton.UseVisualStyleBackColor = false;
-            // 
+            //
             // manageChannelModelsButton
-            // 
+            //
             manageChannelModelsButton.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right;
             manageChannelModelsButton.BackColor = System.Drawing.Color.FromArgb(26, 147, 254);
             manageChannelModelsButton.Cursor = System.Windows.Forms.Cursors.Hand;
@@ -763,9 +776,9 @@ namespace llm_agent.UI.Forms
             manageChannelModelsButton.TabIndex = 5;
             manageChannelModelsButton.Text = "管理";
             manageChannelModelsButton.UseVisualStyleBackColor = false;
-            // 
+            //
             // channelModelsGroupBox
-            // 
+            //
             channelModelsGroupBox.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
             channelModelsGroupBox.Controls.Add(channelModelListBox);
             channelModelsGroupBox.Font = new System.Drawing.Font("Microsoft YaHei UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 134);
@@ -778,9 +791,9 @@ namespace llm_agent.UI.Forms
             channelModelsGroupBox.TabStop = false;
             channelModelsGroupBox.Text = "渠道支持的模型";
             channelModelsGroupBox.Enter += channelModelsGroupBox_Enter;
-            // 
+            //
             // channelModelListBox
-            // 
+            //
             channelModelListBox.BorderStyle = System.Windows.Forms.BorderStyle.None;
             channelModelListBox.Dock = System.Windows.Forms.DockStyle.Fill;
             channelModelListBox.Font = new System.Drawing.Font("Microsoft YaHei UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 134);
@@ -790,9 +803,9 @@ namespace llm_agent.UI.Forms
             channelModelListBox.Name = "channelModelListBox";
             channelModelListBox.Size = new System.Drawing.Size(602, 243);
             channelModelListBox.TabIndex = 0;
-            // 
+            //
             // channelInfoGroupBox
-            // 
+            //
             channelInfoGroupBox.Controls.Add(btnUpdateChannel);
             channelInfoGroupBox.Controls.Add(txtApiHost);
             channelInfoGroupBox.Controls.Add(lblApiHost);
@@ -811,9 +824,9 @@ namespace llm_agent.UI.Forms
             channelInfoGroupBox.TabIndex = 2;
             channelInfoGroupBox.TabStop = false;
             channelInfoGroupBox.Text = "渠道信息";
-            // 
+            //
             // btnUpdateChannel
-            // 
+            //
             btnUpdateChannel.Cursor = System.Windows.Forms.Cursors.Hand;
             btnUpdateChannel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             btnUpdateChannel.Font = new System.Drawing.Font("Microsoft YaHei UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 134);
@@ -825,9 +838,9 @@ namespace llm_agent.UI.Forms
             btnUpdateChannel.Text = "更新渠道设置";
             btnUpdateChannel.UseVisualStyleBackColor = true;
             btnUpdateChannel.Click += btnUpdateChannel_Click;
-            // 
+            //
             // txtApiHost
-            // 
+            //
             txtApiHost.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             txtApiHost.Font = new System.Drawing.Font("Microsoft YaHei UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 134);
             txtApiHost.Location = new System.Drawing.Point(249, 151);
@@ -835,9 +848,9 @@ namespace llm_agent.UI.Forms
             txtApiHost.Name = "txtApiHost";
             txtApiHost.Size = new System.Drawing.Size(200, 27);
             txtApiHost.TabIndex = 7;
-            // 
+            //
             // lblApiHost
-            // 
+            //
             lblApiHost.AutoSize = true;
             lblApiHost.Font = new System.Drawing.Font("Microsoft YaHei UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 134);
             lblApiHost.Location = new System.Drawing.Point(249, 120);
@@ -845,9 +858,9 @@ namespace llm_agent.UI.Forms
             lblApiHost.Size = new System.Drawing.Size(63, 20);
             lblApiHost.TabIndex = 6;
             lblApiHost.Text = "API主机";
-            // 
+            //
             // txtApiKey
-            // 
+            //
             txtApiKey.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             txtApiKey.Font = new System.Drawing.Font("Microsoft YaHei UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 134);
             txtApiKey.Location = new System.Drawing.Point(21, 151);
@@ -855,9 +868,9 @@ namespace llm_agent.UI.Forms
             txtApiKey.Name = "txtApiKey";
             txtApiKey.Size = new System.Drawing.Size(200, 27);
             txtApiKey.TabIndex = 5;
-            // 
+            //
             // lblApiKey
-            // 
+            //
             lblApiKey.AutoSize = true;
             lblApiKey.Font = new System.Drawing.Font("Microsoft YaHei UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 134);
             lblApiKey.Location = new System.Drawing.Point(21, 120);
@@ -865,9 +878,9 @@ namespace llm_agent.UI.Forms
             lblApiKey.Size = new System.Drawing.Size(63, 20);
             lblApiKey.TabIndex = 4;
             lblApiKey.Text = "API密钥";
-            // 
+            //
             // cboChannelType
-            // 
+            //
             cboChannelType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             cboChannelType.Font = new System.Drawing.Font("Microsoft YaHei UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 134);
             cboChannelType.FormattingEnabled = true;
@@ -877,9 +890,9 @@ namespace llm_agent.UI.Forms
             cboChannelType.Size = new System.Drawing.Size(199, 28);
             cboChannelType.TabIndex = 3;
             cboChannelType.SelectedIndexChanged += cboChannelType_SelectedIndexChanged;
-            // 
+            //
             // lblChannelType
-            // 
+            //
             lblChannelType.AutoSize = true;
             lblChannelType.Font = new System.Drawing.Font("Microsoft YaHei UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 134);
             lblChannelType.Location = new System.Drawing.Point(249, 40);
@@ -887,9 +900,9 @@ namespace llm_agent.UI.Forms
             lblChannelType.Size = new System.Drawing.Size(69, 20);
             lblChannelType.TabIndex = 2;
             lblChannelType.Text = "渠道类型";
-            // 
+            //
             // txtChannelName
-            // 
+            //
             txtChannelName.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             txtChannelName.Font = new System.Drawing.Font("Microsoft YaHei UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 134);
             txtChannelName.Location = new System.Drawing.Point(21, 71);
@@ -897,9 +910,9 @@ namespace llm_agent.UI.Forms
             txtChannelName.Name = "txtChannelName";
             txtChannelName.Size = new System.Drawing.Size(200, 27);
             txtChannelName.TabIndex = 1;
-            // 
+            //
             // lblChannelName
-            // 
+            //
             lblChannelName.AutoSize = true;
             lblChannelName.Font = new System.Drawing.Font("Microsoft YaHei UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 134);
             lblChannelName.Location = new System.Drawing.Point(21, 40);
@@ -907,9 +920,9 @@ namespace llm_agent.UI.Forms
             lblChannelName.Size = new System.Drawing.Size(69, 20);
             lblChannelName.TabIndex = 0;
             lblChannelName.Text = "渠道名称";
-            // 
+            //
             // enableChannelCheckBox
-            // 
+            //
             enableChannelCheckBox.AutoSize = true;
             enableChannelCheckBox.Font = new System.Drawing.Font("Microsoft YaHei UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 134);
             enableChannelCheckBox.Location = new System.Drawing.Point(542, 40);
@@ -920,9 +933,9 @@ namespace llm_agent.UI.Forms
             enableChannelCheckBox.Text = "启用此渠道";
             enableChannelCheckBox.UseVisualStyleBackColor = true;
             enableChannelCheckBox.CheckedChanged += enableChannelCheckBox_CheckedChanged;
-            // 
+            //
             // channelTitleLabel
-            // 
+            //
             channelTitleLabel.Dock = System.Windows.Forms.DockStyle.Top;
             channelTitleLabel.Font = new System.Drawing.Font("Microsoft YaHei UI", 14F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 134);
             channelTitleLabel.Location = new System.Drawing.Point(21, 20);
@@ -931,9 +944,9 @@ namespace llm_agent.UI.Forms
             channelTitleLabel.TabIndex = 0;
             channelTitleLabel.Text = "渠道详情";
             channelTitleLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            // 
+            //
             // userProfilePanel
-            // 
+            //
             userProfilePanel.Controls.Add(userProfilePageSplitContainer);
             userProfilePanel.Dock = System.Windows.Forms.DockStyle.Fill;
             userProfilePanel.Location = new System.Drawing.Point(0, 0);
@@ -942,28 +955,28 @@ namespace llm_agent.UI.Forms
             userProfilePanel.Size = new System.Drawing.Size(956, 653);
             userProfilePanel.TabIndex = 5;
             userProfilePanel.Visible = false;
-            // 
+            //
             // userProfilePageSplitContainer
-            // 
+            //
             userProfilePageSplitContainer.Dock = System.Windows.Forms.DockStyle.Fill;
             userProfilePageSplitContainer.FixedPanel = System.Windows.Forms.FixedPanel.Panel1;
             userProfilePageSplitContainer.Location = new System.Drawing.Point(0, 0);
             userProfilePageSplitContainer.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             userProfilePageSplitContainer.Name = "userProfilePageSplitContainer";
-            // 
+            //
             // userProfilePageSplitContainer.Panel1
-            // 
+            //
             userProfilePageSplitContainer.Panel1.Controls.Add(userProfileMenuPanel);
-            // 
+            //
             // userProfilePageSplitContainer.Panel2
-            // 
+            //
             userProfilePageSplitContainer.Panel2.Controls.Add(userProfileContentPanel);
             userProfilePageSplitContainer.Size = new System.Drawing.Size(956, 653);
             userProfilePageSplitContainer.SplitterDistance = 283;
             userProfilePageSplitContainer.TabIndex = 0;
-            // 
+            //
             // userProfileMenuPanel
-            // 
+            //
             userProfileMenuPanel.AutoScroll = true;
             userProfileMenuPanel.BackColor = System.Drawing.Color.FromArgb(247, 247, 247);
             userProfileMenuPanel.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -972,9 +985,9 @@ namespace llm_agent.UI.Forms
             userProfileMenuPanel.Name = "userProfileMenuPanel";
             userProfileMenuPanel.Size = new System.Drawing.Size(283, 653);
             userProfileMenuPanel.TabIndex = 0;
-            // 
+            //
             // userProfileContentPanel
-            // 
+            //
             userProfileContentPanel.AutoSize = true;
             userProfileContentPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             userProfileContentPanel.Location = new System.Drawing.Point(0, 0);
@@ -983,9 +996,9 @@ namespace llm_agent.UI.Forms
             userProfileContentPanel.Padding = new System.Windows.Forms.Padding(26, 24, 26, 24);
             userProfileContentPanel.Size = new System.Drawing.Size(669, 653);
             userProfileContentPanel.TabIndex = 0;
-            // 
+            //
             // filesPanel
-            // 
+            //
             filesPanel.Controls.Add(filesPageSplitContainer);
             filesPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             filesPanel.Location = new System.Drawing.Point(0, 0);
@@ -994,28 +1007,28 @@ namespace llm_agent.UI.Forms
             filesPanel.Size = new System.Drawing.Size(956, 653);
             filesPanel.TabIndex = 4;
             filesPanel.Visible = false;
-            // 
+            //
             // filesPageSplitContainer
-            // 
+            //
             filesPageSplitContainer.Dock = System.Windows.Forms.DockStyle.Fill;
             filesPageSplitContainer.FixedPanel = System.Windows.Forms.FixedPanel.Panel1;
             filesPageSplitContainer.Location = new System.Drawing.Point(0, 0);
             filesPageSplitContainer.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             filesPageSplitContainer.Name = "filesPageSplitContainer";
-            // 
+            //
             // filesPageSplitContainer.Panel1
-            // 
+            //
             filesPageSplitContainer.Panel1.Controls.Add(filesMenuPanel);
-            // 
+            //
             // filesPageSplitContainer.Panel2
-            // 
+            //
             filesPageSplitContainer.Panel2.Controls.Add(filesContentPanel);
             filesPageSplitContainer.Size = new System.Drawing.Size(956, 653);
             filesPageSplitContainer.SplitterDistance = 283;
             filesPageSplitContainer.TabIndex = 0;
-            // 
+            //
             // filesMenuPanel
-            // 
+            //
             filesMenuPanel.AutoScroll = true;
             filesMenuPanel.BackColor = System.Drawing.Color.FromArgb(247, 247, 247);
             filesMenuPanel.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -1024,9 +1037,9 @@ namespace llm_agent.UI.Forms
             filesMenuPanel.Name = "filesMenuPanel";
             filesMenuPanel.Size = new System.Drawing.Size(283, 653);
             filesMenuPanel.TabIndex = 0;
-            // 
+            //
             // filesContentPanel
-            // 
+            //
             filesContentPanel.AutoSize = true;
             filesContentPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             filesContentPanel.Location = new System.Drawing.Point(0, 0);
@@ -1035,9 +1048,9 @@ namespace llm_agent.UI.Forms
             filesContentPanel.Padding = new System.Windows.Forms.Padding(26, 24, 26, 24);
             filesContentPanel.Size = new System.Drawing.Size(669, 653);
             filesContentPanel.TabIndex = 0;
-            // 
+            //
             // promptsPanel
-            // 
+            //
             promptsPanel.Controls.Add(promptsPageSplitContainer);
             promptsPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             promptsPanel.Location = new System.Drawing.Point(0, 0);
@@ -1046,49 +1059,49 @@ namespace llm_agent.UI.Forms
             promptsPanel.Size = new System.Drawing.Size(956, 653);
             promptsPanel.TabIndex = 3;
             promptsPanel.Visible = false;
-            // 
+            //
             // promptsPageSplitContainer
-            // 
+            //
             promptsPageSplitContainer.Dock = System.Windows.Forms.DockStyle.Fill;
             promptsPageSplitContainer.FixedPanel = System.Windows.Forms.FixedPanel.Panel1;
             promptsPageSplitContainer.Location = new System.Drawing.Point(0, 0);
             promptsPageSplitContainer.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             promptsPageSplitContainer.Name = "promptsPageSplitContainer";
-            // 
+            //
             // promptsPageSplitContainer.Panel1
-            // 
+            //
             promptsPageSplitContainer.Panel1.Controls.Add(promptsListContainer);
-            // 
+            //
             // promptsPageSplitContainer.Panel2
-            // 
+            //
             promptsPageSplitContainer.Panel2.Controls.Add(promptsContentPanel);
             promptsPageSplitContainer.Size = new System.Drawing.Size(956, 653);
             promptsPageSplitContainer.SplitterDistance = 283;
             promptsPageSplitContainer.TabIndex = 0;
-            // 
+            //
             // promptsListContainer
-            // 
+            //
             promptsListContainer.Dock = System.Windows.Forms.DockStyle.Fill;
             promptsListContainer.Location = new System.Drawing.Point(0, 0);
             promptsListContainer.Margin = new System.Windows.Forms.Padding(2);
             promptsListContainer.Name = "promptsListContainer";
             promptsListContainer.Orientation = System.Windows.Forms.Orientation.Horizontal;
-            // 
+            //
             // promptsListContainer.Panel1
-            // 
+            //
             promptsListContainer.Panel1.Controls.Add(promptSearchBox);
             promptsListContainer.Panel1.Controls.Add(newPromptButton);
-            // 
+            //
             // promptsListContainer.Panel2
-            // 
+            //
             promptsListContainer.Panel2.Controls.Add(promptsListPanel);
             promptsListContainer.Size = new System.Drawing.Size(283, 653);
             promptsListContainer.SplitterDistance = 73;
             promptsListContainer.SplitterWidth = 3;
             promptsListContainer.TabIndex = 2;
-            // 
+            //
             // promptSearchBox
-            // 
+            //
             promptSearchBox.BackColor = System.Drawing.Color.WhiteSmoke;
             promptSearchBox.Dock = System.Windows.Forms.DockStyle.Fill;
             promptSearchBox.Location = new System.Drawing.Point(0, 52);
@@ -1097,9 +1110,9 @@ namespace llm_agent.UI.Forms
             promptSearchBox.PlaceholderText = "搜索提示词...";
             promptSearchBox.Size = new System.Drawing.Size(283, 27);
             promptSearchBox.TabIndex = 1;
-            // 
+            //
             // newPromptButton
-            // 
+            //
             newPromptButton.AutoSize = true;
             newPromptButton.BackColor = System.Drawing.Color.LightSlateGray;
             newPromptButton.Cursor = System.Windows.Forms.Cursors.Hand;
@@ -1114,9 +1127,9 @@ namespace llm_agent.UI.Forms
             newPromptButton.TabIndex = 0;
             newPromptButton.Text = "+ 新建提示词";
             newPromptButton.UseVisualStyleBackColor = false;
-            // 
+            //
             // promptsListPanel
-            // 
+            //
             promptsListPanel.AutoScroll = true;
             promptsListPanel.AutoSize = true;
             promptsListPanel.BackColor = System.Drawing.Color.FromArgb(247, 247, 247);
@@ -1126,9 +1139,9 @@ namespace llm_agent.UI.Forms
             promptsListPanel.Name = "promptsListPanel";
             promptsListPanel.Size = new System.Drawing.Size(283, 577);
             promptsListPanel.TabIndex = 0;
-            // 
+            //
             // promptsContentPanel
-            // 
+            //
             promptsContentPanel.AutoSize = true;
             promptsContentPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             promptsContentPanel.Location = new System.Drawing.Point(0, 0);
@@ -1137,9 +1150,9 @@ namespace llm_agent.UI.Forms
             promptsContentPanel.Padding = new System.Windows.Forms.Padding(26, 24, 26, 24);
             promptsContentPanel.Size = new System.Drawing.Size(669, 653);
             promptsContentPanel.TabIndex = 0;
-            // 
+            //
             // aiWebsitePanel
-            // 
+            //
             aiWebsitePanel.Controls.Add(aiWebsitePageSplitContainer);
             aiWebsitePanel.Dock = System.Windows.Forms.DockStyle.Fill;
             aiWebsitePanel.Location = new System.Drawing.Point(0, 0);
@@ -1148,39 +1161,97 @@ namespace llm_agent.UI.Forms
             aiWebsitePanel.Size = new System.Drawing.Size(956, 653);
             aiWebsitePanel.TabIndex = 0;
             aiWebsitePanel.Visible = false;
-            // 
+            //
             // aiWebsitePageSplitContainer
-            // 
+            //
             aiWebsitePageSplitContainer.Dock = System.Windows.Forms.DockStyle.Fill;
             aiWebsitePageSplitContainer.FixedPanel = System.Windows.Forms.FixedPanel.Panel1;
             aiWebsitePageSplitContainer.Location = new System.Drawing.Point(0, 0);
             aiWebsitePageSplitContainer.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             aiWebsitePageSplitContainer.Name = "aiWebsitePageSplitContainer";
-            // 
+            //
             // aiWebsitePageSplitContainer.Panel1
-            // 
+            //
             aiWebsitePageSplitContainer.Panel1.Controls.Add(aiWebsiteMenuPanel);
-            // 
+            //
             // aiWebsitePageSplitContainer.Panel2
-            // 
+            //
             aiWebsitePageSplitContainer.Panel2.Controls.Add(aiWebsiteContentPanel);
             aiWebsitePageSplitContainer.Size = new System.Drawing.Size(956, 653);
             aiWebsitePageSplitContainer.SplitterDistance = 283;
             aiWebsitePageSplitContainer.TabIndex = 0;
-            // 
+            //
             // aiWebsiteMenuPanel
-            // 
+            //
             aiWebsiteMenuPanel.AutoScroll = true;
             aiWebsiteMenuPanel.BackColor = System.Drawing.Color.FromArgb(247, 247, 247);
+            aiWebsiteMenuPanel.Controls.Add(websiteListContainer);
             aiWebsiteMenuPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             aiWebsiteMenuPanel.Location = new System.Drawing.Point(0, 0);
             aiWebsiteMenuPanel.Margin = new System.Windows.Forms.Padding(4);
             aiWebsiteMenuPanel.Name = "aiWebsiteMenuPanel";
             aiWebsiteMenuPanel.Size = new System.Drawing.Size(283, 653);
             aiWebsiteMenuPanel.TabIndex = 0;
-            // 
+            //
+            // websiteListContainer
+            //
+            websiteListContainer.Dock = System.Windows.Forms.DockStyle.Fill;
+            websiteListContainer.FixedPanel = System.Windows.Forms.FixedPanel.Panel1;
+            websiteListContainer.Location = new System.Drawing.Point(0, 0);
+            websiteListContainer.Name = "websiteListContainer";
+            websiteListContainer.Orientation = System.Windows.Forms.Orientation.Horizontal;
+            //
+            // websiteListContainer.Panel1
+            //
+            websiteListContainer.Panel1.Controls.Add(websiteSearchBox);
+            websiteListContainer.Panel1.Controls.Add(newWebsiteButton);
+            //
+            // websiteListContainer.Panel2
+            //
+            websiteListContainer.Panel2.Controls.Add(websiteListPanel);
+            websiteListContainer.Size = new System.Drawing.Size(283, 653);
+            websiteListContainer.SplitterDistance = 80;
+            websiteListContainer.TabIndex = 0;
+            //
+            // websiteSearchBox
+            //
+            websiteSearchBox.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
+            websiteSearchBox.Font = new System.Drawing.Font("Microsoft YaHei UI", 9F);
+            websiteSearchBox.Location = new System.Drawing.Point(12, 12);
+            websiteSearchBox.Name = "websiteSearchBox";
+            websiteSearchBox.PlaceholderText = "搜索网站...";
+            websiteSearchBox.Size = new System.Drawing.Size(259, 27);
+            websiteSearchBox.TabIndex = 0;
+            //
+            // newWebsiteButton
+            //
+            newWebsiteButton.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
+            newWebsiteButton.BackColor = System.Drawing.Color.FromArgb(51, 122, 183);
+            newWebsiteButton.FlatAppearance.BorderSize = 0;
+            newWebsiteButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            newWebsiteButton.Font = new System.Drawing.Font("Microsoft YaHei UI", 9F);
+            newWebsiteButton.ForeColor = System.Drawing.Color.White;
+            newWebsiteButton.Location = new System.Drawing.Point(12, 45);
+            newWebsiteButton.Name = "newWebsiteButton";
+            newWebsiteButton.Size = new System.Drawing.Size(259, 28);
+            newWebsiteButton.TabIndex = 1;
+            newWebsiteButton.Text = "➕ 添加网站";
+            newWebsiteButton.UseVisualStyleBackColor = false;
+            //
+            // websiteListPanel
+            //
+            websiteListPanel.AutoScroll = true;
+            websiteListPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            websiteListPanel.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
+            websiteListPanel.Location = new System.Drawing.Point(0, 0);
+            websiteListPanel.Name = "websiteListPanel";
+            websiteListPanel.Padding = new System.Windows.Forms.Padding(8);
+            websiteListPanel.Size = new System.Drawing.Size(283, 569);
+            websiteListPanel.TabIndex = 0;
+            websiteListPanel.WrapContents = false;
+            //
             // aiWebsiteContentPanel
-            // 
+            //
             aiWebsiteContentPanel.AutoSize = true;
             aiWebsiteContentPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             aiWebsiteContentPanel.Location = new System.Drawing.Point(0, 0);
@@ -1189,25 +1260,25 @@ namespace llm_agent.UI.Forms
             aiWebsiteContentPanel.Padding = new System.Windows.Forms.Padding(26, 24, 26, 24);
             aiWebsiteContentPanel.Size = new System.Drawing.Size(669, 653);
             aiWebsiteContentPanel.TabIndex = 0;
-            // 
+            //
             // settingsContentPanel
-            // 
+            //
             settingsContentPanel.Location = new System.Drawing.Point(0, 0);
             settingsContentPanel.Name = "settingsContentPanel";
             settingsContentPanel.Size = new System.Drawing.Size(200, 100);
             settingsContentPanel.TabIndex = 0;
-            // 
+            //
             // generalSettingsGroup
-            // 
+            //
             generalSettingsGroup.Controls.Add(chkEnableMarkdown);
             generalSettingsGroup.Location = new System.Drawing.Point(0, 0);
             generalSettingsGroup.Name = "generalSettingsGroup";
             generalSettingsGroup.Size = new System.Drawing.Size(200, 100);
             generalSettingsGroup.TabIndex = 0;
             generalSettingsGroup.TabStop = false;
-            // 
+            //
             // chkEnableMarkdown
-            // 
+            //
             chkEnableMarkdown.AutoSize = true;
             chkEnableMarkdown.Location = new System.Drawing.Point(0, 30);
             chkEnableMarkdown.Name = "chkEnableMarkdown";
@@ -1215,23 +1286,23 @@ namespace llm_agent.UI.Forms
             chkEnableMarkdown.TabIndex = 1;
             chkEnableMarkdown.Text = "启用Markdown格式";
             chkEnableMarkdown.UseVisualStyleBackColor = true;
-            // 
+            //
             // btnSaveSettings
-            // 
+            //
             btnSaveSettings.Location = new System.Drawing.Point(0, 0);
             btnSaveSettings.Name = "btnSaveSettings";
             btnSaveSettings.Size = new System.Drawing.Size(75, 23);
             btnSaveSettings.TabIndex = 0;
-            // 
+            //
             // chkStreamResponse
-            // 
+            //
             chkStreamResponse.Location = new System.Drawing.Point(0, 0);
             chkStreamResponse.Name = "chkStreamResponse";
             chkStreamResponse.Size = new System.Drawing.Size(104, 24);
             chkStreamResponse.TabIndex = 0;
-            // 
+            //
             // LlmAgentMainForm
-            // 
+            //
             AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             BackColor = System.Drawing.Color.White;
@@ -1312,6 +1383,12 @@ namespace llm_agent.UI.Forms
             aiWebsitePageSplitContainer.Panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)aiWebsitePageSplitContainer).EndInit();
             aiWebsitePageSplitContainer.ResumeLayout(false);
+            aiWebsiteMenuPanel.ResumeLayout(false);
+            websiteListContainer.Panel1.ResumeLayout(false);
+            websiteListContainer.Panel1.PerformLayout();
+            websiteListContainer.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)websiteListContainer).EndInit();
+            websiteListContainer.ResumeLayout(false);
             generalSettingsGroup.ResumeLayout(false);
             generalSettingsGroup.PerformLayout();
             ResumeLayout(false);
@@ -1375,7 +1452,7 @@ namespace llm_agent.UI.Forms
         private System.Windows.Forms.Panel promptsPanel;
         private System.Windows.Forms.SplitContainer promptsPageSplitContainer;
         private System.Windows.Forms.SplitContainer promptsListContainer;
-        private System.Windows.Forms.FlowLayoutPanel promptsListPanel;
+        private llm_agent.UI.Controls.HiddenScrollBarFlowLayoutPanel promptsListPanel;
         private System.Windows.Forms.TextBox promptSearchBox;
         private System.Windows.Forms.Button newPromptButton;
         private System.Windows.Forms.TextBox txtApiHost;
@@ -1386,6 +1463,10 @@ namespace llm_agent.UI.Forms
         private System.Windows.Forms.Panel aiWebsitePanel;
         private System.Windows.Forms.SplitContainer aiWebsitePageSplitContainer;
         private System.Windows.Forms.Panel aiWebsiteMenuPanel;
+        private System.Windows.Forms.SplitContainer websiteListContainer;
+        private System.Windows.Forms.TextBox websiteSearchBox;
+        private System.Windows.Forms.Button newWebsiteButton;
+        private System.Windows.Forms.FlowLayoutPanel websiteListPanel;
         private System.Windows.Forms.Panel aiWebsiteContentPanel;
         private System.Windows.Forms.Panel settingsContentPanel;
         private System.Windows.Forms.GroupBox generalSettingsGroup;

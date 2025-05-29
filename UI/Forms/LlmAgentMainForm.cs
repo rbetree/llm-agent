@@ -71,6 +71,9 @@ namespace llm_agent.UI.Forms
         private bool _enableMarkdown = false; // 用于Markdown支持设置
         private PromptManager _promptManager = null!; // 提示词管理器
         private PromptCardItem _selectedPromptCard = null!; // 当前选中的提示词卡片
+        private WebsiteManager _websiteManager = null!; // 网站管理器
+        private WebsiteCardItem _selectedWebsiteCard = null!; // 当前选中的网站卡片
+        private WebsiteBrowser _websiteBrowser = null!; // 内置浏览器控件
 
         protected FlowLayoutPanel chatListPanel;
         protected TextBox searchBox;
@@ -86,6 +89,7 @@ namespace llm_agent.UI.Forms
             InitializeChannelManager();
             InitializeChannelService();
             InitializePromptManager();
+            InitializeWebsiteManager();
             LoadSettings();
 
             // 设置KeyPreview为true，使窗体可以在控件之前处理键盘事件
@@ -132,6 +136,14 @@ namespace llm_agent.UI.Forms
         private void InitializePromptManager()
         {
             _promptManager = new PromptManager();
+        }
+
+        /// <summary>
+        /// 初始化网站管理器
+        /// </summary>
+        private void InitializeWebsiteManager()
+        {
+            _websiteManager = new WebsiteManager();
         }
 
         private void LoadSettings()
@@ -328,7 +340,7 @@ namespace llm_agent.UI.Forms
             else if (targetPanel == aiWebsitePanel)
             {
                 // 初始化AI网站面板
-                // 待实现
+                InitializeAiWebsitePanel();
             }
             else if (targetPanel == userProfilePanel)
             {
@@ -347,6 +359,9 @@ namespace llm_agent.UI.Forms
 
             // 初始化新建按钮
             InitializeNewPromptButton();
+
+            // 添加大小改变事件处理，与ChatListPanel保持一致
+            promptsListPanel.SizeChanged += PromptsListPanel_SizeChanged;
         }
 
         private void InitializePromptsList()
@@ -368,10 +383,12 @@ namespace llm_agent.UI.Forms
                     var promptCard = new PromptCardItem
                     {
                         Prompt = prompt,
-                        Width = promptsListPanel.Width - SystemInformation.VerticalScrollBarWidth - 5,
                         Height = 100,
                         Margin = new Padding(0, 1, 0, 1)
                     };
+
+                    // 设置宽度，与ChatSessionItem保持一致的计算方式
+                    promptCard.Width = promptsListPanel.ClientSize.Width - promptCard.Margin.Horizontal;
 
                     // 添加点击事件
                     promptCard.PromptClicked += (s, e) =>
@@ -452,10 +469,12 @@ namespace llm_agent.UI.Forms
                     var promptCard = new PromptCardItem
                     {
                         Prompt = prompt,
-                        Width = promptsListPanel.Width - SystemInformation.VerticalScrollBarWidth - 5,
                         Height = 100,
                         Margin = new Padding(0, 1, 0, 1)
                     };
+
+                    // 设置宽度，与ChatSessionItem保持一致的计算方式
+                    promptCard.Width = promptsListPanel.ClientSize.Width - promptCard.Margin.Horizontal;
 
                     // 添加点击事件
                     promptCard.PromptClicked += (s, args) =>
@@ -2672,6 +2691,18 @@ namespace llm_agent.UI.Forms
             }
         }
 
+        private void PromptsListPanel_SizeChanged(object sender, EventArgs e)
+        {
+            // 当面板大小改变时调整所有PromptCardItem的宽度
+            foreach (Control control in promptsListPanel.Controls)
+            {
+                if (control is PromptCardItem promptCard)
+                {
+                    promptCard.Width = promptsListPanel.ClientSize.Width - promptCard.Margin.Horizontal;
+                }
+            }
+        }
+
         private void UpdateChatList()
         {
             chatListPanel.Controls.Clear();
@@ -3230,5 +3261,395 @@ namespace llm_agent.UI.Forms
                 chatTextbox.Focus();
             }
         }
+
+        #region AI网站面板相关方法
+
+        /// <summary>
+        /// 初始化AI网站面板
+        /// </summary>
+        private void InitializeAiWebsitePanel()
+        {
+            try
+            {
+                // 初始化网站列表
+                InitializeWebsiteList();
+
+                // 初始化搜索框
+                InitializeWebsiteSearchBox();
+
+                // 初始化新建按钮
+                InitializeNewWebsiteButton();
+
+                // 初始化内置浏览器
+                InitializeWebsiteBrowser();
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"初始化AI网站面板时出错: {ex.Message}");
+                MessageBox.Show($"初始化AI网站面板时出错: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        /// <summary>
+        /// 初始化网站列表
+        /// </summary>
+        private void InitializeWebsiteList()
+        {
+            try
+            {
+                // 获取所有网站
+                var websites = _websiteManager.GetAllWebsites();
+
+                // 清空现有的网站卡片
+                websiteListPanel.Controls.Clear();
+
+                // 重置选中状态
+                _selectedWebsiteCard = null;
+
+                // 添加各个网站的卡片
+                foreach (var website in websites)
+                {
+                    var websiteCard = new WebsiteCardItem
+                    {
+                        Website = website,
+                        Width = websiteListPanel.Width - SystemInformation.VerticalScrollBarWidth - 5,
+                        Height = 85,
+                        Margin = new Padding(0, 1, 0, 1)
+                    };
+
+                    // 添加点击事件
+                    websiteCard.WebsiteClicked += (s, e) =>
+                    {
+                        // 取消之前选中卡片的高亮状态
+                        if (_selectedWebsiteCard != null)
+                        {
+                            _selectedWebsiteCard.IsSelected = false;
+                        }
+
+                        // 设置当前卡片为选中状态
+                        _selectedWebsiteCard = websiteCard;
+                        websiteCard.IsSelected = true;
+
+                        // 在浏览器中显示网站
+                        DisplayWebsiteInBrowser(e.Website);
+                    };
+
+                    // 添加访问网站事件
+                    websiteCard.VisitWebsiteClicked += (s, e) =>
+                    {
+                        VisitWebsite(e.Website);
+                    };
+
+                    // 添加编辑网站事件
+                    websiteCard.EditWebsiteClicked += (s, e) =>
+                    {
+                        EditWebsite(e.Website);
+                    };
+
+                    // 添加删除网站事件
+                    websiteCard.DeleteWebsiteClicked += (s, e) =>
+                    {
+                        DeleteWebsite(e.Website);
+                    };
+
+                    websiteListPanel.Controls.Add(websiteCard);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"初始化网站列表时出错: {ex.Message}");
+                MessageBox.Show($"加载网站列表时出错: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        /// <summary>
+        /// 初始化网站搜索框
+        /// </summary>
+        private void InitializeWebsiteSearchBox()
+        {
+            // 先解除旧的事件绑定，防止重复绑定
+            websiteSearchBox.TextChanged -= WebsiteSearchBox_TextChanged;
+            // 设置搜索框事件处理
+            websiteSearchBox.TextChanged += WebsiteSearchBox_TextChanged;
+        }
+
+        /// <summary>
+        /// 初始化新建网站按钮
+        /// </summary>
+        private void InitializeNewWebsiteButton()
+        {
+            // 先解除旧的事件绑定，防止重复绑定
+            newWebsiteButton.Click -= NewWebsiteButton_Click;
+            // 设置新建按钮事件处理
+            newWebsiteButton.Click += NewWebsiteButton_Click;
+        }
+
+        /// <summary>
+        /// 初始化内置浏览器
+        /// </summary>
+        private void InitializeWebsiteBrowser()
+        {
+            try
+            {
+                // 清空现有内容
+                aiWebsiteContentPanel.Controls.Clear();
+
+                // 创建内置浏览器控件
+                _websiteBrowser = new WebsiteBrowser
+                {
+                    Dock = DockStyle.Fill
+                };
+
+                // 添加浏览器事件处理
+                _websiteBrowser.NavigationCompleted += (s, e) =>
+                {
+                    // 导航完成后更新访问时间
+                    if (_websiteBrowser.CurrentWebsite != null)
+                    {
+                        _websiteManager.UpdateWebsiteVisitTime(_websiteBrowser.CurrentWebsite.Id);
+                    }
+                };
+
+                // 将浏览器添加到内容面板
+                aiWebsiteContentPanel.Controls.Add(_websiteBrowser);
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"初始化内置浏览器时出错: {ex.Message}");
+                MessageBox.Show($"初始化内置浏览器时出错: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        /// <summary>
+        /// 网站搜索框文本改变事件
+        /// </summary>
+        private void WebsiteSearchBox_TextChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                // 获取搜索框文本
+                string searchText = websiteSearchBox.Text.Trim();
+
+                List<AiWebsite> websites;
+
+                // 根据搜索文本获取网站
+                if (string.IsNullOrEmpty(searchText))
+                {
+                    websites = _websiteManager.GetAllWebsites();
+                }
+                else
+                {
+                    websites = _websiteManager.SearchWebsites(searchText);
+                }
+
+                // 清空现有的网站卡片
+                websiteListPanel.Controls.Clear();
+
+                // 重置选中状态
+                _selectedWebsiteCard = null;
+
+                // 添加匹配搜索文本的网站卡片
+                foreach (var website in websites)
+                {
+                    var websiteCard = new WebsiteCardItem
+                    {
+                        Website = website,
+                        Width = websiteListPanel.Width - SystemInformation.VerticalScrollBarWidth - 5,
+                        Height = 65,
+                        Margin = new Padding(0, 1, 0, 1)
+                    };
+
+                    // 添加点击事件
+                    websiteCard.WebsiteClicked += (s, args) =>
+                    {
+                        // 取消之前选中卡片的高亮状态
+                        if (_selectedWebsiteCard != null)
+                        {
+                            _selectedWebsiteCard.IsSelected = false;
+                        }
+
+                        // 设置当前卡片为选中状态
+                        _selectedWebsiteCard = websiteCard;
+                        websiteCard.IsSelected = true;
+
+                        // 在浏览器中显示网站
+                        DisplayWebsiteInBrowser(args.Website);
+                    };
+
+                    // 添加访问网站事件
+                    websiteCard.VisitWebsiteClicked += (s, args) =>
+                    {
+                        VisitWebsite(args.Website);
+                    };
+
+                    // 添加编辑网站事件
+                    websiteCard.EditWebsiteClicked += (s, args) =>
+                    {
+                        EditWebsite(args.Website);
+                    };
+
+                    // 添加删除网站事件
+                    websiteCard.DeleteWebsiteClicked += (s, args) =>
+                    {
+                        DeleteWebsite(args.Website);
+                    };
+
+                    websiteListPanel.Controls.Add(websiteCard);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"搜索网站时出错: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// 新建网站按钮点击事件
+        /// </summary>
+        private void NewWebsiteButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                // 显示添加网站对话框
+                using (var addWebsiteForm = new AddWebsiteForm())
+                {
+                    if (addWebsiteForm.ShowDialog() == DialogResult.OK)
+                    {
+                        // 创建新网站
+                        var newWebsite = _websiteManager.CreateWebsite(
+                            addWebsiteForm.WebsiteName,
+                            addWebsiteForm.WebsiteUrl,
+                            addWebsiteForm.WebsiteDescription,
+                            addWebsiteForm.WebsiteCategory
+                        );
+
+                        // 刷新网站列表
+                        InitializeWebsiteList();
+
+                        MessageBox.Show("网站已添加成功！", "添加成功", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"添加新网站时出错: {ex.Message}");
+                MessageBox.Show($"添加新网站时出错: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        /// <summary>
+        /// 在浏览器中显示网站
+        /// </summary>
+        private void DisplayWebsiteInBrowser(AiWebsite website)
+        {
+            try
+            {
+                if (website == null || _websiteBrowser == null) return;
+
+                // 导航到网站
+                _websiteBrowser.NavigateToWebsite(website);
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"在浏览器中显示网站时出错: {ex.Message}");
+                MessageBox.Show($"打开网站时出错: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        /// <summary>
+        /// 访问网站
+        /// </summary>
+        private void VisitWebsite(AiWebsite website)
+        {
+            try
+            {
+                if (website == null) return;
+
+                // 更新访问时间
+                _websiteManager.UpdateWebsiteVisitTime(website.Id);
+
+                // 在内置浏览器中打开
+                DisplayWebsiteInBrowser(website);
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"访问网站时出错: {ex.Message}");
+                MessageBox.Show($"访问网站时出错: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        /// <summary>
+        /// 编辑网站
+        /// </summary>
+        private void EditWebsite(AiWebsite website)
+        {
+            try
+            {
+                if (website == null) return;
+
+                // 显示编辑网站对话框
+                using (var editWebsiteForm = new AddWebsiteForm(website))
+                {
+                    if (editWebsiteForm.ShowDialog() == DialogResult.OK)
+                    {
+                        // 更新网站信息
+                        website.Name = editWebsiteForm.WebsiteName;
+                        website.Url = editWebsiteForm.WebsiteUrl;
+                        website.Description = editWebsiteForm.WebsiteDescription;
+                        website.Category = editWebsiteForm.WebsiteCategory;
+
+                        // 保存更改
+                        _websiteManager.SaveWebsite(website);
+
+                        // 刷新网站列表
+                        InitializeWebsiteList();
+
+                        MessageBox.Show("网站信息已更新！", "更新成功", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"编辑网站时出错: {ex.Message}");
+                MessageBox.Show($"编辑网站时出错: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        /// <summary>
+        /// 删除网站
+        /// </summary>
+        private void DeleteWebsite(AiWebsite website)
+        {
+            try
+            {
+                if (website == null) return;
+
+                // 确认删除
+                var result = MessageBox.Show(
+                    $"确定要删除网站 \"{website.DisplayName}\" 吗？此操作不可恢复。",
+                    "确认删除",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Warning
+                );
+
+                if (result == DialogResult.Yes)
+                {
+                    // 删除网站
+                    _websiteManager.DeleteWebsite(website.Id);
+
+                    // 刷新网站列表
+                    InitializeWebsiteList();
+
+                    MessageBox.Show("网站已删除。", "删除成功", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"删除网站时出错: {ex.Message}");
+                MessageBox.Show($"删除网站时出错: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        #endregion
     }
 }

@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -12,7 +13,7 @@ namespace llm_agent.Common.Utils
     {
         // 固定的盐值，用于增强安全性
         private static readonly byte[] Salt = Encoding.UTF8.GetBytes("LlmAgent2024Salt");
-        
+
         // 基于设备特征生成的密钥
         private static string _deviceKey;
 
@@ -40,9 +41,9 @@ namespace llm_agent.Common.Utils
             try
             {
                 // 使用机器名、用户名和应用程序路径生成设备特征
-                var machineInfo = Environment.MachineName + Environment.UserName + 
+                var machineInfo = Environment.MachineName + Environment.UserName +
                                  Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-                
+
                 using (var sha256 = SHA256.Create())
                 {
                     var hash = sha256.ComputeHash(Encoding.UTF8.GetBytes(machineInfo));
