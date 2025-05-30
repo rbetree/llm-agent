@@ -551,6 +551,41 @@ namespace llm_agent.DAL
         }
 
         /// <summary>
+        /// 获取所有网站（包含凭据信息）
+        /// </summary>
+        /// <returns>包含凭据的网站列表</returns>
+        public List<AiWebsite> GetAllWebsitesWithCredentials()
+        {
+            var websites = GetAllWebsites();
+
+            // 为每个网站加载凭据信息
+            foreach (var website in websites)
+            {
+                website.Credential = GetWebsiteCredentialByWebsiteId(website.Id);
+            }
+
+            return websites;
+        }
+
+        /// <summary>
+        /// 搜索网站（包含凭据信息）
+        /// </summary>
+        /// <param name="searchText">搜索文本</param>
+        /// <returns>包含凭据的匹配网站列表</returns>
+        public List<AiWebsite> SearchWebsitesWithCredentials(string searchText)
+        {
+            var websites = SearchWebsites(searchText);
+
+            // 为每个网站加载凭据信息
+            foreach (var website in websites)
+            {
+                website.Credential = GetWebsiteCredentialByWebsiteId(website.Id);
+            }
+
+            return websites;
+        }
+
+        /// <summary>
         /// 获取最近访问的网站
         /// </summary>
         /// <param name="count">返回数量</param>

@@ -40,6 +40,22 @@ namespace llm_agent.BLL
         }
 
         /// <summary>
+        /// 获取所有网站（包含凭据信息）
+        /// </summary>
+        /// <returns>包含凭据的网站列表</returns>
+        public List<AiWebsite> GetAllWebsitesWithCredentials()
+        {
+            try
+            {
+                return _repository.GetAllWebsitesWithCredentials();
+            }
+            catch (Exception ex)
+            {
+                throw new DataAccessException($"获取网站列表失败: {ex.Message}", ex);
+            }
+        }
+
+        /// <summary>
         /// 根据分类获取网站
         /// </summary>
         /// <param name="category">分类名称</param>
@@ -66,6 +82,23 @@ namespace llm_agent.BLL
             try
             {
                 return _repository.SearchWebsites(searchText);
+            }
+            catch (Exception ex)
+            {
+                throw new DataAccessException($"搜索网站失败: {ex.Message}", ex);
+            }
+        }
+
+        /// <summary>
+        /// 搜索网站（包含凭据信息）
+        /// </summary>
+        /// <param name="searchText">搜索文本</param>
+        /// <returns>包含凭据的匹配网站列表</returns>
+        public List<AiWebsite> SearchWebsitesWithCredentials(string searchText)
+        {
+            try
+            {
+                return _repository.SearchWebsitesWithCredentials(searchText);
             }
             catch (Exception ex)
             {
@@ -203,6 +236,38 @@ namespace llm_agent.BLL
             catch (Exception ex)
             {
                 throw new DataAccessException($"获取网站完整信息失败: {ex.Message}", ex);
+            }
+        }
+
+        /// <summary>
+        /// 保存网站凭据
+        /// </summary>
+        /// <param name="credential">凭据信息</param>
+        public void SaveWebsiteCredential(WebsiteCredential credential)
+        {
+            try
+            {
+                // 验证凭据数据
+                if (credential != null && !credential.IsValid())
+                {
+                    var validationErrors = credential.GetValidationErrors();
+                    throw new ValidationException($"凭据数据验证失败: {validationErrors}");
+                }
+
+                if (credential != null)
+                {
+                    // 更新时间戳
+                    credential.UpdatedAt = DateTime.Now;
+                    _repository.SaveWebsiteCredential(credential);
+                }
+            }
+            catch (ValidationException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new DataAccessException($"保存网站凭据失败: {ex.Message}", ex);
             }
         }
 

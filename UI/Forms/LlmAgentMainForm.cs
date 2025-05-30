@@ -3531,8 +3531,8 @@ namespace llm_agent.UI.Forms
         {
             try
             {
-                // 获取所有网站
-                var websites = _websiteManager.GetAllWebsites();
+                // 获取所有网站（包含凭据信息）
+                var websites = _websiteManager.GetAllWebsitesWithCredentials();
 
                 // 清空现有的网站卡片
                 websiteListPanel.Controls.Clear();
@@ -3668,14 +3668,14 @@ namespace llm_agent.UI.Forms
 
                 List<AiWebsite> websites;
 
-                // 根据搜索文本获取网站
+                // 根据搜索文本获取网站（包含凭据信息）
                 if (string.IsNullOrEmpty(searchText))
                 {
-                    websites = _websiteManager.GetAllWebsites();
+                    websites = _websiteManager.GetAllWebsitesWithCredentials();
                 }
                 else
                 {
-                    websites = _websiteManager.SearchWebsites(searchText);
+                    websites = _websiteManager.SearchWebsitesWithCredentials(searchText);
                 }
 
                 // 清空现有的网站卡片
@@ -3844,17 +3844,50 @@ namespace llm_agent.UI.Forms
             {
                 if (website == null) return;
 
+                // 获取包含凭据的完整网站信息
+                var fullWebsite = _websiteManager.GetWebsiteWithCredential(website.Id);
+                if (fullWebsite == null)
+                {
+                    MessageBox.Show("无法获取网站信息。", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
                 // 显示编辑网站对话框
-                using (var editWebsiteForm = new AddWebsiteForm(website))
+                using (var editWebsiteForm = new AddWebsiteForm(fullWebsite))
                 {
                     if (editWebsiteForm.ShowDialog() == DialogResult.OK)
                     {
-                        // 更新网站信息
-                        website.Name = editWebsiteForm.WebsiteName;
-                        website.Url = editWebsiteForm.WebsiteUrl;
+                        // 更新网站基本信息
+                        fullWebsite.Name = editWebsiteForm.WebsiteName;
+                        fullWebsite.Url = editWebsiteForm.WebsiteUrl;
 
-                        // 保存更改
-                        _websiteManager.SaveWebsite(website);
+                        // 保存网站基本信息
+                        _websiteManager.SaveWebsite(fullWebsite);
+
+                        // 处理凭据信息
+                        var username = editWebsiteForm.WebsiteUsername;
+                        var password = editWebsiteForm.WebsitePassword;
+
+                        // 如果用户输入了凭据信息
+                        if (!string.IsNullOrWhiteSpace(username) || !string.IsNullOrWhiteSpace(password))
+                        {
+                            // 创建或更新凭据
+                            var credential = fullWebsite.Credential ?? new WebsiteCredential(fullWebsite.Id);
+                            credential.Username = username;
+                            credential.Password = password;
+                            credential.WebsiteId = fullWebsite.Id;
+
+                            // 保存凭据
+                            _websiteManager.SaveWebsiteCredential(credential);
+                        }
+                        else if (fullWebsite.Credential != null)
+                        {
+                            // 如果用户清空了凭据信息，删除现有凭据
+                            var emptyCredential = new WebsiteCredential(fullWebsite.Id);
+                            emptyCredential.Username = string.Empty;
+                            emptyCredential.Password = string.Empty;
+                            _websiteManager.SaveWebsiteCredential(emptyCredential);
+                        }
 
                         // 刷新网站列表
                         InitializeWebsiteList();
