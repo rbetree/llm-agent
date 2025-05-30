@@ -418,6 +418,23 @@ namespace llm_agent.UI.Forms
 
                     promptsListPanel.Controls.Add(promptCard);
                 }
+
+                // 如果有提示词，默认选择第一个
+                if (promptsListPanel.Controls.Count > 0)
+                {
+                    var firstCard = promptsListPanel.Controls[0] as PromptCardItem;
+                    if (firstCard != null)
+                    {
+                        _selectedPromptCard = firstCard;
+                        firstCard.IsSelected = true;
+                        DisplayPromptDetail(firstCard.Prompt);
+                    }
+                }
+                else
+                {
+                    // 如果没有提示词，显示欢迎界面
+                    ShowPromptsWelcome();
+                }
             }
             catch (Exception ex)
             {
@@ -507,6 +524,33 @@ namespace llm_agent.UI.Forms
                     };
 
                     promptsListPanel.Controls.Add(promptCard);
+                }
+
+                // 处理搜索结果
+                if (promptsListPanel.Controls.Count > 0)
+                {
+                    // 如果有搜索结果，默认选择第一个
+                    var firstCard = promptsListPanel.Controls[0] as PromptCardItem;
+                    if (firstCard != null)
+                    {
+                        _selectedPromptCard = firstCard;
+                        firstCard.IsSelected = true;
+                        DisplayPromptDetail(firstCard.Prompt);
+                    }
+                }
+                else
+                {
+                    // 如果没有搜索结果，显示欢迎界面或无结果提示
+                    if (string.IsNullOrEmpty(searchText))
+                    {
+                        // 如果是清空搜索，显示欢迎界面
+                        ShowPromptsWelcome();
+                    }
+                    else
+                    {
+                        // 如果是搜索无结果，显示无结果提示
+                        DisplayNoSearchResults(searchText);
+                    }
                 }
             }
             catch (Exception ex)
@@ -608,9 +652,11 @@ namespace llm_agent.UI.Forms
                     Text = "保存",
                     Location = new Point(10, 500),
                     Width = 100,
+                    Height = 32,
                     BackColor = Color.LightSlateGray,
                     ForeColor = Color.White,
-                    FlatStyle = FlatStyle.Flat
+                    FlatStyle = FlatStyle.Flat,
+                    Font = new Font("Microsoft YaHei UI", 9F)
                 };
                 saveButton.FlatAppearance.BorderSize = 0;
 
@@ -620,9 +666,11 @@ namespace llm_agent.UI.Forms
                     Text = "使用",
                     Location = new Point(120, 500),
                     Width = 100,
+                    Height = 32,
                     BackColor = Color.CornflowerBlue,
                     ForeColor = Color.White,
-                    FlatStyle = FlatStyle.Flat
+                    FlatStyle = FlatStyle.Flat,
+                    Font = new Font("Microsoft YaHei UI", 9F)
                 };
                 useButton.FlatAppearance.BorderSize = 0;
 
@@ -632,9 +680,11 @@ namespace llm_agent.UI.Forms
                     Text = "删除",
                     Location = new Point(230, 500),
                     Width = 100,
+                    Height = 32,
                     BackColor = Color.IndianRed,
                     ForeColor = Color.White,
-                    FlatStyle = FlatStyle.Flat
+                    FlatStyle = FlatStyle.Flat,
+                    Font = new Font("Microsoft YaHei UI", 9F)
                 };
                 deleteButton.FlatAppearance.BorderSize = 0;
 
@@ -716,6 +766,167 @@ namespace llm_agent.UI.Forms
             {
                 Console.Error.WriteLine($"显示提示词详情时出错: {ex.Message}");
                 MessageBox.Show($"显示提示词详情时出错: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void ShowPromptsWelcome()
+        {
+            try
+            {
+                // 清空现有内容，只保留欢迎面板
+                promptsContentPanel.Controls.Clear();
+                promptsContentPanel.Controls.Add(promptsWelcomePanel);
+
+                // 更新统计信息
+                var prompts = _promptManager.GetAllPrompts();
+                var totalCount = prompts.Count;
+                var categories = prompts.Select(p => p.Category).Distinct().Count();
+
+                welcomeStatsLabel.Text = $"当前共有 {totalCount} 个提示词，分为 {categories} 个分类";
+
+                // 根据是否有提示词决定是否显示快速创建按钮
+                welcomeQuickCreateButton.Visible = (totalCount == 0);
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"显示提示词欢迎界面时出错: {ex.Message}");
+                MessageBox.Show($"显示提示词欢迎界面时出错: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void welcomeQuickCreateButton_Click(object sender, EventArgs e)
+        {
+            NewPromptButton_Click(sender, e);
+        }
+
+        private void DisplayNoSearchResults(string searchText)
+        {
+            try
+            {
+                // 清空现有内容
+                promptsContentPanel.Controls.Clear();
+
+                // 创建无结果标题
+                var noResultLabel = new Label
+                {
+                    Text = "未找到匹配的提示词",
+                    Font = new Font("Microsoft YaHei UI", 14F, FontStyle.Bold),
+                    ForeColor = Color.FromArgb(96, 96, 96),
+                    AutoSize = true,
+                    Location = new Point(20, 50)
+                };
+
+                // 创建搜索关键词显示
+                var searchKeywordLabel = new Label
+                {
+                    Text = $"搜索关键词：\"{searchText}\"",
+                    Font = new Font("Microsoft YaHei UI", 10F),
+                    ForeColor = Color.FromArgb(128, 128, 128),
+                    AutoSize = true,
+                    Location = new Point(20, 90)
+                };
+
+                // 创建建议文本
+                var suggestionLabel = new Label
+                {
+                    Text = "建议：",
+                    Font = new Font("Microsoft YaHei UI", 11F, FontStyle.Bold),
+                    ForeColor = Color.FromArgb(64, 64, 64),
+                    AutoSize = true,
+                    Location = new Point(20, 140)
+                };
+
+                var suggestion1Label = new Label
+                {
+                    Text = "• 检查搜索关键词的拼写",
+                    Font = new Font("Microsoft YaHei UI", 9F),
+                    ForeColor = Color.FromArgb(96, 96, 96),
+                    AutoSize = true,
+                    Location = new Point(20, 170)
+                };
+
+                var suggestion2Label = new Label
+                {
+                    Text = "• 尝试使用更简短的关键词",
+                    Font = new Font("Microsoft YaHei UI", 9F),
+                    ForeColor = Color.FromArgb(96, 96, 96),
+                    AutoSize = true,
+                    Location = new Point(20, 195)
+                };
+
+                var suggestion3Label = new Label
+                {
+                    Text = "• 清空搜索框查看所有提示词",
+                    Font = new Font("Microsoft YaHei UI", 9F),
+                    ForeColor = Color.FromArgb(96, 96, 96),
+                    AutoSize = true,
+                    Location = new Point(20, 220)
+                };
+
+                var suggestion4Label = new Label
+                {
+                    Text = "• 创建一个新的提示词",
+                    Font = new Font("Microsoft YaHei UI", 9F),
+                    ForeColor = Color.FromArgb(96, 96, 96),
+                    AutoSize = true,
+                    Location = new Point(20, 245)
+                };
+
+                // 创建清空搜索按钮
+                var clearSearchButton = new Button
+                {
+                    Text = "清空搜索",
+                    Location = new Point(20, 290),
+                    Width = 120,
+                    Height = 32,
+                    BackColor = Color.FromArgb(108, 117, 125),
+                    ForeColor = Color.White,
+                    FlatStyle = FlatStyle.Flat,
+                    Font = new Font("Microsoft YaHei UI", 9F)
+                };
+                clearSearchButton.FlatAppearance.BorderSize = 0;
+
+                // 创建新建提示词按钮
+                var createNewButton = new Button
+                {
+                    Text = "创建新提示词",
+                    Location = new Point(150, 290),
+                    Width = 120,
+                    Height = 32,
+                    BackColor = Color.FromArgb(26, 147, 254),
+                    ForeColor = Color.White,
+                    FlatStyle = FlatStyle.Flat,
+                    Font = new Font("Microsoft YaHei UI", 9F)
+                };
+                createNewButton.FlatAppearance.BorderSize = 0;
+
+                // 添加清空搜索按钮点击事件
+                clearSearchButton.Click += (s, e) =>
+                {
+                    promptSearchBox.Text = "";
+                };
+
+                // 添加新建提示词按钮点击事件
+                createNewButton.Click += (s, e) =>
+                {
+                    NewPromptButton_Click(s, e);
+                };
+
+                // 将控件添加到面板
+                promptsContentPanel.Controls.Add(noResultLabel);
+                promptsContentPanel.Controls.Add(searchKeywordLabel);
+                promptsContentPanel.Controls.Add(suggestionLabel);
+                promptsContentPanel.Controls.Add(suggestion1Label);
+                promptsContentPanel.Controls.Add(suggestion2Label);
+                promptsContentPanel.Controls.Add(suggestion3Label);
+                promptsContentPanel.Controls.Add(suggestion4Label);
+                promptsContentPanel.Controls.Add(clearSearchButton);
+                promptsContentPanel.Controls.Add(createNewButton);
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"显示搜索无结果界面时出错: {ex.Message}");
+                MessageBox.Show($"显示搜索无结果界面时出错: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -3566,9 +3777,7 @@ namespace llm_agent.UI.Forms
                         // 创建新网站
                         var newWebsite = _websiteManager.CreateWebsite(
                             addWebsiteForm.WebsiteName,
-                            addWebsiteForm.WebsiteUrl,
-                            addWebsiteForm.WebsiteDescription,
-                            addWebsiteForm.WebsiteCategory
+                            addWebsiteForm.WebsiteUrl
                         );
 
                         // 刷新网站列表
@@ -3643,8 +3852,6 @@ namespace llm_agent.UI.Forms
                         // 更新网站信息
                         website.Name = editWebsiteForm.WebsiteName;
                         website.Url = editWebsiteForm.WebsiteUrl;
-                        website.Description = editWebsiteForm.WebsiteDescription;
-                        website.Category = editWebsiteForm.WebsiteCategory;
 
                         // 保存更改
                         _websiteManager.SaveWebsite(website);

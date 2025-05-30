@@ -47,6 +47,16 @@ namespace llm_agent.UI.Controls
         public event EventHandler<WebsiteCardClickEventArgs> VisitWebsiteClicked;
 
         /// <summary>
+        /// 复制账号按钮被点击时触发
+        /// </summary>
+        public event EventHandler<WebsiteCardClickEventArgs> CopyUsernameClicked;
+
+        /// <summary>
+        /// 复制密码按钮被点击时触发
+        /// </summary>
+        public event EventHandler<WebsiteCardClickEventArgs> CopyPasswordClicked;
+
+        /// <summary>
         /// 网站信息
         /// </summary>
         public AiWebsite Website
@@ -93,13 +103,20 @@ namespace llm_agent.UI.Controls
             this.Click += WebsiteCardItem_Click;
             this.DoubleClick += WebsiteCardItem_DoubleClick;
 
-            // 为所有子控件添加相同的事件处理
+            // 设置按钮事件处理
+            btnCopyUsername.Click += BtnCopyUsername_Click;
+            btnCopyPassword.Click += BtnCopyPassword_Click;
+
+            // 为所有子控件添加相同的事件处理（排除按钮）
             foreach (Control control in this.Controls)
             {
-                control.MouseEnter += WebsiteCardItem_MouseEnter;
-                control.MouseLeave += WebsiteCardItem_MouseLeave;
-                control.Click += WebsiteCardItem_Click;
-                control.DoubleClick += WebsiteCardItem_DoubleClick;
+                if (control != btnCopyUsername && control != btnCopyPassword)
+                {
+                    control.MouseEnter += WebsiteCardItem_MouseEnter;
+                    control.MouseLeave += WebsiteCardItem_MouseLeave;
+                    control.Click += WebsiteCardItem_Click;
+                    control.DoubleClick += WebsiteCardItem_DoubleClick;
+                }
             }
         }
 
@@ -116,19 +133,39 @@ namespace llm_agent.UI.Controls
                 lblWebsiteName.Text = _website.DisplayName;
             }
 
-
-
             // 更新网站URL
             if (lblWebsiteUrl != null)
             {
                 lblWebsiteUrl.Text = _website.Url;
             }
 
-
+            // 更新按钮显示状态
+            UpdateButtonsVisibility();
 
             // 设置工具提示
             var tooltip = new ToolTip();
             tooltip.SetToolTip(this, $"{_website.DisplayName}\n{_website.Url}");
+        }
+
+        /// <summary>
+        /// 更新按钮显示状态
+        /// </summary>
+        private void UpdateButtonsVisibility()
+        {
+            if (_website?.Credential != null)
+            {
+                // 显示账号按钮（如果有账号）
+                btnCopyUsername.Visible = !string.IsNullOrEmpty(_website.Credential.Username);
+
+                // 显示密码按钮（如果有密码）
+                btnCopyPassword.Visible = !string.IsNullOrEmpty(_website.Credential.Password);
+            }
+            else
+            {
+                // 没有凭据信息时隐藏所有按钮
+                btnCopyUsername.Visible = false;
+                btnCopyPassword.Visible = false;
+            }
         }
 
         /// <summary>
@@ -184,28 +221,67 @@ namespace llm_agent.UI.Controls
         }
 
         /// <summary>
-        /// 编辑按钮点击事件
+        /// 编辑菜单项点击事件
         /// </summary>
-        private void btnEdit_Click(object sender, EventArgs e)
+        private void editToolStripMenuItem_Click(object sender, EventArgs e)
         {
             EditWebsiteClicked?.Invoke(this, new WebsiteCardClickEventArgs(_website));
         }
 
         /// <summary>
-        /// 删除按钮点击事件
+        /// 删除菜单项点击事件
         /// </summary>
-        private void btnDelete_Click(object sender, EventArgs e)
+        private void deleteToolStripMenuItem_Click(object sender, EventArgs e)
         {
             DeleteWebsiteClicked?.Invoke(this, new WebsiteCardClickEventArgs(_website));
         }
 
         /// <summary>
-        /// 访问按钮点击事件
+        /// 复制账号按钮点击事件
         /// </summary>
-        private void btnVisit_Click(object sender, EventArgs e)
+        private void BtnCopyUsername_Click(object sender, EventArgs e)
         {
-            VisitWebsiteClicked?.Invoke(this, new WebsiteCardClickEventArgs(_website));
+            try
+            {
+                if (_website?.Credential != null && !string.IsNullOrEmpty(_website.Credential.Username))
+                {
+                    Clipboard.SetText(_website.Credential.Username);
+                    CopyUsernameClicked?.Invoke(this, new WebsiteCardClickEventArgs(_website));
+
+                    // 显示提示信息
+                    var tooltip = new ToolTip();
+                    tooltip.Show("账号已复制到剪贴板", btnCopyUsername, 0, -25, 1500);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"复制账号失败: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
+
+        /// <summary>
+        /// 复制密码按钮点击事件
+        /// </summary>
+        private void BtnCopyPassword_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (_website?.Credential != null && !string.IsNullOrEmpty(_website.Credential.Password))
+                {
+                    Clipboard.SetText(_website.Credential.Password);
+                    CopyPasswordClicked?.Invoke(this, new WebsiteCardClickEventArgs(_website));
+
+                    // 显示提示信息
+                    var tooltip = new ToolTip();
+                    tooltip.Show("密码已复制到剪贴板", btnCopyPassword, 0, -25, 1500);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"复制密码失败: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
     }
 
     /// <summary>

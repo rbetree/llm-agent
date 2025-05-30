@@ -24,14 +24,14 @@ namespace llm_agent.UI.Forms
         public string WebsiteUrl => txtUrl.Text.Trim();
 
         /// <summary>
-        /// 网站描述
+        /// 登录账号
         /// </summary>
-        public string WebsiteDescription => txtDescription.Text.Trim();
+        public string WebsiteUsername => txtUsername.Text.Trim();
 
         /// <summary>
-        /// 网站分类
+        /// 登录密码
         /// </summary>
-        public string WebsiteCategory => cboCategory.Text.Trim();
+        public string WebsitePassword => txtPassword.Text.Trim();
 
         /// <summary>
         /// 构造函数 - 新建模式
@@ -68,10 +68,6 @@ namespace llm_agent.UI.Forms
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.StartPosition = FormStartPosition.CenterParent;
-            this.Size = new Size(450, 350);
-
-            // 初始化分类下拉框
-            InitializeCategoryComboBox();
 
             // 设置事件处理
             btnOK.Click += BtnOK_Click;
@@ -79,24 +75,7 @@ namespace llm_agent.UI.Forms
             txtUrl.Leave += TxtUrl_Leave;
         }
 
-        /// <summary>
-        /// 初始化分类下拉框
-        /// </summary>
-        private void InitializeCategoryComboBox()
-        {
-            cboCategory.Items.Clear();
-            cboCategory.Items.AddRange(new string[]
-            {
-                "对话AI",
-                "图像生成",
-                "编程工具",
-                "搜索工具",
-                "AI平台",
-                "学习工具",
-                "办公工具",
-                "其他"
-            });
-        }
+
 
         /// <summary>
         /// 加载网站数据（编辑模式）
@@ -107,8 +86,13 @@ namespace llm_agent.UI.Forms
 
             txtName.Text = _website.Name;
             txtUrl.Text = _website.Url;
-            txtDescription.Text = _website.Description;
-            cboCategory.Text = _website.Category;
+
+            // 加载凭据信息
+            if (_website.Credential != null)
+            {
+                txtUsername.Text = _website.Credential.Username;
+                txtPassword.Text = _website.Credential.Password;
+            }
         }
 
         /// <summary>
