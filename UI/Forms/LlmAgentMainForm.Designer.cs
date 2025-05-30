@@ -95,7 +95,6 @@ namespace llm_agent.UI.Forms
             searchBox = new System.Windows.Forms.TextBox();
             newChatButton = new System.Windows.Forms.Button();
             chatListPanel = new llm_agent.UI.Controls.HiddenScrollBarFlowLayoutPanel();
-            chatContainer = new System.Windows.Forms.SplitContainer();
             inputPanel = new System.Windows.Forms.Panel();
             settingsPanel = new System.Windows.Forms.Panel();
             settingsPageSplitContainer = new System.Windows.Forms.SplitContainer();
@@ -167,9 +166,6 @@ namespace llm_agent.UI.Forms
             chatListContainer.Panel1.SuspendLayout();
             chatListContainer.Panel2.SuspendLayout();
             chatListContainer.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)chatContainer).BeginInit();
-            chatContainer.Panel1.SuspendLayout();
-            chatContainer.SuspendLayout();
             settingsPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)settingsPageSplitContainer).BeginInit();
             settingsPageSplitContainer.Panel1.SuspendLayout();
@@ -206,10 +202,10 @@ namespace llm_agent.UI.Forms
             // 
             // mainSplitContainer.Panel2
             // 
+            mainSplitContainer.Panel2.Controls.Add(chatPagePanel);
             mainSplitContainer.Panel2.Controls.Add(promptsPanel);
             mainSplitContainer.Panel2.Controls.Add(channelPanel);
             mainSplitContainer.Panel2.Controls.Add(aiWebsitePanel);
-            mainSplitContainer.Panel2.Controls.Add(chatPagePanel);
             mainSplitContainer.Panel2.Controls.Add(settingsPanel);
             mainSplitContainer.Panel2.Controls.Add(userProfilePanel);
             mainSplitContainer.Panel2.Controls.Add(filesPanel);
@@ -1027,7 +1023,7 @@ namespace llm_agent.UI.Forms
             // 
             // chatPageSplitContainer.Panel2
             // 
-            chatPageSplitContainer.Panel2.Controls.Add(chatContainer);
+            chatPageSplitContainer.Panel2.Controls.Add(inputPanel);
             chatPageSplitContainer.Size = new System.Drawing.Size(1229, 800);
             chatPageSplitContainer.SplitterDistance = 283;
             chatPageSplitContainer.SplitterWidth = 1;
@@ -1096,30 +1092,13 @@ namespace llm_agent.UI.Forms
             chatListPanel.TabIndex = 0;
             chatListPanel.WrapContents = false;
             // 
-            // chatContainer
-            // 
-            chatContainer.Dock = System.Windows.Forms.DockStyle.Fill;
-            chatContainer.FixedPanel = System.Windows.Forms.FixedPanel.Panel2;
-            chatContainer.Location = new System.Drawing.Point(0, 0);
-            chatContainer.Margin = new System.Windows.Forms.Padding(4);
-            chatContainer.Name = "chatContainer";
-            chatContainer.Orientation = System.Windows.Forms.Orientation.Horizontal;
-            // 
-            // chatContainer.Panel1
-            // 
-            chatContainer.Panel1.Controls.Add(inputPanel);
-            chatContainer.Size = new System.Drawing.Size(945, 800);
-            chatContainer.SplitterDistance = 418;
-            chatContainer.SplitterWidth = 1;
-            chatContainer.TabIndex = 1;
-            // 
             // inputPanel
             // 
             inputPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             inputPanel.Location = new System.Drawing.Point(0, 0);
             inputPanel.Margin = new System.Windows.Forms.Padding(0);
             inputPanel.Name = "inputPanel";
-            inputPanel.Size = new System.Drawing.Size(945, 418);
+            inputPanel.Size = new System.Drawing.Size(945, 800);
             inputPanel.TabIndex = 0;
             // 
             // settingsPanel
@@ -1520,9 +1499,6 @@ namespace llm_agent.UI.Forms
             chatListContainer.Panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)chatListContainer).EndInit();
             chatListContainer.ResumeLayout(false);
-            chatContainer.Panel1.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)chatContainer).EndInit();
-            chatContainer.ResumeLayout(false);
             settingsPanel.ResumeLayout(false);
             settingsPageSplitContainer.Panel1.ResumeLayout(false);
             settingsPageSplitContainer.Panel2.ResumeLayout(false);
@@ -1639,7 +1615,6 @@ namespace llm_agent.UI.Forms
         private System.Windows.Forms.Label welcomeGuide4Label;
         private System.Windows.Forms.Button welcomeQuickCreateButton;
         private System.Windows.Forms.Panel chatPagePanel;
-        private System.Windows.Forms.SplitContainer chatContainer;
         private System.Windows.Forms.Button channelNavButton;
     }
 }

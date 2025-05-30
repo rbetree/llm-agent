@@ -3095,15 +3095,11 @@ namespace llm_agent.UI.Forms
         private void InitializeChatbox()
         {
             // 如果已经初始化，则不再重复初始化
-            if (chatboxControl != null && chatContainer.Panel1.Controls.Contains(chatboxControl))
+            if (chatboxControl != null && chatPageSplitContainer.Panel2.Controls.Contains(chatboxControl))
                 return;
 
-            // 移除chatContainer中Panel1和Panel2的所有控件
-            chatContainer.Panel1.Controls.Clear();
-            chatContainer.Panel2.Controls.Clear();
-
-            // 使chatContainer变为普通的Panel（隐藏分割线）
-            chatContainer.Panel2Collapsed = true;
+            // 移除chatPageSplitContainer.Panel2中的所有控件
+            chatPageSplitContainer.Panel2.Controls.Clear();
 
             // 创建 ChatboxInfo 对象配置 Chatbox
             var chatboxInfo = new ChatboxInfo
@@ -3182,8 +3178,8 @@ namespace llm_agent.UI.Forms
                 };
             }
 
-            // 将 Chatbox 添加到chatContainer的Panel1（主要面板）
-            chatContainer.Panel1.Controls.Add(chatboxControl);
+            // 将 Chatbox 添加到chatPageSplitContainer.Panel2（主要面板）
+            chatPageSplitContainer.Panel2.Controls.Add(chatboxControl);
 
             // 初始化模型列表
             UpdateChatboxModelList();
