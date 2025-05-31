@@ -2,12 +2,12 @@
 {
 	partial class Chatbox
 	{
-		/// <summary> 
+		/// <summary>
 		/// Required designer variable.
 		/// </summary>
 		private System.ComponentModel.IContainer components = null;
 
-		/// <summary> 
+		/// <summary>
 		/// Clean up any resources being used.
 		/// </summary>
 		/// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
@@ -22,8 +22,8 @@
 
         #region Component Designer generated code
 
-        /// <summary> 
-        /// Required method for Designer support - do not modify 
+        /// <summary>
+        /// Required method for Designer support - do not modify
         /// the contents of this method with the code editor.
         /// </summary>
         private void InitializeComponent()
@@ -32,9 +32,6 @@
             topPanel = new System.Windows.Forms.Panel();
             streamCheckBox = new System.Windows.Forms.CheckBox();
             modelComboBox = new System.Windows.Forms.ComboBox();
-            statusLabel = new System.Windows.Forms.Label();
-            phoneLabel = new System.Windows.Forms.Label();
-            clientnameLabel = new System.Windows.Forms.Label();
             bottomPanel = new System.Windows.Forms.Panel();
             chatTextbox = new System.Windows.Forms.TextBox();
             attachButton = new System.Windows.Forms.Button();
@@ -50,16 +47,13 @@
             topPanel.BackColor = System.Drawing.Color.FromArgb(100, 101, 165);
             topPanel.Controls.Add(streamCheckBox);
             topPanel.Controls.Add(modelComboBox);
-            topPanel.Controls.Add(statusLabel);
-            topPanel.Controls.Add(phoneLabel);
-            topPanel.Controls.Add(clientnameLabel);
             topPanel.Dock = System.Windows.Forms.DockStyle.Top;
             topPanel.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
             topPanel.Location = new System.Drawing.Point(0, 0);
             topPanel.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             topPanel.Name = "topPanel";
             topPanel.Padding = new System.Windows.Forms.Padding(23);
-            topPanel.Size = new System.Drawing.Size(616, 75);
+            topPanel.Size = new System.Drawing.Size(936, 52);
             topPanel.TabIndex = 0;
             topPanel.Paint += topPanel_Paint;
             // 
@@ -69,11 +63,11 @@
             streamCheckBox.Checked = true;
             streamCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
             streamCheckBox.Font = new System.Drawing.Font("Segoe UI", 9F);
-            streamCheckBox.Location = new System.Drawing.Point(261, 6);
+            streamCheckBox.Location = new System.Drawing.Point(541, 14);
             streamCheckBox.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             streamCheckBox.Name = "streamCheckBox";
             streamCheckBox.Size = new System.Drawing.Size(95, 24);
-            streamCheckBox.TabIndex = 4;
+            streamCheckBox.TabIndex = 1;
             streamCheckBox.Text = "流式响应";
             streamCheckBox.UseVisualStyleBackColor = true;
             // 
@@ -82,49 +76,12 @@
             modelComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             modelComboBox.Font = new System.Drawing.Font("Segoe UI", 9F);
             modelComboBox.FormattingEnabled = true;
-            modelComboBox.Location = new System.Drawing.Point(184, 36);
+            modelComboBox.Location = new System.Drawing.Point(9, 12);
             modelComboBox.Margin = new System.Windows.Forms.Padding(0);
             modelComboBox.Name = "modelComboBox";
-            modelComboBox.Size = new System.Drawing.Size(409, 28);
-            modelComboBox.TabIndex = 3;
-            // 
-            // statusLabel
-            // 
-            statusLabel.AutoSize = true;
-            statusLabel.Font = new System.Drawing.Font("Segoe UI Semibold", 9F, System.Drawing.FontStyle.Bold);
-            statusLabel.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            statusLabel.Location = new System.Drawing.Point(177, 7);
-            statusLabel.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
-            statusLabel.Name = "statusLabel";
-            statusLabel.Size = new System.Drawing.Size(85, 20);
-            statusLabel.TabIndex = 2;
-            statusLabel.Text = "LastViewed";
-            statusLabel.Click += statusLabel_Click;
-            // 
-            // phoneLabel
-            // 
-            phoneLabel.AutoSize = true;
-            phoneLabel.Font = new System.Drawing.Font("Segoe UI Semibold", 12F, System.Drawing.FontStyle.Bold);
-            phoneLabel.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            phoneLabel.Location = new System.Drawing.Point(28, 0);
-            phoneLabel.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
-            phoneLabel.Name = "phoneLabel";
-            phoneLabel.Size = new System.Drawing.Size(148, 28);
-            phoneLabel.TabIndex = 1;
-            phoneLabel.Text = "(408) 262-9190";
-            // 
-            // clientnameLabel
-            // 
-            clientnameLabel.AutoSize = true;
-            clientnameLabel.Font = new System.Drawing.Font("Segoe UI Semibold", 14F, System.Drawing.FontStyle.Bold);
-            clientnameLabel.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            clientnameLabel.Location = new System.Drawing.Point(23, 30);
-            clientnameLabel.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
-            clientnameLabel.Name = "clientnameLabel";
-            clientnameLabel.Size = new System.Drawing.Size(149, 32);
-            clientnameLabel.TabIndex = 0;
-            clientnameLabel.Text = "Client Name";
-            clientnameLabel.Click += clientnameLabel_Click;
+            modelComboBox.Size = new System.Drawing.Size(504, 28);
+            modelComboBox.TabIndex = 2;
+            modelComboBox.SelectedIndexChanged += modelComboBox_SelectedIndexChanged_1;
             // 
             // bottomPanel
             // 
@@ -139,7 +96,7 @@
             bottomPanel.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             bottomPanel.Name = "bottomPanel";
             bottomPanel.Padding = new System.Windows.Forms.Padding(23, 16, 23, 16);
-            bottomPanel.Size = new System.Drawing.Size(616, 83);
+            bottomPanel.Size = new System.Drawing.Size(936, 83);
             bottomPanel.TabIndex = 1;
             // 
             // chatTextbox
@@ -149,7 +106,7 @@
             chatTextbox.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             chatTextbox.Multiline = true;
             chatTextbox.Name = "chatTextbox";
-            chatTextbox.Size = new System.Drawing.Size(376, 51);
+            chatTextbox.Size = new System.Drawing.Size(696, 51);
             chatTextbox.TabIndex = 7;
             // 
             // attachButton
@@ -161,7 +118,7 @@
             attachButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             attachButton.ForeColor = System.Drawing.SystemColors.ControlText;
             attachButton.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            attachButton.Location = new System.Drawing.Point(399, 16);
+            attachButton.Location = new System.Drawing.Point(719, 16);
             attachButton.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             attachButton.Name = "attachButton";
             attachButton.Size = new System.Drawing.Size(53, 51);
@@ -176,7 +133,7 @@
             removeButton.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
             removeButton.Font = new System.Drawing.Font("Segoe UI Symbol", 9.75F, System.Drawing.FontStyle.Bold);
             removeButton.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            removeButton.Location = new System.Drawing.Point(452, 16);
+            removeButton.Location = new System.Drawing.Point(772, 16);
             removeButton.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             removeButton.Name = "removeButton";
             removeButton.Size = new System.Drawing.Size(28, 51);
@@ -191,7 +148,7 @@
             sendButton.Dock = System.Windows.Forms.DockStyle.Right;
             sendButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             sendButton.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold);
-            sendButton.Location = new System.Drawing.Point(480, 16);
+            sendButton.Location = new System.Drawing.Point(800, 16);
             sendButton.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             sendButton.Name = "sendButton";
             sendButton.Size = new System.Drawing.Size(113, 51);
@@ -203,10 +160,10 @@
             // 
             itemsPanel.AutoScroll = true;
             itemsPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            itemsPanel.Location = new System.Drawing.Point(0, 75);
+            itemsPanel.Location = new System.Drawing.Point(0, 52);
             itemsPanel.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             itemsPanel.Name = "itemsPanel";
-            itemsPanel.Size = new System.Drawing.Size(616, 769);
+            itemsPanel.Size = new System.Drawing.Size(936, 792);
             itemsPanel.TabIndex = 2;
             // 
             // Chatbox
@@ -219,7 +176,7 @@
             Controls.Add(topPanel);
             Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             Name = "Chatbox";
-            Size = new System.Drawing.Size(616, 927);
+            Size = new System.Drawing.Size(936, 927);
             topPanel.ResumeLayout(false);
             topPanel.PerformLayout();
             bottomPanel.ResumeLayout(false);
@@ -231,9 +188,7 @@
         #endregion
 
         private System.Windows.Forms.Panel topPanel;
-		private System.Windows.Forms.Label statusLabel;
-		private System.Windows.Forms.Label phoneLabel;
-		private System.Windows.Forms.Label clientnameLabel;
+
 		private System.Windows.Forms.Panel bottomPanel;
 		private System.Windows.Forms.Button sendButton;
 		private System.Windows.Forms.Button attachButton;

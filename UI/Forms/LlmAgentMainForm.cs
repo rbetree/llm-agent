@@ -353,7 +353,7 @@ namespace llm_agent.UI.Forms
         {
             // 先显示欢迎界面
             ShowPromptsWelcome();
-            
+
             // 初始化提示词列表
             InitializePromptsList();
 
@@ -3080,9 +3080,6 @@ namespace llm_agent.UI.Forms
             var chatboxInfo = new ChatboxInfo
             {
                 User = "用户", // 用户名称
-                NamePlaceholder = "用户", // 顶部显示的名称
-                StatusPlaceholder = "在线", // 状态文本
-                PhonePlaceholder = "LLM Agent", // 显示的标识符
                 ChatPlaceholder = "在此输入消息..." // 输入框占位符文本
             };
 

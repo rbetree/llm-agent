@@ -30,9 +30,6 @@ namespace llm_agent.UI.Controls.ChatForm
 
             chatbox_info = _chatbox_info;
 
-            clientnameLabel.Text = chatbox_info.NamePlaceholder;
-            statusLabel.Text = chatbox_info.StatusPlaceholder;
-            phoneLabel.Text = chatbox_info.PhonePlaceholder;
             chatTextbox.Text = chatbox_info.ChatPlaceholder;
 
             chatTextbox.Enter += ChatEnter;
@@ -272,7 +269,7 @@ namespace llm_agent.UI.Controls.ChatForm
         //Cross-tested this with the Twilio API and the RingCentral API, and async messaging is the way to go.
         async void SendMessage(object sender, EventArgs e)
         {
-            string tonumber = phoneLabel.Text;
+            string tonumber = ""; // 移除对phoneLabel的引用
             string chatmessage = chatTextbox.Text;
 
             IChatModel chatModel = null;
@@ -428,10 +425,7 @@ namespace llm_agent.UI.Controls.ChatForm
 
         }
 
-        private void statusLabel_Click(object sender, EventArgs e)
-        {
 
-        }
 
         /// <summary>
         /// 移除发送消息按钮的Click事件处理程序
@@ -444,7 +438,7 @@ namespace llm_agent.UI.Controls.ChatForm
             }
         }
 
-        private void clientnameLabel_Click(object sender, EventArgs e)
+        private void modelComboBox_SelectedIndexChanged_1(object sender, EventArgs e)
         {
 
         }

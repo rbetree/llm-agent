@@ -40,6 +40,13 @@ namespace llm_agent.UI.Forms
             promptsNavButton = new System.Windows.Forms.Button();
             avatarButton = new System.Windows.Forms.Button();
             channelNavButton = new System.Windows.Forms.Button();
+            chatPagePanel = new System.Windows.Forms.Panel();
+            chatPageSplitContainer = new System.Windows.Forms.SplitContainer();
+            chatListContainer = new System.Windows.Forms.SplitContainer();
+            searchBox = new System.Windows.Forms.TextBox();
+            newChatButton = new System.Windows.Forms.Button();
+            chatListPanel = new llm_agent.UI.Controls.HiddenScrollBarFlowLayoutPanel();
+            inputPanel = new System.Windows.Forms.Panel();
             promptsPanel = new System.Windows.Forms.Panel();
             promptsPageSplitContainer = new System.Windows.Forms.SplitContainer();
             promptsListContainer = new System.Windows.Forms.SplitContainer();
@@ -89,13 +96,6 @@ namespace llm_agent.UI.Forms
             newWebsiteButton = new System.Windows.Forms.Button();
             websiteListPanel = new llm_agent.UI.Controls.HiddenScrollBarFlowLayoutPanel();
             aiWebsiteContentPanel = new System.Windows.Forms.Panel();
-            chatPagePanel = new System.Windows.Forms.Panel();
-            chatPageSplitContainer = new System.Windows.Forms.SplitContainer();
-            chatListContainer = new System.Windows.Forms.SplitContainer();
-            searchBox = new System.Windows.Forms.TextBox();
-            newChatButton = new System.Windows.Forms.Button();
-            chatListPanel = new llm_agent.UI.Controls.HiddenScrollBarFlowLayoutPanel();
-            inputPanel = new System.Windows.Forms.Panel();
             settingsPanel = new System.Windows.Forms.Panel();
             settingsPageSplitContainer = new System.Windows.Forms.SplitContainer();
             settingsMenuPanel = new System.Windows.Forms.Panel();
@@ -127,6 +127,15 @@ namespace llm_agent.UI.Forms
             mainSplitContainer.Panel2.SuspendLayout();
             mainSplitContainer.SuspendLayout();
             navPanel.SuspendLayout();
+            chatPagePanel.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)chatPageSplitContainer).BeginInit();
+            chatPageSplitContainer.Panel1.SuspendLayout();
+            chatPageSplitContainer.Panel2.SuspendLayout();
+            chatPageSplitContainer.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)chatListContainer).BeginInit();
+            chatListContainer.Panel1.SuspendLayout();
+            chatListContainer.Panel2.SuspendLayout();
+            chatListContainer.SuspendLayout();
             promptsPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)promptsPageSplitContainer).BeginInit();
             promptsPageSplitContainer.Panel1.SuspendLayout();
@@ -157,15 +166,6 @@ namespace llm_agent.UI.Forms
             websiteListContainer.Panel1.SuspendLayout();
             websiteListContainer.Panel2.SuspendLayout();
             websiteListContainer.SuspendLayout();
-            chatPagePanel.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)chatPageSplitContainer).BeginInit();
-            chatPageSplitContainer.Panel1.SuspendLayout();
-            chatPageSplitContainer.Panel2.SuspendLayout();
-            chatPageSplitContainer.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)chatListContainer).BeginInit();
-            chatListContainer.Panel1.SuspendLayout();
-            chatListContainer.Panel2.SuspendLayout();
-            chatListContainer.SuspendLayout();
             settingsPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)settingsPageSplitContainer).BeginInit();
             settingsPageSplitContainer.Panel1.SuspendLayout();
@@ -324,6 +324,108 @@ namespace llm_agent.UI.Forms
             channelNavButton.TabIndex = 8;
             channelNavButton.UseVisualStyleBackColor = false;
             channelNavButton.Click += channelNavButton_Click;
+            // 
+            // chatPagePanel
+            // 
+            chatPagePanel.Controls.Add(chatPageSplitContainer);
+            chatPagePanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            chatPagePanel.Location = new System.Drawing.Point(0, 0);
+            chatPagePanel.Margin = new System.Windows.Forms.Padding(4);
+            chatPagePanel.Name = "chatPagePanel";
+            chatPagePanel.Size = new System.Drawing.Size(1229, 800);
+            chatPagePanel.TabIndex = 2;
+            // 
+            // chatPageSplitContainer
+            // 
+            chatPageSplitContainer.Dock = System.Windows.Forms.DockStyle.Fill;
+            chatPageSplitContainer.FixedPanel = System.Windows.Forms.FixedPanel.Panel1;
+            chatPageSplitContainer.Location = new System.Drawing.Point(0, 0);
+            chatPageSplitContainer.Margin = new System.Windows.Forms.Padding(0);
+            chatPageSplitContainer.Name = "chatPageSplitContainer";
+            // 
+            // chatPageSplitContainer.Panel1
+            // 
+            chatPageSplitContainer.Panel1.Controls.Add(chatListContainer);
+            // 
+            // chatPageSplitContainer.Panel2
+            // 
+            chatPageSplitContainer.Panel2.Controls.Add(inputPanel);
+            chatPageSplitContainer.Size = new System.Drawing.Size(1229, 800);
+            chatPageSplitContainer.SplitterDistance = 283;
+            chatPageSplitContainer.SplitterWidth = 1;
+            chatPageSplitContainer.TabIndex = 0;
+            // 
+            // chatListContainer
+            // 
+            chatListContainer.Dock = System.Windows.Forms.DockStyle.Fill;
+            chatListContainer.Location = new System.Drawing.Point(0, 0);
+            chatListContainer.Margin = new System.Windows.Forms.Padding(0);
+            chatListContainer.Name = "chatListContainer";
+            chatListContainer.Orientation = System.Windows.Forms.Orientation.Horizontal;
+            // 
+            // chatListContainer.Panel1
+            // 
+            chatListContainer.Panel1.Controls.Add(searchBox);
+            chatListContainer.Panel1.Controls.Add(newChatButton);
+            // 
+            // chatListContainer.Panel2
+            // 
+            chatListContainer.Panel2.Controls.Add(chatListPanel);
+            chatListContainer.Size = new System.Drawing.Size(283, 800);
+            chatListContainer.SplitterDistance = 73;
+            chatListContainer.SplitterWidth = 1;
+            chatListContainer.TabIndex = 2;
+            // 
+            // searchBox
+            // 
+            searchBox.BackColor = System.Drawing.Color.WhiteSmoke;
+            searchBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            searchBox.Location = new System.Drawing.Point(0, 52);
+            searchBox.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            searchBox.Name = "searchBox";
+            searchBox.PlaceholderText = "搜索会话标题...";
+            searchBox.Size = new System.Drawing.Size(283, 27);
+            searchBox.TabIndex = 0;
+            // 
+            // newChatButton
+            // 
+            newChatButton.AutoSize = true;
+            newChatButton.BackColor = System.Drawing.Color.LightSlateGray;
+            newChatButton.Cursor = System.Windows.Forms.Cursors.Hand;
+            newChatButton.Dock = System.Windows.Forms.DockStyle.Top;
+            newChatButton.FlatAppearance.BorderSize = 0;
+            newChatButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            newChatButton.Font = new System.Drawing.Font("Microsoft YaHei UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 134);
+            newChatButton.Location = new System.Drawing.Point(0, 0);
+            newChatButton.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            newChatButton.Name = "newChatButton";
+            newChatButton.Size = new System.Drawing.Size(283, 52);
+            newChatButton.TabIndex = 0;
+            newChatButton.Text = "+ 新对话";
+            newChatButton.UseVisualStyleBackColor = false;
+            // 
+            // chatListPanel
+            // 
+            chatListPanel.AutoScroll = true;
+            chatListPanel.AutoSize = true;
+            chatListPanel.BackColor = System.Drawing.Color.FromArgb(247, 247, 247);
+            chatListPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            chatListPanel.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
+            chatListPanel.Location = new System.Drawing.Point(0, 0);
+            chatListPanel.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            chatListPanel.Name = "chatListPanel";
+            chatListPanel.Size = new System.Drawing.Size(283, 726);
+            chatListPanel.TabIndex = 0;
+            chatListPanel.WrapContents = false;
+            // 
+            // inputPanel
+            // 
+            inputPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            inputPanel.Location = new System.Drawing.Point(0, 0);
+            inputPanel.Margin = new System.Windows.Forms.Padding(0);
+            inputPanel.Name = "inputPanel";
+            inputPanel.Size = new System.Drawing.Size(945, 800);
+            inputPanel.TabIndex = 0;
             // 
             // promptsPanel
             // 
@@ -999,108 +1101,6 @@ namespace llm_agent.UI.Forms
             aiWebsiteContentPanel.Size = new System.Drawing.Size(945, 800);
             aiWebsiteContentPanel.TabIndex = 0;
             // 
-            // chatPagePanel
-            // 
-            chatPagePanel.Controls.Add(chatPageSplitContainer);
-            chatPagePanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            chatPagePanel.Location = new System.Drawing.Point(0, 0);
-            chatPagePanel.Margin = new System.Windows.Forms.Padding(4);
-            chatPagePanel.Name = "chatPagePanel";
-            chatPagePanel.Size = new System.Drawing.Size(1229, 800);
-            chatPagePanel.TabIndex = 2;
-            // 
-            // chatPageSplitContainer
-            // 
-            chatPageSplitContainer.Dock = System.Windows.Forms.DockStyle.Fill;
-            chatPageSplitContainer.FixedPanel = System.Windows.Forms.FixedPanel.Panel1;
-            chatPageSplitContainer.Location = new System.Drawing.Point(0, 0);
-            chatPageSplitContainer.Margin = new System.Windows.Forms.Padding(0);
-            chatPageSplitContainer.Name = "chatPageSplitContainer";
-            // 
-            // chatPageSplitContainer.Panel1
-            // 
-            chatPageSplitContainer.Panel1.Controls.Add(chatListContainer);
-            // 
-            // chatPageSplitContainer.Panel2
-            // 
-            chatPageSplitContainer.Panel2.Controls.Add(inputPanel);
-            chatPageSplitContainer.Size = new System.Drawing.Size(1229, 800);
-            chatPageSplitContainer.SplitterDistance = 283;
-            chatPageSplitContainer.SplitterWidth = 1;
-            chatPageSplitContainer.TabIndex = 0;
-            // 
-            // chatListContainer
-            // 
-            chatListContainer.Dock = System.Windows.Forms.DockStyle.Fill;
-            chatListContainer.Location = new System.Drawing.Point(0, 0);
-            chatListContainer.Margin = new System.Windows.Forms.Padding(0);
-            chatListContainer.Name = "chatListContainer";
-            chatListContainer.Orientation = System.Windows.Forms.Orientation.Horizontal;
-            // 
-            // chatListContainer.Panel1
-            // 
-            chatListContainer.Panel1.Controls.Add(searchBox);
-            chatListContainer.Panel1.Controls.Add(newChatButton);
-            // 
-            // chatListContainer.Panel2
-            // 
-            chatListContainer.Panel2.Controls.Add(chatListPanel);
-            chatListContainer.Size = new System.Drawing.Size(283, 800);
-            chatListContainer.SplitterDistance = 73;
-            chatListContainer.SplitterWidth = 1;
-            chatListContainer.TabIndex = 2;
-            // 
-            // searchBox
-            // 
-            searchBox.BackColor = System.Drawing.Color.WhiteSmoke;
-            searchBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            searchBox.Location = new System.Drawing.Point(0, 52);
-            searchBox.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            searchBox.Name = "searchBox";
-            searchBox.PlaceholderText = "搜索会话标题...";
-            searchBox.Size = new System.Drawing.Size(283, 27);
-            searchBox.TabIndex = 0;
-            // 
-            // newChatButton
-            // 
-            newChatButton.AutoSize = true;
-            newChatButton.BackColor = System.Drawing.Color.LightSlateGray;
-            newChatButton.Cursor = System.Windows.Forms.Cursors.Hand;
-            newChatButton.Dock = System.Windows.Forms.DockStyle.Top;
-            newChatButton.FlatAppearance.BorderSize = 0;
-            newChatButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            newChatButton.Font = new System.Drawing.Font("Microsoft YaHei UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 134);
-            newChatButton.Location = new System.Drawing.Point(0, 0);
-            newChatButton.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            newChatButton.Name = "newChatButton";
-            newChatButton.Size = new System.Drawing.Size(283, 52);
-            newChatButton.TabIndex = 0;
-            newChatButton.Text = "+ 新对话";
-            newChatButton.UseVisualStyleBackColor = false;
-            // 
-            // chatListPanel
-            // 
-            chatListPanel.AutoScroll = true;
-            chatListPanel.AutoSize = true;
-            chatListPanel.BackColor = System.Drawing.Color.FromArgb(247, 247, 247);
-            chatListPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            chatListPanel.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
-            chatListPanel.Location = new System.Drawing.Point(0, 0);
-            chatListPanel.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            chatListPanel.Name = "chatListPanel";
-            chatListPanel.Size = new System.Drawing.Size(283, 726);
-            chatListPanel.TabIndex = 0;
-            chatListPanel.WrapContents = false;
-            // 
-            // inputPanel
-            // 
-            inputPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            inputPanel.Location = new System.Drawing.Point(0, 0);
-            inputPanel.Margin = new System.Windows.Forms.Padding(0);
-            inputPanel.Name = "inputPanel";
-            inputPanel.Size = new System.Drawing.Size(945, 800);
-            inputPanel.TabIndex = 0;
-            // 
             // settingsPanel
             // 
             settingsPanel.AutoScroll = true;
@@ -1449,6 +1449,17 @@ namespace llm_agent.UI.Forms
             ((System.ComponentModel.ISupportInitialize)mainSplitContainer).EndInit();
             mainSplitContainer.ResumeLayout(false);
             navPanel.ResumeLayout(false);
+            chatPagePanel.ResumeLayout(false);
+            chatPageSplitContainer.Panel1.ResumeLayout(false);
+            chatPageSplitContainer.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)chatPageSplitContainer).EndInit();
+            chatPageSplitContainer.ResumeLayout(false);
+            chatListContainer.Panel1.ResumeLayout(false);
+            chatListContainer.Panel1.PerformLayout();
+            chatListContainer.Panel2.ResumeLayout(false);
+            chatListContainer.Panel2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)chatListContainer).EndInit();
+            chatListContainer.ResumeLayout(false);
             promptsPanel.ResumeLayout(false);
             promptsPageSplitContainer.Panel1.ResumeLayout(false);
             promptsPageSplitContainer.Panel2.ResumeLayout(false);
@@ -1488,17 +1499,6 @@ namespace llm_agent.UI.Forms
             websiteListContainer.Panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)websiteListContainer).EndInit();
             websiteListContainer.ResumeLayout(false);
-            chatPagePanel.ResumeLayout(false);
-            chatPageSplitContainer.Panel1.ResumeLayout(false);
-            chatPageSplitContainer.Panel2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)chatPageSplitContainer).EndInit();
-            chatPageSplitContainer.ResumeLayout(false);
-            chatListContainer.Panel1.ResumeLayout(false);
-            chatListContainer.Panel1.PerformLayout();
-            chatListContainer.Panel2.ResumeLayout(false);
-            chatListContainer.Panel2.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)chatListContainer).EndInit();
-            chatListContainer.ResumeLayout(false);
             settingsPanel.ResumeLayout(false);
             settingsPageSplitContainer.Panel1.ResumeLayout(false);
             settingsPageSplitContainer.Panel2.ResumeLayout(false);
