@@ -351,6 +351,9 @@ namespace llm_agent.UI.Forms
 
         private void InitializePromptsPanel()
         {
+            // 先显示欢迎界面
+            ShowPromptsWelcome();
+            
             // 初始化提示词列表
             InitializePromptsList();
 
@@ -417,23 +420,6 @@ namespace llm_agent.UI.Forms
                     };
 
                     promptsListPanel.Controls.Add(promptCard);
-                }
-
-                // 如果有提示词，默认选择第一个
-                if (promptsListPanel.Controls.Count > 0)
-                {
-                    var firstCard = promptsListPanel.Controls[0] as PromptCardItem;
-                    if (firstCard != null)
-                    {
-                        _selectedPromptCard = firstCard;
-                        firstCard.IsSelected = true;
-                        DisplayPromptDetail(firstCard.Prompt);
-                    }
-                }
-                else
-                {
-                    // 如果没有提示词，显示欢迎界面
-                    ShowPromptsWelcome();
                 }
             }
             catch (Exception ex)
@@ -527,29 +513,18 @@ namespace llm_agent.UI.Forms
                 }
 
                 // 处理搜索结果
-                if (promptsListPanel.Controls.Count > 0)
+                if (promptsListPanel.Controls.Count == 0)
                 {
-                    // 如果有搜索结果，默认选择第一个
-                    var firstCard = promptsListPanel.Controls[0] as PromptCardItem;
-                    if (firstCard != null)
+                    // 如果是搜索无结果
+                    if (!string.IsNullOrEmpty(searchText))
                     {
-                        _selectedPromptCard = firstCard;
-                        firstCard.IsSelected = true;
-                        DisplayPromptDetail(firstCard.Prompt);
-                    }
-                }
-                else
-                {
-                    // 如果没有搜索结果，显示欢迎界面或无结果提示
-                    if (string.IsNullOrEmpty(searchText))
-                    {
-                        // 如果是清空搜索，显示欢迎界面
-                        ShowPromptsWelcome();
+                        // 显示无结果提示
+                        DisplayNoSearchResults(searchText);
                     }
                     else
                     {
-                        // 如果是搜索无结果，显示无结果提示
-                        DisplayNoSearchResults(searchText);
+                        // 如果是清空搜索，显示欢迎界面
+                        ShowPromptsWelcome();
                     }
                 }
             }
