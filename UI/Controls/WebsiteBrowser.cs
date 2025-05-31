@@ -239,55 +239,146 @@ namespace llm_agent.UI.Controls
                     <meta charset='utf-8'>
                     <title>AI网站导航</title>
                     <style>
-                        body {
-                            font-family: 'Microsoft YaHei', sans-serif;
+                        * {
                             margin: 0;
-                            padding: 40px;
-                            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                            color: white;
+                            padding: 0;
+                            box-sizing: border-box;
+                        }
+
+                        body {
+                            font-family: 'Microsoft YaHei UI', 'Microsoft YaHei', sans-serif;
+                            background-color: #2d2d2d;
+                            color: #f5f5f5;
+                            min-height: 100vh;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            padding: 20px;
+                        }
+
+                        .welcome-container {
+                            max-width: 480px;
+                            width: 100%;
+                            text-align: center;
+                            padding: 24px 20px;
+                        }
+
+                        .welcome-header {
+                            margin-bottom: 24px;
+                        }
+
+                        .welcome-icon {
+                            font-size: 2.4em;
+                            margin-bottom: 12px;
+                            display: block;
+                        }
+
+                        .welcome-title {
+                            font-size: 1.5em;
+                            font-weight: 600;
+                            color: #f5f5f5;
+                            margin-bottom: 8px;
+                        }
+
+                        .welcome-subtitle {
+                            font-size: 1em;
+                            color: #b0b0b0;
+                            line-height: 1.4;
+                        }
+
+                        .features-grid {
+                            display: grid;
+                            grid-template-columns: 1fr 1fr;
+                            gap: 12px;
+                            margin: 20px 0;
+                        }
+
+                        .feature-item {
+                            padding: 12px 8px;
                             text-align: center;
                         }
-                        .container {
-                            max-width: 600px;
-                            margin: 0 auto;
-                            background: rgba(255,255,255,0.1);
-                            padding: 40px;
-                            border-radius: 15px;
-                            backdrop-filter: blur(10px);
+
+                        .feature-icon {
+                            font-size: 1.4em;
+                            margin-bottom: 4px;
+                            display: block;
                         }
-                        h1 {
-                            font-size: 2.5em;
-                            margin-bottom: 20px;
-                            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+
+                        .feature-text {
+                            font-size: 0.9em;
+                            color: #b0b0b0;
+                            font-weight: 400;
                         }
-                        p {
-                            font-size: 1.2em;
-                            line-height: 1.6;
-                            margin-bottom: 30px;
+
+                        .welcome-footer {
+                            margin-top: 20px;
+                            padding-top: 16px;
+                            border-top: 1px solid #4a4a4a;
                         }
-                        .features {
-                            text-align: left;
-                            margin: 30px 0;
+
+                        .footer-text {
+                            font-size: 0.95em;
+                            color: #b0b0b0;
+                            line-height: 1.3;
                         }
-                        .feature {
-                            margin: 15px 0;
-                            padding: 10px;
-                            background: rgba(255,255,255,0.1);
-                            border-radius: 8px;
+
+                        .highlight {
+                            color: #f5f5f5;
+                            font-weight: 600;
+                        }
+
+                        @media (max-width: 480px) {
+                            .welcome-container {
+                                padding: 20px 16px;
+                            }
+
+                            .features-grid {
+                                grid-template-columns: 1fr;
+                                gap: 8px;
+                            }
+
+                            .welcome-icon {
+                                font-size: 2em;
+                            }
+
+                            .welcome-title {
+                                font-size: 1.3em;
+                            }
                         }
                     </style>
                 </head>
                 <body>
-                    <div class='container'>
-                        <h1>🌐 AI网站导航</h1>
-                        <p>欢迎使用内置浏览器！从左侧选择一个AI网站开始浏览。</p>
-                        <div class='features'>
-                            <div class='feature'>📱 现代化浏览体验</div>
-                            <div class='feature'>🔍 智能网站管理</div>
-                            <div class='feature'>⚡ 快速访问收藏</div>
-                            <div class='feature'>🛡️ 安全浏览环境</div>
+                    <div class='welcome-container'>
+                        <div class='welcome-header'>
+                            <span class='welcome-icon'>🌐</span>
+                            <h1 class='welcome-title'>AI网站导航</h1>
+                            <p class='welcome-subtitle'>集成化AI工具浏览平台，一站式访问主流AI服务</p>
                         </div>
-                        <p>选择左侧的网站卡片即可开始浏览！</p>
+
+                        <div class='features-grid'>
+                            <div class='feature-item'>
+                                <span class='feature-icon'>🚀</span>
+                                <div class='feature-text'>快速访问</div>
+                            </div>
+                            <div class='feature-item'>
+                                <span class='feature-icon'>🔐</span>
+                                <div class='feature-text'>安全管理</div>
+                            </div>
+                            <div class='feature-item'>
+                                <span class='feature-icon'>📊</span>
+                                <div class='feature-text'>智能收藏</div>
+                            </div>
+                            <div class='feature-item'>
+                                <span class='feature-icon'>⚡</span>
+                                <div class='feature-text'>高效浏览</div>
+                            </div>
+                        </div>
+
+                        <div class='welcome-footer'>
+                            <p class='footer-text'>
+                                从左侧选择 <span class='highlight'>AI网站卡片</span> 开始您的智能浏览之旅
+                            </p>
+                        </div>
                     </div>
                 </body>
                 </html>";
