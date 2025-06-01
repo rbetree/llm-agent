@@ -1,9 +1,13 @@
 export default {
-  title: 'LLM多模型客户端',
+  title: 'LLM-Agent',
   description: '支持多个大语言模型服务商的Windows桌面客户端应用程序',
   lang: 'zh-CN',
   base: '/llm-agent/', // 根据GitHub仓库名设置
   lastUpdated: true,
+  
+  head: [
+    ['link', { rel: 'icon', type: 'image/x-icon', href: '/llm-agent/favicon.ico' }]
+  ],
   
   themeConfig: {
     logo: '/images/logo.png',
@@ -14,7 +18,7 @@ export default {
       { text: '指南', link: '/guide/' },
       { text: 'API', link: '/api/' },
       { text: '架构', link: '/architecture/' },
-      { text: '问题记录', link: '/note' }
+      { text: '问题记录', link: '/note/' }
     ],
     
     // 侧边栏
@@ -25,7 +29,10 @@ export default {
           items: [
             { text: '介绍', link: '/guide/' },
             { text: '安装', link: '/guide/installation' },
-            { text: '使用', link: '/guide/usage' }
+            { text: '使用', link: '/guide/usage' },
+            { text: 'UI设计', link: '/guide/ui-design' },
+            { text: '交互逻辑', link: '/guide/interaction' },
+            { text: '开发路线图', link: '/guide/roadmap' }
           ]
         }
       ],
@@ -47,6 +54,16 @@ export default {
             { text: '技术栈', link: '/architecture/tech-stack' }
           ]
         }
+      ],
+      '/note/': [
+        {
+          text: '问题记录',
+          items: [
+            { text: '概述', link: '/note/' },
+            { text: '2025年4月', link: '/note/2025-04' },
+            { text: '2025年5月', link: '/note/2025-05' }
+          ]
+        }
       ]
     },
     
@@ -58,7 +75,7 @@ export default {
     // 页脚
     footer: {
       message: '基于 MIT 许可发布',
-      copyright: 'Copyright © 2025 LLM多模型客户端项目组'
+      copyright: 'Copyright © 2025 rbetree. All rights reserved'
     },
     
     // 搜索

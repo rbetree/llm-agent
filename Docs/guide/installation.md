@@ -1,63 +1,118 @@
 # 安装指南
 
-本页面将指导您如何安装和设置LLM多模型客户端。
+本文将指导您完成LLM Agent的安装和初始配置过程。
 
 ## 系统要求
 
-在安装LLM多模型客户端之前，请确保您的系统满足以下要求：
+在安装LLM Agent之前，请确保您的系统满足以下要求：
 
-- **操作系统**: Windows 10或Windows 11
-- **运行时**: .NET 8.0 Runtime（如果没有安装，安装程序会提示您安装）
-- **内存**: 至少4GB RAM
-- **存储空间**: 至少100MB可用空间
-- **网络**: 稳定的互联网连接
+- **操作系统**: Windows 10/11
+- **.NET运行时**: .NET 8.0或更高版本
+- **硬件要求**:
+  - 最低配置: 4GB RAM, 1GHz CPU, 100MB可用磁盘空间
+  - 推荐配置: 8GB RAM, 2GHz+ CPU, 500MB可用磁盘空间
+- **网络连接**: 需要稳定的互联网连接访问API服务
 
-## 安装方法
+## 下载应用程序
 
-### 方法一：使用安装程序（推荐）
+1. 访问[GitHub发布页面](https://github.com/rbetree/llm-agent/releases)
+2. 下载最新版本的安装包:
+   - `LlmAgent-Setup-x.x.x.exe` - 标准安装程序
+   - `LlmAgent-Portable-x.x.x.zip` - 便携版（无需安装）
 
-1. 从[GitHub Releases](https://github.com/rbetree/llm-agent/releases)页面下载最新版本的安装程序（`LLM-Client-Setup.exe`）
-2. 双击安装程序，按照向导进行安装
-3. 如果您的系统没有安装.NET 8.0 Runtime，安装程序会提示您安装
-4. 完成安装后，在开始菜单或桌面上找到LLM多模型客户端图标启动应用
+## 安装步骤
 
-### 方法二：便携版
+### 使用安装程序
 
-1. 从[GitHub Releases](https://github.com/rbetree/llm-agent/releases)页面下载最新版本的便携版压缩包（`LLM-Client-Portable.zip`）
-2. 将压缩包解压到您选择的位置
-3. 确保您的系统已安装.NET 8.0 Runtime
-4. 双击`LLM-Client.exe`启动应用
+1. 双击下载的`LlmAgent-Setup-x.x.x.exe`文件
+2. 如果出现安全警告，点击"更多信息"然后选择"仍要运行"
+3. 按照安装向导的指示完成安装:
+   - 选择安装位置
+   - 选择是否创建桌面快捷方式
+   - 选择是否添加到开始菜单
+4. 点击"完成"结束安装
 
-## 首次启动配置
+### 使用便携版
 
-首次启动应用时，您需要进行一些基本配置：
+1. 下载`LlmAgent-Portable-x.x.x.zip`文件
+2. 将ZIP文件解压到您选择的任何位置
+3. 双击`LlmAgent.exe`启动应用程序
 
-1. 选择您想要使用的LLM服务商
-2. 配置API密钥（请参考[API密钥获取](#api密钥获取)部分）
-3. 可选：配置代理设置（如果需要）
-4. 可选：自定义界面主题和其他设置
+## 初始设置
 
-## API密钥获取
+首次启动LLM Agent时，您需要进行一些基本配置：
 
-要使用各种LLM服务，您需要获取相应的API密钥：
+### 配置API密钥
 
-- **OpenAI**: 访问[OpenAI Platform](https://platform.openai.com/api-keys)创建API密钥
-- **Anthropic**: 访问[Anthropic Console](https://console.anthropic.com/keys)申请API密钥
-- **Google Gemini**: 访问[Google AI Studio](https://aistudio.google.com/app/apikey)获取API密钥
-- **百度文心一言**: 访问[百度智能云](https://console.bce.baidu.com/)获取API Key和Secret Key
-- **智谱AI**: 访问[智谱AI开放平台](https://open.bigmodel.cn/)获取API Key和API Secret
-- **其他OpenAI兼容服务**: 请访问相关服务商网站获取API密钥
+1. 启动LLM Agent应用程序
+2. 点击左侧导航栏中的"设置"图标
+3. 在设置页面中，选择"渠道"选项卡
+4. 点击"添加渠道"按钮
+5. 填写以下信息:
+   - 渠道名称: 为您的API配置命名（如"我的OpenAI"）
+   - 提供商类型: 从下拉菜单中选择API提供商
+   - API密钥: 输入您的API密钥
+   - API主机: 如果使用自定义端点，请输入API主机地址
+6. 点击"保存"按钮完成配置
 
-获取API密钥后，在应用的设置界面中填入相应的密钥即可开始使用。
+::: tip 获取API密钥
+不同提供商的API密钥获取方式不同:
+- OpenAI: 访问[OpenAI API密钥页面](https://platform.openai.com/account/api-keys)
+- Anthropic: 访问[Anthropic控制台](https://console.anthropic.com/)
+- Google: 访问[Google AI Studio](https://makersuite.google.com/app/apikey)
+:::
+
+### 验证API连接
+
+1. 添加渠道后，选择该渠道
+2. 点击"测试连接"按钮
+3. 如果配置正确，您将看到"连接成功"的提示
+
+## 升级应用程序
+
+### 自动更新
+
+LLM Agent支持自动检查更新:
+
+1. 启动应用程序
+2. 如果有新版本可用，将显示更新通知
+3. 点击"立即更新"按钮开始更新过程
+
+### 手动更新
+
+1. 下载最新版本的安装包
+2. 运行安装程序，它将自动检测并升级现有安装
+3. 按照安装向导完成更新
+
+## 卸载应用程序
+
+### 使用控制面板卸载
+
+1. 打开Windows控制面板
+2. 选择"程序和功能"或"卸载程序"
+3. 找到"LLM Agent"并点击"卸载"
+4. 按照卸载向导的指示完成卸载
+
+### 手动卸载便携版
+
+如果您使用的是便携版，只需删除包含应用程序的文件夹即可。
 
 ## 故障排除
 
-如果您在安装或使用过程中遇到问题，请尝试以下步骤：
+### 安装失败
 
-1. 确保您的系统满足最低系统要求
-2. 检查您是否已安装最新版本的.NET 8.0 Runtime
-3. 确认您的API密钥是否正确
-4. 检查您的网络连接是否正常
-5. 尝试重启应用程序
+- 确保您有管理员权限
+- 关闭杀毒软件或将安装程序添加到例外列表
+- 确保.NET 8.0运行时已正确安装
 
-如果问题仍然存在，请在[GitHub Issues](https://github.com/rbetree/llm-agent/issues)页面提交问题报告。 
+### 启动问题
+
+- 检查应用程序日志文件（位于`%AppData%\LlmAgent\logs`）
+- 确保您的系统满足最低要求
+- 尝试以管理员身份运行应用程序
+
+### 连接问题
+
+- 验证您的API密钥是否正确
+- 检查网络连接
+- 确认API服务提供商的服务状态 

@@ -1,317 +1,293 @@
 # 模型接口
 
-本页面详细说明LLM多模型客户端中的模型定义和参数。
+本文档详细介绍了LLM Agent支持的各种模型提供商的接口规范和使用方法。
 
-## 模型定义
+## OpenAI
 
-### ModelInfo
+### 支持的模型
 
-`ModelInfo`类表示一个LLM模型的基本信息：
+OpenAI提供商支持以下模型：
+
+| 模型名称 | 类别 | 上下文长度 | 说明 |
+|---------|------|-----------|------|
+| gpt-4 | 聊天 | 8,192 | GPT-4基础模型 |
+| gpt-4-turbo | 聊天 | 128,000 | GPT-4 Turbo版本，支持更长上下文 |
+| gpt-4-vision | 聊天+视觉 | 128,000 | 支持图像理解的GPT-4 |
+| gpt-3.5-turbo | 聊天 | 16,384 | GPT-3.5 Turbo版本 |
+| text-embedding-ada-002 | 嵌入 | 8,191 | 文本嵌入模型 |
+
+### 配置参数
+
+OpenAI提供商需要以下配置参数：
 
 ```csharp
-public class ModelInfo
+// 创建OpenAI提供商
+var openAIProvider = new OpenAIProvider(
+    apiKey: "sk-...",  // OpenAI API密钥
+    apiHost: "https://api.openai.com"  // 可选，默认为官方API地址
+);
+```
+
+### 请求参数
+
+发送消息时支持以下参数：
+
+| 参数 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| temperature | float | 0.7 | 控制生成文本的随机性，0-2之间 |
+| max_tokens | int | 1000 | 生成文本的最大长度 |
+| top_p | float | 1.0 | 控制词汇选择的多样性 |
+| frequency_penalty | float | 0.0 | 减少重复内容的惩罚系数 |
+| presence_penalty | float | 0.0 | 鼓励引入新主题的系数 |
+
+### 示例代码
+
+```csharp
+// 创建提供商
+var provider = new OpenAIProvider(apiKey, apiHost);
+
+// 获取可用模型
+var models = await provider.GetAvailableModelsAsync();
+var gpt4Model = models.FirstOrDefault(m => m.Name == "gpt-4");
+
+// 创建聊天会话
+var session = new ChatSession { Id = Guid.NewGuid().ToString() };
+
+// 发送消息
+var message = new ChatMessage { 
+    Role = "user", 
+    Content = "用简单的语言解释量子计算" 
+};
+
+// 设置参数
+var parameters = new Dictionary<string, object>
 {
-    // 模型ID
-    public string Id { get; set; }
-    
-    // 模型名称
-    public string Name { get; set; }
-    
-    // 模型描述
-    public string Description { get; set; }
-    
-    // 最大令牌数
-    public int MaxTokens { get; set; }
-    
-    // 是否支持流式响应
-    public bool SupportsStreaming { get; set; } = true;
-    
-    // 是否支持系统提示
-    public bool SupportsSystemPrompt { get; set; } = true;
-    
-    // 模型提供商类型
-    public ProviderType ProviderType { get; set; }
-    
-    // 模型能力
-    public ModelCapabilities Capabilities { get; set; }
+    ["temperature"] = 0.5,
+    ["max_tokens"] = 500
+};
+
+// 发送请求
+var response = await provider.SendMessageAsync(message, session, gpt4Model, parameters);
+```
+
+## Azure OpenAI
+
+### 支持的模型
+
+Azure OpenAI支持与OpenAI相同的模型，但需要在Azure平台上部署。
+
+### 配置参数
+
+Azure OpenAI提供商需要以下配置参数：
+
+```csharp
+// 创建Azure OpenAI提供商
+var azureOpenAIProvider = new AzureOpenAIProvider(
+    apiKey: "your-azure-api-key",
+    apiHost: "https://your-resource-name.openai.azure.com",
+    deploymentId: "your-deployment-id"  // Azure部署ID
+);
+```
+
+### 请求参数
+
+与OpenAI相同的参数，另外增加：
+
+| 参数 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| deployment_id | string | null | Azure部署ID，可在请求时覆盖配置值 |
+
+## Anthropic Claude
+
+### 支持的模型
+
+Anthropic提供商支持以下Claude系列模型：
+
+| 模型名称 | 类别 | 上下文长度 | 说明 |
+|---------|------|-----------|------|
+| claude-3-opus | 聊天 | 200,000 | Claude 3最强大版本 |
+| claude-3-sonnet | 聊天 | 200,000 | Claude 3平衡版本 |
+| claude-3-haiku | 聊天 | 200,000 | Claude 3快速版本 |
+| claude-2 | 聊天 | 100,000 | Claude 2模型 |
+
+### 配置参数
+
+Anthropic提供商需要以下配置参数：
+
+```csharp
+// 创建Anthropic提供商
+var anthropicProvider = new AnthropicProvider(
+    apiKey: "sk-ant-...",  // Anthropic API密钥
+    apiHost: "https://api.anthropic.com"  // 可选，默认为官方API地址
+);
+```
+
+### 请求参数
+
+| 参数 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| temperature | float | 0.7 | 控制生成文本的随机性 |
+| max_tokens | int | 1000 | 生成文本的最大长度 |
+| top_p | float | 1.0 | 控制词汇选择的多样性 |
+| top_k | int | null | 限制词汇选择范围 |
+
+## Google Gemini
+
+### 支持的模型
+
+Google提供商支持以下Gemini系列模型：
+
+| 模型名称 | 类别 | 上下文长度 | 说明 |
+|---------|------|-----------|------|
+| gemini-pro | 聊天 | 32,768 | Gemini Pro文本模型 |
+| gemini-pro-vision | 聊天+视觉 | 32,768 | 支持图像理解的Gemini Pro |
+| gemini-ultra | 聊天 | 32,768 | Gemini Ultra高级模型 |
+
+### 配置参数
+
+Google Gemini提供商需要以下配置参数：
+
+```csharp
+// 创建Google提供商
+var googleProvider = new GoogleProvider(
+    apiKey: "your-google-api-key",
+    apiHost: "https://generativelanguage.googleapis.com"  // 可选，默认为官方API地址
+);
+```
+
+### 请求参数
+
+| 参数 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| temperature | float | 0.7 | 控制生成文本的随机性 |
+| max_output_tokens | int | 1000 | 生成文本的最大长度 |
+| top_p | float | 0.95 | 控制词汇选择的多样性 |
+| top_k | int | 40 | 限制词汇选择范围 |
+
+## ZhipuAI
+
+### 支持的模型
+
+智谱AI提供商支持以下模型：
+
+| 模型名称 | 类别 | 上下文长度 | 说明 |
+|---------|------|-----------|------|
+| glm-4 | 聊天 | 128,000 | GLM-4大规模预训练模型 |
+| glm-3-turbo | 聊天 | 32,000 | GLM-3 Turbo版本 |
+| cogview-3 | 图像生成 | - | 文生图模型 |
+
+### 配置参数
+
+ZhipuAI提供商需要以下配置参数：
+
+```csharp
+// 创建ZhipuAI提供商
+var zhipuProvider = new ZhipuProvider(
+    apiKey: "your-zhipu-api-key",
+    apiHost: "https://open.bigmodel.cn/api/paas/v4"  // 可选，默认为官方API地址
+);
+```
+
+### 请求参数
+
+| 参数 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| temperature | float | 0.7 | 控制生成文本的随机性 |
+| top_p | float | 0.7 | 控制词汇选择的多样性 |
+| max_tokens | int | 1500 | 生成文本的最大长度 |
+
+## SiliconFlow
+
+### 支持的模型
+
+硅基流动提供商支持以下模型：
+
+| 模型名称 | 类别 | 上下文长度 | 说明 |
+|---------|------|-----------|------|
+| silicon-flow-1 | 聊天 | 16,000 | 硅基流动基础模型 |
+| silicon-flow-2 | 聊天 | 32,000 | 硅基流动增强模型 |
+
+### 配置参数
+
+SiliconFlow提供商需要以下配置参数：
+
+```csharp
+// 创建SiliconFlow提供商
+var siliconProvider = new SiliconFlowProvider(
+    apiKey: "your-silicon-api-key",
+    apiHost: "https://api.siliconflow.com"  // 可选，默认为官方API地址
+);
+```
+
+### 请求参数
+
+| 参数 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| temperature | float | 0.7 | 控制生成文本的随机性 |
+| max_tokens | int | 1000 | 生成文本的最大长度 |
+| top_p | float | 0.9 | 控制词汇选择的多样性 |
+
+## 通用参数处理
+
+LLM Agent通过`ModelParameters`类统一管理不同提供商的参数：
+
+```csharp
+// 创建通用参数对象
+var parameters = new ModelParameters
+{
+    Temperature = 0.7f,
+    MaxTokens = 1000,
+    TopP = 0.9f
+};
+
+// 转换为特定提供商参数
+var openAIParams = parameters.ToOpenAIParameters();
+var anthropicParams = parameters.ToAnthropicParameters();
+var googleParams = parameters.ToGoogleParameters();
+```
+
+## 错误处理
+
+各提供商可能返回不同的错误格式，LLM Agent将它们统一封装为`ApiException`：
+
+```csharp
+try
+{
+    var response = await provider.SendMessageAsync(...);
+}
+catch (ApiException ex) when (ex.ErrorCode == "rate_limit_exceeded")
+{
+    // 处理速率限制错误
+    Console.WriteLine("API请求过于频繁，请稍后再试");
+}
+catch (ApiException ex) when (ex.ErrorCode == "invalid_api_key")
+{
+    // 处理认证错误
+    Console.WriteLine("API密钥无效，请检查配置");
+}
+catch (ApiException ex)
+{
+    // 处理其他API错误
+    Console.WriteLine($"API错误: {ex.Message}");
 }
 ```
 
-### ModelCapabilities
+## 流式响应处理
 
-`ModelCapabilities`枚举定义了模型的能力：
-
-```csharp
-[Flags]
-public enum ModelCapabilities
-{
-    None = 0,
-    TextGeneration = 1,
-    ChatCompletion = 2,
-    ImageGeneration = 4,
-    CodeCompletion = 8,
-    FunctionCalling = 16,
-    All = TextGeneration | ChatCompletion | ImageGeneration | CodeCompletion | FunctionCalling
-}
-```
-
-### ProviderType
-
-`ProviderType`枚举定义了支持的LLM服务提供商类型：
+所有提供商都支持流式响应，使用方式如下：
 
 ```csharp
-public enum ProviderType
-{
-    OpenAI,
-    Anthropic,
-    Google,
-    Baidu,
-    ZhipuAI,
-    Custom
-}
-```
-
-## 消息模型
-
-### ChatMessage
-
-`ChatMessage`类表示聊天对话中的一条消息：
-
-```csharp
-public class ChatMessage
-{
-    // 消息角色
-    public ChatRole Role { get; set; }
-    
-    // 消息内容
-    public string Content { get; set; }
-    
-    // 消息ID
-    public string Id { get; set; }
-    
-    // 消息创建时间
-    public DateTime CreatedAt { get; set; }
-    
-    // 构造函数
-    public ChatMessage(ChatRole role, string content)
-    {
-        Role = role;
-        Content = content;
-        Id = Guid.NewGuid().ToString();
-        CreatedAt = DateTime.Now;
+// 处理流式响应
+await provider.SendMessageStreamAsync(
+    message,
+    session,
+    model,
+    partialResponse => {
+        // 处理部分响应
+        Console.Write(partialResponse);
+        
+        // 可以在UI上实时显示
+        UpdateUI(partialResponse);
     }
-}
-```
-
-### ChatRole
-
-`ChatRole`枚举定义了聊天消息的角色类型：
-
-```csharp
-public enum ChatRole
-{
-    System,
-    User,
-    Assistant,
-    Function
-}
-```
-
-### ChatResponseChunk
-
-`ChatResponseChunk`类表示流式响应中的一个数据块：
-
-```csharp
-public class ChatResponseChunk
-{
-    // 块ID
-    public string Id { get; set; }
-    
-    // 块内容
-    public string Content { get; set; }
-    
-    // 是否是最后一个块
-    public bool IsLast { get; set; }
-    
-    // 完成原因（仅在最后一个块中有效）
-    public string FinishReason { get; set; }
-    
-    // 使用的模型
-    public string Model { get; set; }
-    
-    // 使用的令牌数（仅在最后一个块中有效）
-    public TokenUsage TokenUsage { get; set; }
-}
-```
-
-### TokenUsage
-
-`TokenUsage`类表示令牌使用情况：
-
-```csharp
-public class TokenUsage
-{
-    // 提示令牌数
-    public int PromptTokens { get; set; }
-    
-    // 完成令牌数
-    public int CompletionTokens { get; set; }
-    
-    // 总令牌数
-    public int TotalTokens => PromptTokens + CompletionTokens;
-}
-```
-
-## 配置模型
-
-### ProviderConfig
-
-`ProviderConfig`类表示LLM服务提供商的配置：
-
-```csharp
-public class ProviderConfig
-{
-    // API密钥
-    public string ApiKey { get; set; }
-    
-    // API密钥2（部分提供商需要，如百度的Secret Key）
-    public string ApiKey2 { get; set; }
-    
-    // 组织ID（部分提供商需要，如OpenAI）
-    public string OrganizationId { get; set; }
-    
-    // API基础URL
-    public string BaseUrl { get; set; }
-    
-    // 是否使用自定义API服务器
-    public bool UseCustomServer { get; set; }
-    
-    // 自定义API服务器地址
-    public string CustomServerUrl { get; set; }
-    
-    // 代理设置
-    public ProxySettings ProxySettings { get; set; }
-    
-    // 超时设置（毫秒）
-    public int TimeoutMs { get; set; } = 30000;
-}
-```
-
-### ProxySettings
-
-`ProxySettings`类表示代理服务器设置：
-
-```csharp
-public class ProxySettings
-{
-    // 是否使用代理
-    public bool UseProxy { get; set; }
-    
-    // 代理服务器地址
-    public string ProxyServer { get; set; }
-    
-    // 代理服务器端口
-    public int ProxyPort { get; set; }
-    
-    // 是否需要认证
-    public bool RequiresAuthentication { get; set; }
-    
-    // 代理用户名
-    public string Username { get; set; }
-    
-    // 代理密码
-    public string Password { get; set; }
-}
-```
-
-## 预定义模型
-
-应用预定义了各个服务提供商的常用模型，这些定义位于`Models.cs`文件中：
-
-### OpenAI模型
-
-```csharp
-public static class OpenAIModels
-{
-    public static readonly ModelInfo GPT35Turbo = new ModelInfo
-    {
-        Id = "gpt-3.5-turbo",
-        Name = "GPT-3.5 Turbo",
-        Description = "最适合大多数任务的平衡模型",
-        MaxTokens = 4096,
-        ProviderType = ProviderType.OpenAI,
-        Capabilities = ModelCapabilities.ChatCompletion | ModelCapabilities.FunctionCalling
-    };
-    
-    public static readonly ModelInfo GPT4 = new ModelInfo
-    {
-        Id = "gpt-4",
-        Name = "GPT-4",
-        Description = "更强大的模型，适合复杂任务",
-        MaxTokens = 8192,
-        ProviderType = ProviderType.OpenAI,
-        Capabilities = ModelCapabilities.All
-    };
-    
-    // 其他OpenAI模型...
-}
-```
-
-### Anthropic模型
-
-```csharp
-public static class AnthropicModels
-{
-    public static readonly ModelInfo Claude3Haiku = new ModelInfo
-    {
-        Id = "claude-3-haiku-20240307",
-        Name = "Claude 3 Haiku",
-        Description = "最快速的Claude模型",
-        MaxTokens = 200000,
-        ProviderType = ProviderType.Anthropic,
-        Capabilities = ModelCapabilities.ChatCompletion
-    };
-    
-    public static readonly ModelInfo Claude3Sonnet = new ModelInfo
-    {
-        Id = "claude-3-sonnet-20240229",
-        Name = "Claude 3 Sonnet",
-        Description = "平衡速度和智能的Claude模型",
-        MaxTokens = 200000,
-        ProviderType = ProviderType.Anthropic,
-        Capabilities = ModelCapabilities.ChatCompletion
-    };
-    
-    // 其他Anthropic模型...
-}
-```
-
-## 自定义模型
-
-您可以通过扩展`Models.cs`文件来添加自定义模型定义：
-
-```csharp
-public static class CustomModels
-{
-    public static readonly ModelInfo MyCustomModel = new ModelInfo
-    {
-        Id = "my-custom-model",
-        Name = "My Custom Model",
-        Description = "我的自定义模型",
-        MaxTokens = 4096,
-        ProviderType = ProviderType.Custom,
-        Capabilities = ModelCapabilities.ChatCompletion
-    };
-}
-```
-
-然后，您需要在自定义的LLM提供商实现中返回这些模型：
-
-```csharp
-public override List<ModelInfo> GetSupportedModels()
-{
-    return new List<ModelInfo>
-    {
-        CustomModels.MyCustomModel
-    };
-} 
+);
+``` 

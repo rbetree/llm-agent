@@ -1,194 +1,92 @@
 # 技术栈
 
-本页面详细说明LLM多模型客户端使用的技术栈和依赖项。
+LLM Agent项目采用了一系列现代技术和框架，以下是项目的核心技术栈说明。
 
-## 核心技术
+## 开发平台
 
-### 开发语言
+- **.NET 8.0**: 最新的.NET平台，提供高性能、跨平台的开发环境
+- **Windows Forms**: 用于构建Windows桌面应用程序的UI框架
+- **Visual Studio 2022**: 主要开发工具，提供强大的设计器和调试功能
 
-- **C#**: 主要开发语言，版本 10.0
-- **.NET**: 基于 .NET 8.0 框架开发
+## 数据存储
 
-### UI框架
+- **SQLite**: 轻量级嵌入式数据库，用于存储聊天历史和模型信息
+- **JSON**: 用于配置文件和渠道信息的序列化和持久化
+- **Settings API**: .NET内置的应用程序设置管理机制
 
-- **Windows Forms**: 用于构建桌面应用程序的UI
-- **自定义控件**: 基于Windows Forms开发的自定义控件
+## 第三方API集成
 
-### 数据处理
+- **REST API客户端**: 用于与各LLM服务提供商通信
+- **HTTP客户端工厂**: 实现高效的HTTP连接复用
+- **异步API调用**: 确保UI响应性和高效的网络通信
+
+## 核心库和框架
 
 - **System.Text.Json**: 用于JSON序列化和反序列化
-- **SQLite**: 轻量级嵌入式数据库，用于本地数据存储
-- **Entity Framework Core**: ORM框架，用于数据库操作
+- **System.Data.SQLite**: SQLite数据库访问
+- **System.Net.Http**: HTTP客户端实现
+- **System.ComponentModel**: 用于实现属性通知和数据绑定
 
-### 网络通信
+## UI组件和控件
 
-- **System.Net.Http**: 用于HTTP请求和响应
-- **HttpClient**: 用于与LLM服务API进行通信
-- **IHttpClientFactory**: 用于创建和管理HttpClient实例
+- **自定义控件**: 扩展标准Windows Forms控件，实现特定功能
+- **SplitContainer**: 实现可调整大小的多面板布局
+- **RichTextBox**: 支持富文本显示，用于渲染Markdown格式消息
+- **ContextMenuStrip**: 提供上下文菜单功能
 
-### 异步编程
+## 设计模式应用
 
-- **Task-based Asynchronous Pattern (TAP)**: 基于任务的异步编程模式
-- **IAsyncEnumerable**: 用于处理异步流数据（如流式聊天响应）
-- **CancellationToken**: 用于取消异步操作
+项目中应用了多种设计模式，确保代码的可维护性和可扩展性：
 
-## 依赖库
+1. **工厂模式**: 
+   - `ProviderFactory` 用于创建不同的LLM提供商实例
+   - 根据配置动态选择合适的提供商实现
 
-### 核心依赖
+2. **仓储模式**:
+   - `ChatRepository` 封装数据访问逻辑
+   - 提供统一的数据操作接口
 
-| 依赖项 | 版本 | 用途 |
-|-------|------|------|
-| Microsoft.EntityFrameworkCore.Sqlite | 8.0.0 | SQLite数据库访问 |
-| Microsoft.Extensions.Http | 8.0.0 | HTTP客户端工厂 |
-| Microsoft.Extensions.DependencyInjection | 8.0.0 | 依赖注入 |
-| Microsoft.Extensions.Configuration | 8.0.0 | 配置管理 |
-| Microsoft.Extensions.Logging | 8.0.0 | 日志记录 |
+3. **单例模式**:
+   - `DatabaseManager` 确保数据库连接的唯一性
+   - `ChannelManager` 管理渠道配置的全局访问
 
-### UI相关
+4. **策略模式**:
+   - 不同的LLM提供商实现相同的接口
+   - 运行时可以无缝切换不同的提供商
 
-| 依赖项 | 版本 | 用途 |
-|-------|------|------|
-| Markdig | 0.33.0 | Markdown渲染 |
-| WinForms.DataVisualization | 1.8.0 | 数据可视化控件 |
-| ModernWpfUI | 0.9.6 | 现代化UI控件 |
+5. **观察者模式**:
+   - 使用事件机制实现UI和业务逻辑层的松耦合通信
+   - 聊天消息更新通知机制
 
-### API集成
+## 多线程和异步处理
 
-| 依赖项 | 版本 | 用途 |
-|-------|------|------|
-| Newtonsoft.Json | 13.0.3 | JSON处理（部分API需要） |
-| System.IdentityModel.Tokens.Jwt | 7.0.3 | JWT处理 |
-| Microsoft.AspNetCore.WebUtilities | 8.0.0 | Web工具类 |
+- **Task-based Asynchronous Pattern (TAP)**: 使用async/await实现异步操作
+- **UI线程同步**: 确保从工作线程安全更新UI
+- **取消令牌支持**: 允许用户取消长时间运行的操作
+- **进度报告**: 实现IProgress&lt;T&gt;接口提供操作进度反馈
 
-### 安全性
+## 安全性考虑
 
-| 依赖项 | 版本 | 用途 |
-|-------|------|------|
-| Microsoft.AspNetCore.Cryptography.KeyDerivation | 8.0.0 | 密钥派生 |
-| System.Security.Cryptography.ProtectedData | 8.0.0 | 数据保护 |
+- **敏感数据保护**: API密钥等敏感信息的安全存储
+- **输入验证**: 防止恶意输入和注入攻击
+- **错误处理**: 避免暴露敏感的错误信息
+- **最小权限原则**: 应用程序只请求必要的系统权限
 
-### 工具类
-
-| 依赖项 | 版本 | 用途 |
-|-------|------|------|
-| Serilog | 3.1.1 | 结构化日志 |
-| Polly | 8.2.0 | 弹性和瞬态故障处理 |
-| CommunityToolkit.Mvvm | 8.2.2 | MVVM模式支持 |
-| Humanizer | 2.14.1 | 字符串和数字人性化处理 |
-
-## 开发工具
-
-### IDE
-
-- **Visual Studio 2022**: 主要开发环境，版本 17.8 或更高
-- **Visual Studio Code**: 辅助开发环境，用于编辑文档等
-
-### 构建工具
-
-- **MSBuild**: .NET项目构建系统
-- **NuGet**: 包管理器，用于管理依赖项
-
-### 版本控制
-
-- **Git**: 分布式版本控制系统
-- **GitHub**: 代码托管平台
-
-### 测试工具
+## 测试框架
 
 - **MSTest**: 单元测试框架
-- **Moq**: 模拟框架，用于单元测试
-- **FluentAssertions**: 流畅的断言库，用于单元测试
+- **Moq**: 模拟框架，用于隔离测试依赖
+- **测试覆盖率分析**: 确保关键代码路径的测试覆盖
 
-## 架构模式
+## 部署和分发
 
-### 应用架构
+- **ClickOnce**: 简化应用程序的部署和更新
+- **自包含部署**: 包含所有依赖项的单一可执行文件
+- **安装程序**: 提供用户友好的安装体验
 
-- **三层架构**: 表示层、业务逻辑层、数据访问层
-- **仓储模式**: 用于数据访问层，提供统一的数据访问接口
-- **工厂模式**: 用于创建LLM提供商实例
-- **策略模式**: 用于处理不同LLM提供商的请求和响应
-- **单例模式**: 用于确保某些类只有一个实例
-- **观察者模式**: 用于实现事件驱动的通信
+## 开发工具链
 
-### 编程范式
-
-- **面向对象编程 (OOP)**: 主要编程范式
-- **异步编程**: 使用async/await进行异步操作
-- **LINQ**: 用于数据查询
-- **扩展方法**: 用于扩展现有类型的功能
-
-## 第三方API
-
-### LLM服务
-
-| 服务提供商 | API版本 | 文档链接 |
-|----------|---------|---------|
-| OpenAI | v1 | [OpenAI API](https://platform.openai.com/docs/api-reference) |
-| Anthropic | v1 | [Anthropic API](https://docs.anthropic.com/claude/reference) |
-| Google | v1 | [Google Gemini API](https://ai.google.dev/docs) |
-| 百度 | v1 | [百度文心一言API](https://cloud.baidu.com/doc/WENXINWORKSHOP/index.html) |
-| 智谱AI | v1 | [智谱AI API](https://open.bigmodel.cn/dev/api) |
-
-## 开发规范
-
-### 代码规范
-
-- **命名规范**: 遵循.NET命名规范
-  - 类名、方法名: PascalCase
-  - 私有字段: _camelCase
-  - 局部变量: camelCase
-  - 常量: ALL_CAPS
-- **注释规范**: 使用XML文档注释
-- **异常处理**: 使用try-catch块处理异常，并记录日志
-
-### 项目结构规范
-
-- **文件组织**: 按功能模块组织文件
-- **命名空间**: 使用层次化的命名空间
-- **依赖关系**: 遵循依赖倒置原则，高层模块不依赖低层模块
-
-### 版本控制规范
-
-- **分支模型**: 使用Git Flow分支模型
-- **提交消息**: 使用约定式提交规范
-- **版本号**: 使用语义化版本号
-
-## 性能优化
-
-### UI性能
-
-- **异步加载**: 使用异步方法加载数据，避免阻塞UI线程
-- **虚拟化**: 对长列表使用虚拟化技术，减少内存占用
-- **延迟加载**: 对不立即需要的资源使用延迟加载
-
-### 数据性能
-
-- **缓存**: 对频繁访问的数据使用内存缓存
-- **批量操作**: 对数据库操作使用批量操作，减少IO次数
-- **异步IO**: 使用异步IO操作，提高响应速度
-
-### 网络性能
-
-- **连接池**: 使用HttpClient连接池，复用HTTP连接
-- **压缩**: 对HTTP请求和响应使用压缩
-- **超时控制**: 对网络请求设置合理的超时时间
-
-## 安全性
-
-### 数据安全
-
-- **加密存储**: 敏感数据（如API密钥）使用加密存储
-- **安全擦除**: 内存中的敏感数据使用后安全擦除
-- **最小权限**: 遵循最小权限原则，只访问必要的数据
-
-### 网络安全
-
-- **HTTPS**: 所有网络请求使用HTTPS
-- **证书验证**: 验证服务器证书
-- **防止中间人攻击**: 实现证书固定（Certificate Pinning）
-
-### 输入验证
-
-- **参数验证**: 验证所有用户输入
-- **防止注入**: 使用参数化查询，防止SQL注入
-- **输出编码**: 对输出进行适当编码，防止XSS攻击 
+- **Git**: 版本控制系统
+- **GitHub Actions**: CI/CD自动化
+- **NuGet**: 包管理器，管理第三方依赖
+- **Visual Studio Code**: 轻量级编辑器，用于快速编辑和查看 
