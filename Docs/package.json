@@ -1,0 +1,22 @@
+{
+  "name": "llm-agent-docs",
+  "version": "1.0.0",
+  "description": "LLM多模型客户端文档",
+  "main": "index.js",
+  "scripts": {
+    "docs:dev": "vitepress dev",
+    "docs:build": "vitepress build",
+    "docs:preview": "vitepress preview"
+  },
+  "keywords": [
+    "llm",
+    "ai",
+    "client",
+    "documentation"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "vitepress": "^1.0.0-rc.44"
+  }
+} 

@@ -36,9 +36,7 @@ packages/
 # SpecStory explanation file
 .specstory/.what-is-this.md
 
-# 项目文档
-Docs/
-
 # 工具配置文件夹
 .specstory/
 .cursor/
+.vs
