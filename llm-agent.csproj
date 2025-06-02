@@ -30,19 +30,10 @@
     <None Remove="src\**" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Include="Docs\**">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-
   <!-- 显式引用ChatForm控件文件 -->
   <ItemGroup>
     <Compile Include="UI\Controls\ChatForm\*.cs" />
     <EmbeddedResource Include="UI\Controls\ChatForm\*.resx" />
-    <None Include="UI\Controls\ChatForm\*.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
 
   <!-- 显式包含其他所有.cs文件和.resx文件 -->
