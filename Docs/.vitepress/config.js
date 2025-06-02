@@ -61,7 +61,8 @@ export default {
           items: [
             { text: '概述', link: '/note/' },
             { text: '2025年4月', link: '/note/2025-04' },
-            { text: '2025年5月', link: '/note/2025-05' }
+            { text: '2025年5月', link: '/note/2025-05' },
+            { text: '2025年6月', link: '/note/2025-06' }
           ]
         }
       ]
