@@ -1,10 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Data.SQLite;
 using System.IO;
-using System.Text.Json;
 using llm_agent.Model;
 using llm_agent.Common.Exceptions;
+using llm_agent.DAL;
 
 namespace llm_agent.BLL
 {
@@ -14,21 +15,14 @@ namespace llm_agent.BLL
     public class ChannelManager
     {
         private List<Channel> _channels = new List<Channel>();
-        private readonly string _dataPath;
-        private readonly string _channelsFile;
+        private static readonly string DbName = "llm_agent.db";
+        private static readonly string DbPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, DbName);
+        private static readonly string ConnectionString = $"Data Source={DbPath};Version=3;";
 
         public ChannelManager()
         {
-            // 获取应用数据目录
-            string appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-            _dataPath = Path.Combine(appDataPath, "LlmAgent");
-            _channelsFile = Path.Combine(_dataPath, "channels.json");
-
-            // 确保目录存在
-            if (!Directory.Exists(_dataPath))
-            {
-                Directory.CreateDirectory(_dataPath);
-            }
+            // 确保数据库和表已初始化
+            var databaseManager = new DatabaseManager();
 
             // 加载渠道数据
             LoadChannels();
@@ -45,6 +39,8 @@ namespace llm_agent.BLL
         /// </summary>
         public List<Channel> GetAllChannels()
         {
+            // 确保从数据库重新加载最新数据
+            LoadChannels();
             return _channels.OrderBy(c => c.Name).ToList();
         }
 
@@ -53,6 +49,8 @@ namespace llm_agent.BLL
         /// </summary>
         public List<Channel> GetEnabledChannels()
         {
+            // 确保从数据库重新加载最新数据
+            LoadChannels();
             return _channels.Where(c => c.IsEnabled).OrderBy(c => c.Name).ToList();
         }
 
@@ -61,12 +59,43 @@ namespace llm_agent.BLL
         /// </summary>
         public Channel GetChannelById(Guid id)
         {
-            var channel = _channels.FirstOrDefault(c => c.Id == id);
-            if (channel == null)
+            using (var connection = new SQLiteConnection(ConnectionString))
             {
-                throw new DataAccessException($"找不到ID为 {id} 的渠道");
+                connection.Open();
+                string sql = "SELECT * FROM Channels WHERE Id = @id";
+                
+                using (var command = new SQLiteCommand(sql, connection))
+                {
+                    command.Parameters.AddWithValue("@id", id.ToString());
+                    
+                    using (var reader = command.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            var channel = new Channel
+                            {
+                                Id = Guid.Parse(reader["Id"].ToString()),
+                                Name = reader["Name"].ToString(),
+                                ProviderType = (ProviderType)Enum.Parse(typeof(ProviderType), reader["ProviderType"].ToString()),
+                                ApiKey = reader["ApiKey"].ToString(),
+                                ApiHost = reader["ApiHost"].ToString(),
+                                IsEnabled = Convert.ToBoolean(Convert.ToInt32(reader["IsEnabled"])),
+                                UseStreamResponse = Convert.ToBoolean(Convert.ToInt32(reader["UseStreamResponse"])),
+                                CreatedAt = DateTime.Parse(reader["CreatedAt"].ToString()),
+                                UpdatedAt = DateTime.Parse(reader["UpdatedAt"].ToString()),
+                                SupportedModels = new List<string>()
+                            };
+                            
+                            // 加载渠道支持的模型列表
+                            LoadChannelModels(channel, connection);
+                            
+                            return channel;
+                        }
+                    }
+                }
             }
-            return channel;
+            
+            throw new DataAccessException($"找不到ID为 {id} 的渠道");
         }
 
         /// <summary>
@@ -74,7 +103,43 @@ namespace llm_agent.BLL
         /// </summary>
         public Channel GetChannelByName(string name)
         {
-            return _channels.FirstOrDefault(c => c.Name == name);
+            using (var connection = new SQLiteConnection(ConnectionString))
+            {
+                connection.Open();
+                string sql = "SELECT * FROM Channels WHERE Name = @name";
+                
+                using (var command = new SQLiteCommand(sql, connection))
+                {
+                    command.Parameters.AddWithValue("@name", name);
+                    
+                    using (var reader = command.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            var channel = new Channel
+                            {
+                                Id = Guid.Parse(reader["Id"].ToString()),
+                                Name = reader["Name"].ToString(),
+                                ProviderType = (ProviderType)Enum.Parse(typeof(ProviderType), reader["ProviderType"].ToString()),
+                                ApiKey = reader["ApiKey"].ToString(),
+                                ApiHost = reader["ApiHost"].ToString(),
+                                IsEnabled = Convert.ToBoolean(Convert.ToInt32(reader["IsEnabled"])),
+                                UseStreamResponse = Convert.ToBoolean(Convert.ToInt32(reader["UseStreamResponse"])),
+                                CreatedAt = DateTime.Parse(reader["CreatedAt"].ToString()),
+                                UpdatedAt = DateTime.Parse(reader["UpdatedAt"].ToString()),
+                                SupportedModels = new List<string>()
+                            };
+                            
+                            // 加载渠道支持的模型列表
+                            LoadChannelModels(channel, connection);
+                            
+                            return channel;
+                        }
+                    }
+                }
+            }
+            
+            return null;
         }
 
         /// <summary>
@@ -89,7 +154,7 @@ namespace llm_agent.BLL
             }
 
             // 检查名称是否已存在
-            if (_channels.Any(c => c.Name.Equals(channel.Name, StringComparison.OrdinalIgnoreCase)))
+            if (!IsChannelNameAvailable(channel.Name))
             {
                 throw new DataAccessException($"渠道名称 '{channel.Name}' 已存在");
             }
@@ -98,8 +163,51 @@ namespace llm_agent.BLL
             channel.CreatedAt = DateTime.Now;
             channel.UpdatedAt = DateTime.Now;
 
-            _channels.Add(channel);
-            SaveChannels();
+            using (var connection = new SQLiteConnection(ConnectionString))
+            {
+                connection.Open();
+                using (var transaction = connection.BeginTransaction())
+                {
+                    try
+                    {
+                        // 插入渠道基本信息
+                        string insertChannelSql = @"
+                            INSERT INTO Channels (Id, Name, ProviderType, ApiKey, ApiHost, IsEnabled, UseStreamResponse, CreatedAt, UpdatedAt)
+                            VALUES (@id, @name, @providerType, @apiKey, @apiHost, @isEnabled, @useStreamResponse, @createdAt, @updatedAt)";
+                        
+                        using (var command = new SQLiteCommand(insertChannelSql, connection, transaction))
+                        {
+                            command.Parameters.AddWithValue("@id", channel.Id.ToString());
+                            command.Parameters.AddWithValue("@name", channel.Name);
+                            command.Parameters.AddWithValue("@providerType", channel.ProviderType.ToString());
+                            command.Parameters.AddWithValue("@apiKey", channel.ApiKey ?? "");
+                            command.Parameters.AddWithValue("@apiHost", channel.ApiHost ?? "");
+                            command.Parameters.AddWithValue("@isEnabled", channel.IsEnabled ? 1 : 0);
+                            command.Parameters.AddWithValue("@useStreamResponse", channel.UseStreamResponse ? 1 : 0);
+                            command.Parameters.AddWithValue("@createdAt", channel.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss"));
+                            command.Parameters.AddWithValue("@updatedAt", channel.UpdatedAt.ToString("yyyy-MM-dd HH:mm:ss"));
+                            command.ExecuteNonQuery();
+                        }
+                        
+                        // 插入渠道支持的模型
+                        if (channel.SupportedModels != null && channel.SupportedModels.Count > 0)
+                        {
+                            SaveChannelModels(channel, connection, transaction);
+                        }
+                        
+                        transaction.Commit();
+                    }
+                    catch
+                    {
+                        transaction.Rollback();
+                        throw;
+                    }
+                }
+            }
+            
+            // 重新加载渠道列表
+            LoadChannels();
+            
             return channel;
         }
 
@@ -108,11 +216,11 @@ namespace llm_agent.BLL
         /// </summary>
         public Channel UpdateChannel(Channel channel)
         {
+            // 检查渠道是否存在
             var existingChannel = GetChannelById(channel.Id);
-            var index = _channels.IndexOf(existingChannel);
-
+            
             // 检查名称是否与其他渠道冲突
-            if (_channels.Any(c => c.Id != channel.Id && c.Name.Equals(channel.Name, StringComparison.OrdinalIgnoreCase)))
+            if (!IsChannelNameAvailable(channel.Name, channel.Id))
             {
                 throw new DataAccessException($"渠道名称 '{channel.Name}' 已存在");
             }
@@ -121,8 +229,65 @@ namespace llm_agent.BLL
             channel.CreatedAt = existingChannel.CreatedAt;
             channel.UpdatedAt = DateTime.Now;
 
-            _channels[index] = channel;
-            SaveChannels();
+            using (var connection = new SQLiteConnection(ConnectionString))
+            {
+                connection.Open();
+                using (var transaction = connection.BeginTransaction())
+                {
+                    try
+                    {
+                        // 更新渠道基本信息
+                        string updateChannelSql = @"
+                            UPDATE Channels 
+                            SET Name = @name, 
+                                ProviderType = @providerType, 
+                                ApiKey = @apiKey, 
+                                ApiHost = @apiHost, 
+                                IsEnabled = @isEnabled, 
+                                UseStreamResponse = @useStreamResponse, 
+                                UpdatedAt = @updatedAt
+                            WHERE Id = @id";
+                        
+                        using (var command = new SQLiteCommand(updateChannelSql, connection, transaction))
+                        {
+                            command.Parameters.AddWithValue("@id", channel.Id.ToString());
+                            command.Parameters.AddWithValue("@name", channel.Name);
+                            command.Parameters.AddWithValue("@providerType", channel.ProviderType.ToString());
+                            command.Parameters.AddWithValue("@apiKey", channel.ApiKey ?? "");
+                            command.Parameters.AddWithValue("@apiHost", channel.ApiHost ?? "");
+                            command.Parameters.AddWithValue("@isEnabled", channel.IsEnabled ? 1 : 0);
+                            command.Parameters.AddWithValue("@useStreamResponse", channel.UseStreamResponse ? 1 : 0);
+                            command.Parameters.AddWithValue("@updatedAt", channel.UpdatedAt.ToString("yyyy-MM-dd HH:mm:ss"));
+                            command.ExecuteNonQuery();
+                        }
+                        
+                        // 删除旧的模型关联
+                        string deleteModelsSql = "DELETE FROM ChannelModels WHERE ChannelId = @channelId";
+                        using (var command = new SQLiteCommand(deleteModelsSql, connection, transaction))
+                        {
+                            command.Parameters.AddWithValue("@channelId", channel.Id.ToString());
+                            command.ExecuteNonQuery();
+                        }
+                        
+                        // 插入新的模型关联
+                        if (channel.SupportedModels != null && channel.SupportedModels.Count > 0)
+                        {
+                            SaveChannelModels(channel, connection, transaction);
+                        }
+                        
+                        transaction.Commit();
+                    }
+                    catch
+                    {
+                        transaction.Rollback();
+                        throw;
+                    }
+                }
+            }
+            
+            // 重新加载渠道列表
+            LoadChannels();
+            
             return channel;
         }
 
@@ -131,9 +296,44 @@ namespace llm_agent.BLL
         /// </summary>
         public void DeleteChannel(Guid id)
         {
-            var channel = GetChannelById(id);
-            _channels.Remove(channel);
-            SaveChannels();
+            // 检查渠道是否存在
+            GetChannelById(id);
+
+            using (var connection = new SQLiteConnection(ConnectionString))
+            {
+                connection.Open();
+                using (var transaction = connection.BeginTransaction())
+                {
+                    try
+                    {
+                        // 删除渠道模型关联（级联删除会自动处理，但为了清晰起见，显式删除）
+                        string deleteModelsSql = "DELETE FROM ChannelModels WHERE ChannelId = @channelId";
+                        using (var command = new SQLiteCommand(deleteModelsSql, connection, transaction))
+                        {
+                            command.Parameters.AddWithValue("@channelId", id.ToString());
+                            command.ExecuteNonQuery();
+                        }
+                        
+                        // 删除渠道
+                        string deleteChannelSql = "DELETE FROM Channels WHERE Id = @id";
+                        using (var command = new SQLiteCommand(deleteChannelSql, connection, transaction))
+                        {
+                            command.Parameters.AddWithValue("@id", id.ToString());
+                            command.ExecuteNonQuery();
+                        }
+                        
+                        transaction.Commit();
+                    }
+                    catch
+                    {
+                        transaction.Rollback();
+                        throw;
+                    }
+                }
+            }
+            
+            // 重新加载渠道列表
+            LoadChannels();
         }
 
         /// <summary>
@@ -141,11 +341,30 @@ namespace llm_agent.BLL
         /// </summary>
         public Channel SetChannelEnabledState(Guid id, bool isEnabled)
         {
-            var channel = GetChannelById(id);
-            channel.IsEnabled = isEnabled;
-            channel.UpdatedAt = DateTime.Now;
-            SaveChannels();
-            return channel;
+            using (var connection = new SQLiteConnection(ConnectionString))
+            {
+                connection.Open();
+                
+                string updateSql = "UPDATE Channels SET IsEnabled = @isEnabled, UpdatedAt = @updatedAt WHERE Id = @id";
+                using (var command = new SQLiteCommand(updateSql, connection))
+                {
+                    var now = DateTime.Now;
+                    command.Parameters.AddWithValue("@id", id.ToString());
+                    command.Parameters.AddWithValue("@isEnabled", isEnabled ? 1 : 0);
+                    command.Parameters.AddWithValue("@updatedAt", now.ToString("yyyy-MM-dd HH:mm:ss"));
+                    
+                    int rowsAffected = command.ExecuteNonQuery();
+                    if (rowsAffected == 0)
+                    {
+                        throw new DataAccessException($"找不到ID为 {id} 的渠道");
+                    }
+                }
+            }
+            
+            // 重新加载渠道列表
+            LoadChannels();
+            
+            return GetChannelById(id);
         }
 
         /// <summary>
@@ -153,10 +372,54 @@ namespace llm_agent.BLL
         /// </summary>
         public Channel UpdateChannelModels(Guid id, List<string> models)
         {
+            // 获取渠道
             var channel = GetChannelById(id);
             channel.SupportedModels = models;
             channel.UpdatedAt = DateTime.Now;
-            SaveChannels();
+            
+            using (var connection = new SQLiteConnection(ConnectionString))
+            {
+                connection.Open();
+                using (var transaction = connection.BeginTransaction())
+                {
+                    try
+                    {
+                        // 更新渠道更新时间
+                        string updateChannelSql = "UPDATE Channels SET UpdatedAt = @updatedAt WHERE Id = @id";
+                        using (var command = new SQLiteCommand(updateChannelSql, connection, transaction))
+                        {
+                            command.Parameters.AddWithValue("@id", id.ToString());
+                            command.Parameters.AddWithValue("@updatedAt", channel.UpdatedAt.ToString("yyyy-MM-dd HH:mm:ss"));
+                            command.ExecuteNonQuery();
+                        }
+                        
+                        // 删除旧的模型关联
+                        string deleteModelsSql = "DELETE FROM ChannelModels WHERE ChannelId = @channelId";
+                        using (var command = new SQLiteCommand(deleteModelsSql, connection, transaction))
+                        {
+                            command.Parameters.AddWithValue("@channelId", id.ToString());
+                            command.ExecuteNonQuery();
+                        }
+                        
+                        // 插入新的模型关联
+                        if (models != null && models.Count > 0)
+                        {
+                            SaveChannelModels(channel, connection, transaction);
+                        }
+                        
+                        transaction.Commit();
+                    }
+                    catch
+                    {
+                        transaction.Rollback();
+                        throw;
+                    }
+                }
+            }
+            
+            // 重新加载渠道列表
+            LoadChannels();
+            
             return channel;
         }
 
@@ -168,7 +431,28 @@ namespace llm_agent.BLL
         /// <returns>名称是否可用</returns>
         public bool IsChannelNameAvailable(string name, Guid? currentId = null)
         {
-            return !_channels.Any(c => c.Name.Equals(name, StringComparison.OrdinalIgnoreCase) && (!currentId.HasValue || c.Id != currentId.Value));
+            using (var connection = new SQLiteConnection(ConnectionString))
+            {
+                connection.Open();
+                
+                string sql = "SELECT COUNT(*) FROM Channels WHERE Name = @name";
+                if (currentId.HasValue)
+                {
+                    sql += " AND Id != @id";
+                }
+                
+                using (var command = new SQLiteCommand(sql, connection))
+                {
+                    command.Parameters.AddWithValue("@name", name);
+                    if (currentId.HasValue)
+                    {
+                        command.Parameters.AddWithValue("@id", currentId.Value.ToString());
+                    }
+                    
+                    int count = Convert.ToInt32(command.ExecuteScalar());
+                    return count == 0;
+                }
+            }
         }
 
         /// <summary>
@@ -176,41 +460,79 @@ namespace llm_agent.BLL
         /// </summary>
         private void LoadChannels()
         {
-            if (File.Exists(_channelsFile))
+            _channels.Clear();
+            
+            using (var connection = new SQLiteConnection(ConnectionString))
             {
-                try
+                connection.Open();
+                string sql = "SELECT * FROM Channels";
+                
+                using (var command = new SQLiteCommand(sql, connection))
                 {
-                    string json = File.ReadAllText(_channelsFile);
-                    var channels = JsonSerializer.Deserialize<List<Channel>>(json);
-                    if (channels != null)
+                    using (var reader = command.ExecuteReader())
                     {
-                        _channels = channels;
+                        while (reader.Read())
+                        {
+                            var channel = new Channel
+                            {
+                                Id = Guid.Parse(reader["Id"].ToString()),
+                                Name = reader["Name"].ToString(),
+                                ProviderType = (ProviderType)Enum.Parse(typeof(ProviderType), reader["ProviderType"].ToString()),
+                                ApiKey = reader["ApiKey"].ToString(),
+                                ApiHost = reader["ApiHost"].ToString(),
+                                IsEnabled = Convert.ToBoolean(Convert.ToInt32(reader["IsEnabled"])),
+                                UseStreamResponse = Convert.ToBoolean(Convert.ToInt32(reader["UseStreamResponse"])),
+                                CreatedAt = DateTime.Parse(reader["CreatedAt"].ToString()),
+                                UpdatedAt = DateTime.Parse(reader["UpdatedAt"].ToString()),
+                                SupportedModels = new List<string>()
+                            };
+                            
+                            // 加载渠道支持的模型列表
+                            LoadChannelModels(channel, connection);
+                            
+                            _channels.Add(channel);
+                        }
                     }
-                }
-                catch (Exception ex)
-                {
-                    Console.Error.WriteLine($"加载渠道数据失败: {ex.Message}");
-                    // 如果加载失败，使用空列表
-                    _channels = new List<Channel>();
                 }
             }
         }
 
         /// <summary>
-        /// 保存渠道数据
+        /// 加载渠道支持的模型列表
         /// </summary>
-        private void SaveChannels()
+        private void LoadChannelModels(Channel channel, SQLiteConnection connection)
         {
-            try
+            string sql = "SELECT ModelName FROM ChannelModels WHERE ChannelId = @channelId";
+            
+            using (var command = new SQLiteCommand(sql, connection))
             {
-                var options = new JsonSerializerOptions { WriteIndented = true };
-                string json = JsonSerializer.Serialize(_channels, options);
-                File.WriteAllText(_channelsFile, json);
+                command.Parameters.AddWithValue("@channelId", channel.Id.ToString());
+                
+                using (var reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        channel.SupportedModels.Add(reader["ModelName"].ToString());
+                    }
+                }
             }
-            catch (Exception ex)
+        }
+
+        /// <summary>
+        /// 保存渠道支持的模型列表
+        /// </summary>
+        private void SaveChannelModels(Channel channel, SQLiteConnection connection, SQLiteTransaction transaction)
+        {
+            string insertModelSql = "INSERT INTO ChannelModels (ChannelId, ModelName) VALUES (@channelId, @modelName)";
+            
+            foreach (var model in channel.SupportedModels)
             {
-                Console.Error.WriteLine($"保存渠道数据失败: {ex.Message}");
-                throw new DataAccessException($"保存渠道数据失败: {ex.Message}");
+                using (var command = new SQLiteCommand(insertModelSql, connection, transaction))
+                {
+                    command.Parameters.AddWithValue("@channelId", channel.Id.ToString());
+                    command.Parameters.AddWithValue("@modelName", model);
+                    command.ExecuteNonQuery();
+                }
             }
         }
 
@@ -219,61 +541,7 @@ namespace llm_agent.BLL
         /// </summary>
         private void CreateDefaultChannels()
         {
-            // 添加默认OpenAI渠道
-            var openAIChannel = new Channel
-            {
-                Name = "OpenAI",
-                ProviderType = ProviderType.OpenAI,
-                ApiHost = "https://api.openai.com/v1",
-                IsEnabled = true,
-                UseStreamResponse = true,
-                SupportedModels = new List<string>
-                {
-                    "gpt-3.5-turbo",
-                    "gpt-3.5-turbo-16k",
-                    "gpt-4",
-                    "gpt-4-turbo",
-                    "gpt-4o"
-                }
-            };
-            _channels.Add(openAIChannel);
-
-            // 添加默认Azure OpenAI渠道
-            var azureOpenAIChannel = new Channel
-            {
-                Name = "Azure OpenAI",
-                ProviderType = ProviderType.AzureOpenAI,
-                ApiHost = "https://{resource-name}.openai.azure.com/",
-                IsEnabled = false,
-                UseStreamResponse = true,
-                SupportedModels = new List<string>
-                {
-                    "gpt-35-turbo",
-                    "gpt-4",
-                    "gpt-4-turbo"
-                }
-            };
-            _channels.Add(azureOpenAIChannel);
-
-            // 添加默认Anthropic渠道
-            var anthropicChannel = new Channel
-            {
-                Name = "Anthropic",
-                ProviderType = ProviderType.Anthropic,
-                ApiHost = "https://api.anthropic.com",
-                IsEnabled = false,
-                UseStreamResponse = true,
-                SupportedModels = new List<string>
-                {
-                    "claude-3-opus-20240229",
-                    "claude-3-sonnet-20240229",
-                    "claude-3-haiku-20240307"
-                }
-            };
-            _channels.Add(anthropicChannel);
-
-            // 保存默认渠道
-            SaveChannels();
+            // 已移除预设渠道和预设模型，用户可以完全自定义渠道和模型
         }
     }
 } 

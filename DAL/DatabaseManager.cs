@@ -101,6 +101,39 @@ namespace llm_agent.DAL
                 {
                     command.ExecuteNonQuery();
                 }
+
+                // 创建渠道表
+                string createChannelsTableSql = @"
+                    CREATE TABLE IF NOT EXISTS Channels (
+                        Id TEXT PRIMARY KEY,
+                        Name TEXT NOT NULL,
+                        ProviderType TEXT NOT NULL,
+                        ApiKey TEXT,
+                        ApiHost TEXT,
+                        IsEnabled INTEGER NOT NULL DEFAULT 1,
+                        UseStreamResponse INTEGER NOT NULL DEFAULT 1,
+                        CreatedAt TEXT NOT NULL,
+                        UpdatedAt TEXT NOT NULL
+                    );";
+
+                using (var command = new SQLiteCommand(createChannelsTableSql, connection))
+                {
+                    command.ExecuteNonQuery();
+                }
+
+                // 创建渠道模型表
+                string createChannelModelsTableSql = @"
+                    CREATE TABLE IF NOT EXISTS ChannelModels (
+                        Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        ChannelId TEXT NOT NULL,
+                        ModelName TEXT NOT NULL,
+                        FOREIGN KEY (ChannelId) REFERENCES Channels(Id) ON DELETE CASCADE
+                    );";
+
+                using (var command = new SQLiteCommand(createChannelModelsTableSql, connection))
+                {
+                    command.ExecuteNonQuery();
+                }
             }
         }
 
