@@ -17,8 +17,7 @@ export default {
       { text: '首页', link: '/' },
       { text: '指南', link: '/guide/' },
       { text: 'API', link: '/api/' },
-      { text: '架构', link: '/architecture/' },
-      { text: '问题记录', link: '/note/' }
+      { text: '架构', link: '/architecture/' }
     ],
     
     // 侧边栏
@@ -52,17 +51,6 @@ export default {
             { text: '概述', link: '/architecture/' },
             { text: '项目结构', link: '/architecture/structure' },
             { text: '技术栈', link: '/architecture/tech-stack' }
-          ]
-        }
-      ],
-      '/note/': [
-        {
-          text: '问题记录',
-          items: [
-            { text: '概述', link: '/note/' },
-            { text: '2025年4月', link: '/note/2025-04' },
-            { text: '2025年5月', link: '/note/2025-05' },
-            { text: '2025年6月', link: '/note/2025-06' }
           ]
         }
       ]
