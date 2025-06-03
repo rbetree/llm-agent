@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using llm_agent.Common.Utils;
 
 namespace llm_agent.UI.Controls.ChatForm
 {
@@ -146,8 +147,19 @@ namespace llm_agent.UI.Controls.ChatForm
                         var bodyTextBox = chatItem.Controls.Find("bodyTextBox", true).FirstOrDefault() as RichTextBox;
                         if (bodyTextBox != null)
                         {
-                            // 更新文本框内容，保留原始格式包括换行符
-                            bodyTextBox.Text = content;
+                            // 检查消息是否包含Markdown格式
+                            if (MarkdownToRichTextConverter.ContainsMarkdown(content))
+                            {
+                                // 使用Markdown渲染
+                                bodyTextBox.Text = ""; // 清空文本框
+                                var converter = new MarkdownToRichTextConverter(bodyTextBox);
+                                converter.RenderMarkdown(content, 0);
+                            }
+                            else
+                            {
+                                // 普通文本显示，保留原始格式包括换行符
+                                bodyTextBox.Text = content;
+                            }
 
                             // 调整气泡大小以适应新内容
                             chatItem.ResizeBubbles((int)(itemsPanel.Width * 0.6));

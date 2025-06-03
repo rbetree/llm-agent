@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using llm_agent.Common.Utils;
 
 namespace llm_agent.UI.Controls.ChatForm
 {
@@ -71,8 +72,20 @@ namespace llm_agent.UI.Controls.ChatForm
             {
                 case "text":
                     var textmodel = chatModel as TextChatModel;
-                    // 保留原始文本格式，包括换行符
-                    bodyTextBox.Text = textmodel.Body;
+                    
+                    // 检查消息是否包含Markdown格式
+                    if (MarkdownToRichTextConverter.ContainsMarkdown(textmodel.Body))
+                    {
+                        // 使用Markdown渲染
+                        bodyTextBox.Text = ""; // 清空文本框
+                        var converter = new MarkdownToRichTextConverter(bodyTextBox);
+                        converter.RenderMarkdown(textmodel.Body, 0);
+                    }
+                    else
+                    {
+                        // 普通文本显示，保留原始文本格式，包括换行符
+                        bodyTextBox.Text = textmodel.Body;
+                    }
                     break;
                 case "image":
                     var imagemodel = chatModel as ImageChatModel;
@@ -162,7 +175,21 @@ namespace llm_agent.UI.Controls.ChatForm
                         //Ah, this is hell. Alright, so the implementation for this is similar to the image one, except the width can't be automatically calculated. Instead, it
                         //has to be calculated through the size and length of the text. See TextChange().
                         string body = textmodel.Body;
-                        TextChange(bodyTextBox.Text);
+                        
+                        // 检查是否是Markdown渲染后的内容
+                        bool isMarkdownContent = MarkdownToRichTextConverter.ContainsMarkdown(body);
+                        
+                        // 如果是Markdown内容，不要在TextChange中重新设置文本，避免覆盖渲染结果
+                        if (isMarkdownContent)
+                        {
+                            // 使用当前RichTextBox的内容进行大小计算
+                            TextChangeForMarkdown();
+                        }
+                        else
+                        {
+                            // 普通文本，使用原来的方法
+                            TextChange(body);
+                        }
                         break;
                     case "attachment":
                         var attachmodel = ChatModel as AttachmentChatModel;
@@ -174,6 +201,47 @@ namespace llm_agent.UI.Controls.ChatForm
             }
 
             ResumeLayout();
+
+            // 为Markdown渲染后的内容调整大小
+            void TextChangeForMarkdown()
+            {
+                // 使用RichTextBox的自动换行和测量功能
+                int fontheight = bodyTextBox.Font.Height;
+
+                // 计算当前内容的宽度
+                var gfx = this.CreateGraphics();
+                
+                // 获取当前文本的首选大小
+                int preferredWidth = bodyTextBox.PreferredSize.Width;
+                
+                // 设置气泡宽度
+                if (preferredWidth < maxwidth)
+                {
+                    // 设置宽度为文本宽度加上一些边距
+                    bodyPanel.Width = preferredWidth + 20; // 添加一些边距
+                }
+                else
+                {
+                    // 设置为最大宽度
+                    bodyPanel.Width = maxwidth;
+                }
+
+                // 计算实际行数
+                int actualLines = CalculateActualLines(bodyTextBox.Text, bodyTextBox);
+
+                // 调整控件高度，确保有足够空间显示所有行
+                // 为Markdown内容提供更多空间
+                int calculatedHeight = (int)(actualLines * fontheight * 1.3) + (Height - bodyTextBox.Height) + 20;
+                
+                // 设置最大高度限制
+                int maxHeight = 500;
+                Height = Math.Min(calculatedHeight, maxHeight);
+                
+                // 如果内容太长需要滚动条，则确保滚动条可见
+                bodyTextBox.ScrollBars = (calculatedHeight > maxHeight) 
+                    ? RichTextBoxScrollBars.Vertical 
+                    : RichTextBoxScrollBars.None;
+            }
 
             void TextChange(string body)
             {
@@ -203,7 +271,7 @@ namespace llm_agent.UI.Controls.ChatForm
                 int actualLines = CalculateActualLines(body, bodyTextBox);
 
                 // 调整控件高度，确保有足够空间显示所有行
-                // 使用1.1的系数来增加一些额外空间
+                // 使用1.2的系数来增加一些额外空间
                 int calculatedHeight = (int)(actualLines * fontheight * 1.2) + (Height - bodyTextBox.Height) + 12;
                 
                 // 设置最大高度限制，避免气泡过大

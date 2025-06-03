@@ -33,7 +33,7 @@ namespace llm_agent.Common.Utils
         public MarkdownToRichTextConverter(RichTextBox richTextBox)
         {
             _richTextBox = richTextBox ?? throw new ArgumentNullException(nameof(richTextBox));
-            _defaultTextColor = Color.Black;
+            _defaultTextColor = richTextBox.ForeColor;
             _defaultFont = richTextBox.Font;
             _boldFont = new Font(_defaultFont, FontStyle.Bold);
             _italicFont = new Font(_defaultFont, FontStyle.Italic);
@@ -184,7 +184,7 @@ namespace llm_agent.Common.Utils
             
             var headingFont = new Font(_defaultFont.FontFamily, size, FontStyle.Bold);
             _richTextBox.SelectionFont = headingFont;
-            _richTextBox.SelectionColor = Color.FromArgb(50, 50, 50);
+            _richTextBox.SelectionColor = _defaultTextColor;
             
             RenderInlines(heading.Inline);
             _richTextBox.AppendText(Environment.NewLine);
@@ -220,7 +220,8 @@ namespace llm_agent.Common.Utils
             int quoteEnd = _richTextBox.TextLength;
             _richTextBox.SelectionStart = quoteStart;
             _richTextBox.SelectionLength = quoteEnd - quoteStart;
-            _richTextBox.SelectionColor = Color.FromArgb(100, 100, 100);
+            
+            _richTextBox.SelectionColor = _defaultTextColor;
             _richTextBox.SelectionBackColor = Color.FromArgb(245, 245, 245);
             
             // 添加引用左边线（通过绘制字符实现）
@@ -235,7 +236,8 @@ namespace llm_agent.Common.Utils
             _richTextBox.SelectionStart = _richTextBox.TextLength;
             _richTextBox.SelectionLength = 0;
             _richTextBox.SelectionFont = _codeFont;
-            _richTextBox.SelectionColor = Color.FromArgb(80, 80, 80);
+            
+            _richTextBox.SelectionColor = _defaultTextColor;
             _richTextBox.SelectionBackColor = Color.FromArgb(245, 245, 245);
             
             string code = "";
@@ -311,7 +313,7 @@ namespace llm_agent.Common.Utils
             _richTextBox.SelectionLength = 0;
             
             string line = "────────────────────────────────────";
-            _richTextBox.SelectionColor = Color.Gray;
+            _richTextBox.SelectionColor = _defaultTextColor;
             _richTextBox.AppendText(line + Environment.NewLine);
         }
 
@@ -421,7 +423,7 @@ namespace llm_agent.Common.Utils
             var prevBackColor = _richTextBox.SelectionBackColor;
             
             _richTextBox.SelectionFont = _codeFont;
-            _richTextBox.SelectionColor = Color.FromArgb(80, 80, 80);
+            _richTextBox.SelectionColor = _defaultTextColor;
             _richTextBox.SelectionBackColor = Color.FromArgb(240, 240, 240);
             
             _richTextBox.AppendText(code.Content.ToString());
