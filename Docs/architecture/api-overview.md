@@ -48,14 +48,14 @@ public abstract class BaseLLMProvider : ILLMProvider
 
 LLM Agent支持以下模型提供商的API：
 
-1. [OpenAI](./models.md#openai)
-2. [Azure OpenAI](./models.md#azure-openai)
-3. [Anthropic Claude](./models.md#anthropic-claude)
-4. [Google Gemini](./models.md#google-gemini)
-5. [ZhipuAI](./models.md#zhipuai)
-6. [SiliconFlow](./models.md#siliconflow)
+1. OpenAI
+2. Azure OpenAI
+3. Anthropic Claude
+4. Google Gemini
+5. ZhipuAI
+6. SiliconFlow
 
-每个提供商都有特定的API参数和配置选项，详情请参阅[模型接口](./models.md)文档。
+每个提供商都有特定的API参数和配置选项。
 
 ## 使用示例
 

@@ -1,4 +1,6 @@
-export default {
+import { withMermaid } from "vitepress-plugin-mermaid";
+
+export default withMermaid({
   title: 'LLM-Agent',
   description: '支持多个大语言模型服务商的Windows桌面客户端应用程序',
   lang: 'zh-CN',
@@ -16,8 +18,7 @@ export default {
     nav: [
       { text: '首页', link: '/' },
       { text: '指南', link: '/guide/' },
-      { text: 'API', link: '/api/' },
-      { text: '架构', link: '/architecture/' }
+      { text: '技术设计', link: '/architecture/' }
     ],
     
     // 侧边栏
@@ -27,30 +28,23 @@ export default {
           text: '指南',
           items: [
             { text: '介绍', link: '/guide/' },
-            { text: '安装', link: '/guide/installation' },
+            { text: '安装&卸载', link: '/guide/installation' },
             { text: '使用', link: '/guide/usage' },
-            { text: 'UI设计', link: '/guide/ui-design' },
-            { text: '交互逻辑', link: '/guide/interaction' },
-            { text: '开发路线图', link: '/guide/roadmap' }
-          ]
-        }
-      ],
-      '/api/': [
-        {
-          text: 'API参考',
-          items: [
-            { text: '概述', link: '/api/' },
-            { text: '模型接口', link: '/api/models' }
+            { text: '故障排除', link: '/guide/debug' }
           ]
         }
       ],
       '/architecture/': [
         {
-          text: '架构设计',
+          text: '技术设计',
           items: [
             { text: '概述', link: '/architecture/' },
             { text: '项目结构', link: '/architecture/structure' },
-            { text: '技术栈', link: '/architecture/tech-stack' }
+            { text: '技术栈', link: '/architecture/tech-stack' },
+            { text: '数据存储', link: '/architecture/data-storage' },
+            { text: 'UI设计', link: '/architecture/ui-design' },
+            { text: '交互逻辑', link: '/architecture/interaction' },
+            { text: 'API', link: '/architecture/api-overview' }
           ]
         }
       ]
@@ -77,5 +71,12 @@ export default {
       pattern: 'https://github.com/rbetree/llm-agent/edit/main/Docs/:path',
       text: '在 GitHub 上编辑此页'
     }
+  },
+  
+  // Mermaid配置
+  mermaid: {
+    // Mermaid配置选项，参考 https://mermaid.js.org/config/setup/modules/mermaidAPI.html
+    theme: 'default',
+    darkTheme: 'dark'
   }
-} 
+}); 
