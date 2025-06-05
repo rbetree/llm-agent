@@ -209,7 +209,6 @@ namespace llm_agent.UI.Forms
             chatNavButton.Click += (s, e) => SwitchToPanel(chatPagePanel, chatNavButton);
             websiteNavButton.Click += (s, e) => SwitchToPanel(aiWebsitePanel, websiteNavButton);
             promptsNavButton.Click += (s, e) => SwitchToPanel(promptsPanel, promptsNavButton);
-            filesNavButton.Click += (s, e) => SwitchToPanel(filesPanel, filesNavButton);
             settingsNavButton.Click += (s, e) => SwitchToPanel(settingsPanel, settingsNavButton);
             channelNavButton.Click += channelNavButton_Click;
 
@@ -331,11 +330,6 @@ namespace llm_agent.UI.Forms
             {
                 // 初始化提示词库面板
                 InitializePromptsPanel();
-            }
-            else if (targetPanel == filesPanel)
-            {
-                // 初始化文件管理面板
-                // 待实现
             }
             else if (targetPanel == aiWebsitePanel)
             {
@@ -949,9 +943,10 @@ namespace llm_agent.UI.Forms
                         AddIconToNavButton(chatNavButton, "\uec2e", remixIconFont);
                         AddIconToNavButton(promptsNavButton, "\ueda4", remixIconFont);
                         AddIconToNavButton(websiteNavButton, "\ueb7c", remixIconFont);
-                        AddIconToNavButton(filesNavButton, "\ueccb", remixIconFont);
-                        AddIconToNavButton(channelNavButton, "\ueb5c", remixIconFont);
+                        // 移除filesNavButton图标添加
                         AddIconToNavButton(settingsNavButton, "\uee4a", remixIconFont);
+                        AddIconToNavButton(avatarButton, "👤", remixIconFont);
+                        AddIconToNavButton(channelNavButton, "🔌", remixIconFont);
                     }
                 }
             }
@@ -993,7 +988,7 @@ namespace llm_agent.UI.Forms
                 AddIconToNavButton(chatNavButton, "💬");
                 AddIconToNavButton(websiteNavButton, "🌐");
                 AddIconToNavButton(promptsNavButton, "📝");
-                AddIconToNavButton(filesNavButton, "📁");
+                // 移除filesNavButton图标添加
                 AddIconToNavButton(settingsNavButton, "⚙️");
                 AddIconToNavButton(avatarButton, "👤");
                 AddIconToNavButton(channelNavButton, "🔌");
@@ -1003,7 +998,7 @@ namespace llm_agent.UI.Forms
                 toolTip1.SetToolTip(chatNavButton, "聊天");
                 toolTip1.SetToolTip(websiteNavButton, "AI网站");
                 toolTip1.SetToolTip(promptsNavButton, "提示词库");
-                toolTip1.SetToolTip(filesNavButton, "文件");
+                // 移除filesNavButton工具提示
                 toolTip1.SetToolTip(settingsNavButton, "设置");
                 toolTip1.SetToolTip(channelNavButton, "渠道管理");
 
@@ -1803,7 +1798,7 @@ namespace llm_agent.UI.Forms
         private void SwitchToNextNavPage()
         {
             // 实现在导航页面之间循环切换的逻辑
-            Button[] navButtons = { avatarButton, chatNavButton, websiteNavButton, promptsNavButton, filesNavButton, settingsNavButton };
+            Button[] navButtons = { avatarButton, chatNavButton, websiteNavButton, promptsNavButton, settingsNavButton, channelNavButton };
 
             // 找出当前活动的按钮
             int currentIndex = -1;

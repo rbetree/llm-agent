@@ -34,7 +34,6 @@ namespace llm_agent.UI.Forms
             mainSplitContainer = new System.Windows.Forms.SplitContainer();
             navPanel = new System.Windows.Forms.Panel();
             settingsNavButton = new System.Windows.Forms.Button();
-            filesNavButton = new System.Windows.Forms.Button();
             chatNavButton = new System.Windows.Forms.Button();
             websiteNavButton = new System.Windows.Forms.Button();
             promptsNavButton = new System.Windows.Forms.Button();
@@ -113,10 +112,6 @@ namespace llm_agent.UI.Forms
             userProfilePageSplitContainer = new System.Windows.Forms.SplitContainer();
             userProfileMenuPanel = new System.Windows.Forms.Panel();
             userProfileContentPanel = new System.Windows.Forms.Panel();
-            filesPanel = new System.Windows.Forms.Panel();
-            filesPageSplitContainer = new System.Windows.Forms.SplitContainer();
-            filesMenuPanel = new System.Windows.Forms.Panel();
-            filesContentPanel = new System.Windows.Forms.Panel();
             settingsContentPanel = new System.Windows.Forms.Panel();
             generalSettingsGroup = new System.Windows.Forms.GroupBox();
             chkEnableMarkdown = new System.Windows.Forms.CheckBox();
@@ -179,11 +174,6 @@ namespace llm_agent.UI.Forms
             userProfilePageSplitContainer.Panel1.SuspendLayout();
             userProfilePageSplitContainer.Panel2.SuspendLayout();
             userProfilePageSplitContainer.SuspendLayout();
-            filesPanel.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)filesPageSplitContainer).BeginInit();
-            filesPageSplitContainer.Panel1.SuspendLayout();
-            filesPageSplitContainer.Panel2.SuspendLayout();
-            filesPageSplitContainer.SuspendLayout();
             generalSettingsGroup.SuspendLayout();
             SuspendLayout();
             // 
@@ -208,7 +198,6 @@ namespace llm_agent.UI.Forms
             mainSplitContainer.Panel2.Controls.Add(aiWebsitePanel);
             mainSplitContainer.Panel2.Controls.Add(settingsPanel);
             mainSplitContainer.Panel2.Controls.Add(userProfilePanel);
-            mainSplitContainer.Panel2.Controls.Add(filesPanel);
             mainSplitContainer.Size = new System.Drawing.Size(1300, 800);
             mainSplitContainer.SplitterDistance = 70;
             mainSplitContainer.SplitterWidth = 1;
@@ -218,7 +207,6 @@ namespace llm_agent.UI.Forms
             // 
             navPanel.BackColor = System.Drawing.Color.FromArgb(100, 101, 165);
             navPanel.Controls.Add(settingsNavButton);
-            navPanel.Controls.Add(filesNavButton);
             navPanel.Controls.Add(chatNavButton);
             navPanel.Controls.Add(websiteNavButton);
             navPanel.Controls.Add(promptsNavButton);
@@ -245,19 +233,6 @@ namespace llm_agent.UI.Forms
             settingsNavButton.TabIndex = 6;
             settingsNavButton.UseVisualStyleBackColor = false;
             settingsNavButton.Click += settingsNavButton_Click;
-            // 
-            // filesNavButton
-            // 
-            filesNavButton.BackColor = System.Drawing.Color.Transparent;
-            filesNavButton.Cursor = System.Windows.Forms.Cursors.Hand;
-            filesNavButton.FlatAppearance.BorderSize = 0;
-            filesNavButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            filesNavButton.Location = new System.Drawing.Point(0, 280);
-            filesNavButton.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            filesNavButton.Name = "filesNavButton";
-            filesNavButton.Size = new System.Drawing.Size(70, 70);
-            filesNavButton.TabIndex = 5;
-            filesNavButton.UseVisualStyleBackColor = false;
             // 
             // chatNavButton
             // 
@@ -317,7 +292,7 @@ namespace llm_agent.UI.Forms
             channelNavButton.Cursor = System.Windows.Forms.Cursors.Hand;
             channelNavButton.FlatAppearance.BorderSize = 0;
             channelNavButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            channelNavButton.Location = new System.Drawing.Point(0, 350);
+            channelNavButton.Location = new System.Drawing.Point(0, 280);
             channelNavButton.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             channelNavButton.Name = "channelNavButton";
             channelNavButton.Size = new System.Drawing.Size(70, 70);
@@ -1338,58 +1313,6 @@ namespace llm_agent.UI.Forms
             userProfileContentPanel.Size = new System.Drawing.Size(942, 800);
             userProfileContentPanel.TabIndex = 0;
             // 
-            // filesPanel
-            // 
-            filesPanel.Controls.Add(filesPageSplitContainer);
-            filesPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            filesPanel.Location = new System.Drawing.Point(0, 0);
-            filesPanel.Margin = new System.Windows.Forms.Padding(4);
-            filesPanel.Name = "filesPanel";
-            filesPanel.Size = new System.Drawing.Size(1229, 800);
-            filesPanel.TabIndex = 4;
-            filesPanel.Visible = false;
-            // 
-            // filesPageSplitContainer
-            // 
-            filesPageSplitContainer.Dock = System.Windows.Forms.DockStyle.Fill;
-            filesPageSplitContainer.FixedPanel = System.Windows.Forms.FixedPanel.Panel1;
-            filesPageSplitContainer.Location = new System.Drawing.Point(0, 0);
-            filesPageSplitContainer.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            filesPageSplitContainer.Name = "filesPageSplitContainer";
-            // 
-            // filesPageSplitContainer.Panel1
-            // 
-            filesPageSplitContainer.Panel1.Controls.Add(filesMenuPanel);
-            // 
-            // filesPageSplitContainer.Panel2
-            // 
-            filesPageSplitContainer.Panel2.Controls.Add(filesContentPanel);
-            filesPageSplitContainer.Size = new System.Drawing.Size(1229, 800);
-            filesPageSplitContainer.SplitterDistance = 283;
-            filesPageSplitContainer.TabIndex = 0;
-            // 
-            // filesMenuPanel
-            // 
-            filesMenuPanel.AutoScroll = true;
-            filesMenuPanel.BackColor = System.Drawing.Color.FromArgb(247, 247, 247);
-            filesMenuPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            filesMenuPanel.Location = new System.Drawing.Point(0, 0);
-            filesMenuPanel.Margin = new System.Windows.Forms.Padding(4);
-            filesMenuPanel.Name = "filesMenuPanel";
-            filesMenuPanel.Size = new System.Drawing.Size(283, 800);
-            filesMenuPanel.TabIndex = 0;
-            // 
-            // filesContentPanel
-            // 
-            filesContentPanel.AutoSize = true;
-            filesContentPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            filesContentPanel.Location = new System.Drawing.Point(0, 0);
-            filesContentPanel.Margin = new System.Windows.Forms.Padding(4);
-            filesContentPanel.Name = "filesContentPanel";
-            filesContentPanel.Padding = new System.Windows.Forms.Padding(26, 24, 26, 24);
-            filesContentPanel.Size = new System.Drawing.Size(942, 800);
-            filesContentPanel.TabIndex = 0;
-            // 
             // settingsContentPanel
             // 
             settingsContentPanel.Location = new System.Drawing.Point(0, 0);
@@ -1513,12 +1436,6 @@ namespace llm_agent.UI.Forms
             userProfilePageSplitContainer.Panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)userProfilePageSplitContainer).EndInit();
             userProfilePageSplitContainer.ResumeLayout(false);
-            filesPanel.ResumeLayout(false);
-            filesPageSplitContainer.Panel1.ResumeLayout(false);
-            filesPageSplitContainer.Panel2.ResumeLayout(false);
-            filesPageSplitContainer.Panel2.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)filesPageSplitContainer).EndInit();
-            filesPageSplitContainer.ResumeLayout(false);
             generalSettingsGroup.ResumeLayout(false);
             generalSettingsGroup.PerformLayout();
             ResumeLayout(false);
@@ -1533,7 +1450,6 @@ namespace llm_agent.UI.Forms
         private System.Windows.Forms.Button websiteNavButton;
         private System.Windows.Forms.Button promptsNavButton;
         private System.Windows.Forms.Button settingsNavButton;
-        private System.Windows.Forms.Button filesNavButton;
         private System.Windows.Forms.Button newChatButton;
         private System.Windows.Forms.SplitContainer chatPageSplitContainer;
         private System.Windows.Forms.Panel inputPanel;
@@ -1575,10 +1491,6 @@ namespace llm_agent.UI.Forms
         private System.Windows.Forms.SplitContainer userProfilePageSplitContainer;
         private System.Windows.Forms.Panel userProfileMenuPanel;
         private System.Windows.Forms.Panel userProfileContentPanel;
-        private System.Windows.Forms.Panel filesPanel;
-        private System.Windows.Forms.SplitContainer filesPageSplitContainer;
-        private System.Windows.Forms.Panel filesMenuPanel;
-        private System.Windows.Forms.Panel filesContentPanel;
         private System.Windows.Forms.Panel promptsPanel;
         private System.Windows.Forms.SplitContainer promptsPageSplitContainer;
         private System.Windows.Forms.SplitContainer promptsListContainer;
