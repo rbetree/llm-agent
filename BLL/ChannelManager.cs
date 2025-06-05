@@ -6,6 +6,7 @@ using System.IO;
 using llm_agent.Model;
 using llm_agent.Common.Exceptions;
 using llm_agent.DAL;
+using System.Net.Http;
 
 namespace llm_agent.BLL
 {
@@ -541,7 +542,30 @@ namespace llm_agent.BLL
         /// </summary>
         private void CreateDefaultChannels()
         {
-            // 已移除预设渠道和预设模型，用户可以完全自定义渠道和模型
+            try
+            {
+                // 创建siliconflow测试渠道
+                var channel = new Channel
+                {
+                    Name = "测试",
+                    ProviderType = ProviderType.OpenAI,
+                    ApiKey = "sk-tgamwxumswqrsfkzknwscaeqvbzqamkbosxghpbcjhlaxjqt",
+                    ApiHost = "https://api.siliconflow.cn/v1",
+                    IsEnabled = true,
+                    UseStreamResponse = true,
+                    CreatedAt = DateTime.Now,
+                    UpdatedAt = DateTime.Now,
+                    SupportedModels = new List<string>() // 使用空列表，不预设模型
+                };
+
+                // 添加到系统中
+                AddChannel(channel);
+            }
+            catch (Exception ex)
+            {
+                // 记录创建默认渠道失败的错误，但不阻止应用程序启动
+                Console.WriteLine($"创建默认渠道失败: {ex.Message}");
+            }
         }
     }
 } 
