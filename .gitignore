@@ -40,3 +40,5 @@ packages/
 .specstory/
 .cursor/
 .vs
+.cursorignore
+.cursorindexingignore

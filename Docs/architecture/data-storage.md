@@ -227,18 +227,6 @@ CREATE TABLE ChannelModels (
 
 ## 数据关系模型
 
-主要实体间的关系：
-
-```
-ChatSession 1────* ChatMessage
-    |
-    | (使用)
-    ↓
-Channel 1────* ChannelModel
-
-AiWebsite 1────* WebsiteCredential
-```
-
 - 一个聊天会话包含多条聊天消息（一对多）
 - 一个渠道可以支持多个模型（一对多）
 - 一个AI网站可以有多个凭据记录（一对多）
