@@ -10,5 +10,6 @@ namespace llm_agent.Model
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public DateTime UpdatedAt { get; set; } = DateTime.Now;
         public List<ChatMessage> Messages { get; set; } = new List<ChatMessage>();
+        public int OrderIndex { get; set; } = 0;
     }
 }
