@@ -29,6 +29,22 @@ namespace llm_agent.DAL
             {
                 connection.Open();
 
+                // 创建用户表
+                string createUsersTableSql = @"
+                    CREATE TABLE IF NOT EXISTS Users (
+                        Id TEXT PRIMARY KEY,
+                        Username TEXT NOT NULL UNIQUE,
+                        PasswordHash TEXT NOT NULL,
+                        Salt TEXT NOT NULL,
+                        CreatedAt TEXT NOT NULL,
+                        LastLoginAt TEXT
+                    );";
+
+                using (var command = new SQLiteCommand(createUsersTableSql, connection))
+                {
+                    command.ExecuteNonQuery();
+                }
+
                 // 创建模型表
                 string createModelsTableSql = @"
                     CREATE TABLE IF NOT EXISTS Models (
@@ -133,6 +149,40 @@ namespace llm_agent.DAL
                 using (var command = new SQLiteCommand(createChannelModelsTableSql, connection))
                 {
                     command.ExecuteNonQuery();
+                }
+
+                // 检查ChatSessions表中是否存在UserId字段
+                bool userIdExists = false;
+                try
+                {
+                    using (var command = new SQLiteCommand("PRAGMA table_info(ChatSessions);", connection))
+                    {
+                        using (var reader = command.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                string columnName = reader["name"].ToString();
+                                if (columnName == "UserId")
+                                {
+                                    userIdExists = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
+                    // 如果ChatSessions表存在但UserId字段不存在，则添加该字段
+                    if (!userIdExists)
+                    {
+                        using (var command = new SQLiteCommand("ALTER TABLE ChatSessions ADD COLUMN UserId TEXT DEFAULT NULL REFERENCES Users(Id);", connection))
+                        {
+                            command.ExecuteNonQuery();
+                        }
+                    }
+                }
+                catch (SQLiteException)
+                {
+                    // 如果ChatSessions表不存在，则忽略错误，因为ChatRepository会创建该表
                 }
             }
         }

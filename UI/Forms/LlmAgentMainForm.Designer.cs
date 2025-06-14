@@ -117,6 +117,28 @@ namespace llm_agent.UI.Forms
             chkEnableMarkdown = new System.Windows.Forms.CheckBox();
             btnSaveSettings = new System.Windows.Forms.Button();
             chkStreamResponse = new System.Windows.Forms.CheckBox();
+            // 添加用户信息显示和管理控件
+            userInfoGroupBox = new System.Windows.Forms.GroupBox();
+            lblUserInfoTitle = new System.Windows.Forms.Label();
+            lblUserCreatedAt = new System.Windows.Forms.Label();
+            lblUserLastLogin = new System.Windows.Forms.Label();
+            btnChangePassword = new System.Windows.Forms.Button();
+            btnSwitchAccount = new System.Windows.Forms.Button();
+            btnLogoutProfile = new System.Windows.Forms.Button();
+            
+            changePasswordGroupBox = new System.Windows.Forms.GroupBox();
+            lblOldPassword = new System.Windows.Forms.Label();
+            lblNewPassword = new System.Windows.Forms.Label();
+            lblConfirmPassword = new System.Windows.Forms.Label();
+            txtOldPassword = new System.Windows.Forms.TextBox();
+            txtNewPassword = new System.Windows.Forms.TextBox();
+            txtConfirmPassword = new System.Windows.Forms.TextBox();
+            btnConfirmChangePassword = new System.Windows.Forms.Button();
+            btnCancelChangePassword = new System.Windows.Forms.Button();
+            userListContainer = new System.Windows.Forms.SplitContainer();
+            userSearchBox = new System.Windows.Forms.TextBox();
+            newUserButton = new System.Windows.Forms.Button();
+            userListPanel = new llm_agent.UI.Controls.HiddenScrollBarFlowLayoutPanel();
             ((System.ComponentModel.ISupportInitialize)mainSplitContainer).BeginInit();
             mainSplitContainer.Panel1.SuspendLayout();
             mainSplitContainer.Panel2.SuspendLayout();
@@ -175,6 +197,10 @@ namespace llm_agent.UI.Forms
             userProfilePageSplitContainer.Panel2.SuspendLayout();
             userProfilePageSplitContainer.SuspendLayout();
             generalSettingsGroup.SuspendLayout();
+            userProfileContentPanel.SuspendLayout();
+            userInfoGroupBox.SuspendLayout();
+            changePasswordGroupBox.SuspendLayout();
+            userListContainer.SuspendLayout();
             SuspendLayout();
             // 
             // mainSplitContainer
@@ -1293,18 +1319,76 @@ namespace llm_agent.UI.Forms
             // 
             // userProfileMenuPanel
             // 
-            userProfileMenuPanel.AutoScroll = true;
-            userProfileMenuPanel.BackColor = System.Drawing.Color.FromArgb(247, 247, 247);
+            userProfileMenuPanel.Controls.Add(userListContainer);
             userProfileMenuPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             userProfileMenuPanel.Location = new System.Drawing.Point(0, 0);
-            userProfileMenuPanel.Margin = new System.Windows.Forms.Padding(4);
             userProfileMenuPanel.Name = "userProfileMenuPanel";
             userProfileMenuPanel.Size = new System.Drawing.Size(283, 800);
             userProfileMenuPanel.TabIndex = 0;
             // 
+            // userListContainer
+            // 
+            userListContainer.Cursor = System.Windows.Forms.Cursors.HSplit;
+            userListContainer.Dock = System.Windows.Forms.DockStyle.Fill;
+            userListContainer.FixedPanel = System.Windows.Forms.FixedPanel.Panel1;
+            userListContainer.Location = new System.Drawing.Point(0, 0);
+            userListContainer.Name = "userListContainer";
+            userListContainer.Orientation = System.Windows.Forms.Orientation.Horizontal;
+            // 
+            // userListContainer.Panel1
+            // 
+            userListContainer.Panel1.Controls.Add(userSearchBox);
+            userListContainer.Panel1.Controls.Add(newUserButton);
+            // 
+            // userListContainer.Panel2
+            // 
+            userListContainer.Panel2.Controls.Add(userListPanel);
+            userListContainer.Size = new System.Drawing.Size(283, 800);
+            userListContainer.SplitterDistance = 85;
+            userListContainer.TabIndex = 0;
+            // 
+            // userSearchBox
+            // 
+            userSearchBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            userSearchBox.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(247)))), ((int)(((byte)(247)))), ((int)(((byte)(247)))));
+            userSearchBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            userSearchBox.Location = new System.Drawing.Point(12, 48);
+            userSearchBox.Name = "userSearchBox";
+            userSearchBox.PlaceholderText = "搜索用户...";
+            userSearchBox.Size = new System.Drawing.Size(259, 27);
+            userSearchBox.TabIndex = 1;
+            // 
+            // newUserButton
+            // 
+            newUserButton.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            newUserButton.BackColor = System.Drawing.Color.LightSlateGray;
+            newUserButton.Cursor = System.Windows.Forms.Cursors.Hand;
+            newUserButton.FlatAppearance.BorderSize = 0;
+            newUserButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            newUserButton.Font = new System.Drawing.Font("Microsoft YaHei UI", 9F, System.Drawing.FontStyle.Bold);
+            newUserButton.Location = new System.Drawing.Point(12, 12);
+            newUserButton.Name = "newUserButton";
+            newUserButton.Size = new System.Drawing.Size(259, 30);
+            newUserButton.TabIndex = 0;
+            newUserButton.Text = "+ 新建用户";
+            newUserButton.UseVisualStyleBackColor = false;
+            // 
+            // userListPanel
+            // 
+            userListPanel.AutoScroll = true;
+            userListPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            userListPanel.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
+            userListPanel.Location = new System.Drawing.Point(0, 0);
+            userListPanel.Name = "userListPanel";
+            userListPanel.Size = new System.Drawing.Size(283, 711);
+            userListPanel.TabIndex = 0;
+            userListPanel.WrapContents = false;
+            // 
             // userProfileContentPanel
             // 
-            userProfileContentPanel.AutoSize = true;
+            userProfileContentPanel.Controls.Add(changePasswordGroupBox);
             userProfileContentPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             userProfileContentPanel.Location = new System.Drawing.Point(0, 0);
             userProfileContentPanel.Margin = new System.Windows.Forms.Padding(4);
@@ -1312,6 +1396,173 @@ namespace llm_agent.UI.Forms
             userProfileContentPanel.Padding = new System.Windows.Forms.Padding(26, 24, 26, 24);
             userProfileContentPanel.Size = new System.Drawing.Size(942, 800);
             userProfileContentPanel.TabIndex = 0;
+            userProfileContentPanel.Controls.Add(userInfoGroupBox);
+            userProfileContentPanel.Controls.Add(changePasswordGroupBox);
+            
+            // userInfoGroupBox
+            //
+            userInfoGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right));
+            userInfoGroupBox.Location = new System.Drawing.Point(30, 30);
+            userInfoGroupBox.Name = "userInfoGroupBox";
+            userInfoGroupBox.Size = new System.Drawing.Size(880, 200);
+            userInfoGroupBox.TabIndex = 0;
+            userInfoGroupBox.TabStop = false;
+            userInfoGroupBox.Text = "用户信息";
+            userInfoGroupBox.Controls.Add(lblUserInfoTitle);
+            userInfoGroupBox.Controls.Add(lblUserCreatedAt);
+            userInfoGroupBox.Controls.Add(lblUserLastLogin);
+            userInfoGroupBox.Controls.Add(btnChangePassword);
+            userInfoGroupBox.Controls.Add(btnSwitchAccount);
+            userInfoGroupBox.Controls.Add(lblUserInfoTitle);
+            userInfoGroupBox.Controls.Add(btnLogoutProfile);
+            
+            // lblUserInfoTitle
+            //
+            lblUserInfoTitle.AutoSize = true;
+            lblUserInfoTitle.Font = new System.Drawing.Font("Microsoft YaHei UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            lblUserInfoTitle.Location = new System.Drawing.Point(20, 30);
+            lblUserInfoTitle.Name = "lblUserInfoTitle";
+            lblUserInfoTitle.Size = new System.Drawing.Size(200, 27);
+            lblUserInfoTitle.TabIndex = 0;
+            lblUserInfoTitle.Text = "当前用户：";
+            
+            // lblUserCreatedAt
+            //
+            lblUserCreatedAt.AutoSize = true;
+            lblUserCreatedAt.Location = new System.Drawing.Point(20, 70);
+            lblUserCreatedAt.Name = "lblUserCreatedAt";
+            lblUserCreatedAt.Size = new System.Drawing.Size(200, 20);
+            lblUserCreatedAt.TabIndex = 1;
+            lblUserCreatedAt.Text = "注册时间：";
+            
+            // lblUserLastLogin
+            //
+            lblUserLastLogin.AutoSize = true;
+            lblUserLastLogin.Location = new System.Drawing.Point(20, 100);
+            lblUserLastLogin.Name = "lblUserLastLogin";
+            lblUserLastLogin.Size = new System.Drawing.Size(200, 20);
+            lblUserLastLogin.TabIndex = 2;
+            lblUserLastLogin.Text = "上次登录：";
+            
+            // btnChangePassword
+            //
+            btnChangePassword.Location = new System.Drawing.Point(20, 140);
+            btnChangePassword.Name = "btnChangePassword";
+            btnChangePassword.Size = new System.Drawing.Size(120, 35);
+            btnChangePassword.TabIndex = 3;
+            btnChangePassword.Text = "修改密码";
+            btnChangePassword.UseVisualStyleBackColor = true;
+            btnChangePassword.Click += new System.EventHandler(this.btnChangePassword_Click);
+            
+            // btnSwitchAccount
+            //
+            btnSwitchAccount.Location = new System.Drawing.Point(160, 140);
+            btnSwitchAccount.Name = "btnSwitchAccount";
+            btnSwitchAccount.Size = new System.Drawing.Size(120, 35);
+            btnSwitchAccount.TabIndex = 4;
+            btnSwitchAccount.Text = "切换账号";
+            btnSwitchAccount.UseVisualStyleBackColor = true;
+            btnSwitchAccount.Click += new System.EventHandler(this.btnSwitchAccount_Click);
+            
+            // btnLogoutProfile
+            //
+            btnLogoutProfile.Location = new System.Drawing.Point(300, 140);
+            btnLogoutProfile.Name = "btnLogoutProfile";
+            btnLogoutProfile.Size = new System.Drawing.Size(120, 35);
+            btnLogoutProfile.TabIndex = 5;
+            btnLogoutProfile.Text = "退出登录";
+            btnLogoutProfile.UseVisualStyleBackColor = true;
+            btnLogoutProfile.Click += new System.EventHandler(this.btnLogoutProfile_Click);
+            
+            // changePasswordGroupBox
+            //
+            changePasswordGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right));
+            changePasswordGroupBox.Location = new System.Drawing.Point(30, 250);
+            changePasswordGroupBox.Name = "changePasswordGroupBox";
+            changePasswordGroupBox.Size = new System.Drawing.Size(880, 250);
+            changePasswordGroupBox.TabIndex = 1;
+            changePasswordGroupBox.TabStop = false;
+            changePasswordGroupBox.Text = "修改密码";
+            changePasswordGroupBox.Visible = false;
+            changePasswordGroupBox.Controls.Add(lblOldPassword);
+            changePasswordGroupBox.Controls.Add(lblNewPassword);
+            changePasswordGroupBox.Controls.Add(lblConfirmPassword);
+            changePasswordGroupBox.Controls.Add(txtOldPassword);
+            changePasswordGroupBox.Controls.Add(txtNewPassword);
+            changePasswordGroupBox.Controls.Add(txtConfirmPassword);
+            changePasswordGroupBox.Controls.Add(btnConfirmChangePassword);
+            changePasswordGroupBox.Controls.Add(btnCancelChangePassword);
+            
+            // lblOldPassword
+            //
+            lblOldPassword.AutoSize = true;
+            lblOldPassword.Location = new System.Drawing.Point(20, 40);
+            lblOldPassword.Name = "lblOldPassword";
+            lblOldPassword.Size = new System.Drawing.Size(84, 20);
+            lblOldPassword.TabIndex = 0;
+            lblOldPassword.Text = "当前密码：";
+            
+            // lblNewPassword
+            //
+            lblNewPassword.AutoSize = true;
+            lblNewPassword.Location = new System.Drawing.Point(20, 80);
+            lblNewPassword.Name = "lblNewPassword";
+            lblNewPassword.Size = new System.Drawing.Size(84, 20);
+            lblNewPassword.TabIndex = 1;
+            lblNewPassword.Text = "新密码：";
+            
+            // lblConfirmPassword
+            //
+            lblConfirmPassword.AutoSize = true;
+            lblConfirmPassword.Location = new System.Drawing.Point(20, 120);
+            lblConfirmPassword.Name = "lblConfirmPassword";
+            lblConfirmPassword.Size = new System.Drawing.Size(84, 20);
+            lblConfirmPassword.TabIndex = 2;
+            lblConfirmPassword.Text = "确认密码：";
+            
+            // txtOldPassword
+            //
+            txtOldPassword.Location = new System.Drawing.Point(120, 40);
+            txtOldPassword.Name = "txtOldPassword";
+            txtOldPassword.PasswordChar = '*';
+            txtOldPassword.Size = new System.Drawing.Size(250, 27);
+            txtOldPassword.TabIndex = 3;
+            
+            // txtNewPassword
+            //
+            txtNewPassword.Location = new System.Drawing.Point(120, 80);
+            txtNewPassword.Name = "txtNewPassword";
+            txtNewPassword.PasswordChar = '*';
+            txtNewPassword.Size = new System.Drawing.Size(250, 27);
+            txtNewPassword.TabIndex = 4;
+            
+            // txtConfirmPassword
+            //
+            txtConfirmPassword.Location = new System.Drawing.Point(120, 120);
+            txtConfirmPassword.Name = "txtConfirmPassword";
+            txtConfirmPassword.PasswordChar = '*';
+            txtConfirmPassword.Size = new System.Drawing.Size(250, 27);
+            txtConfirmPassword.TabIndex = 5;
+            
+            // btnConfirmChangePassword
+            //
+            btnConfirmChangePassword.Location = new System.Drawing.Point(120, 170);
+            btnConfirmChangePassword.Name = "btnConfirmChangePassword";
+            btnConfirmChangePassword.Size = new System.Drawing.Size(100, 35);
+            btnConfirmChangePassword.TabIndex = 6;
+            btnConfirmChangePassword.Text = "确认";
+            btnConfirmChangePassword.UseVisualStyleBackColor = true;
+            btnConfirmChangePassword.Click += new System.EventHandler(this.btnConfirmChangePassword_Click);
+            
+            // btnCancelChangePassword
+            //
+            btnCancelChangePassword.Location = new System.Drawing.Point(240, 170);
+            btnCancelChangePassword.Name = "btnCancelChangePassword";
+            btnCancelChangePassword.Size = new System.Drawing.Size(100, 35);
+            btnCancelChangePassword.TabIndex = 7;
+            btnCancelChangePassword.Text = "取消";
+            btnCancelChangePassword.UseVisualStyleBackColor = true;
+            btnCancelChangePassword.Click += new System.EventHandler(this.btnCancelChangePassword_Click);
             // 
             // settingsContentPanel
             // 
@@ -1438,6 +1689,14 @@ namespace llm_agent.UI.Forms
             userProfilePageSplitContainer.ResumeLayout(false);
             generalSettingsGroup.ResumeLayout(false);
             generalSettingsGroup.PerformLayout();
+            userProfileContentPanel.ResumeLayout(false);
+            userInfoGroupBox.ResumeLayout(false);
+            changePasswordGroupBox.ResumeLayout(false);
+            userListContainer.Panel1.ResumeLayout(false);
+            userListContainer.Panel1.PerformLayout();
+            userListContainer.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)userListContainer).EndInit();
+            userListContainer.ResumeLayout(false);
             ResumeLayout(false);
         }
 
@@ -1528,5 +1787,27 @@ namespace llm_agent.UI.Forms
         private System.Windows.Forms.Button welcomeQuickCreateButton;
         private System.Windows.Forms.Panel chatPagePanel;
         private System.Windows.Forms.Button channelNavButton;
+        // 添加用户信息显示和管理控件的声明
+        private System.Windows.Forms.GroupBox userInfoGroupBox;
+        private System.Windows.Forms.Label lblUserInfoTitle;
+        private System.Windows.Forms.Label lblUserCreatedAt;
+        private System.Windows.Forms.Label lblUserLastLogin;
+        private System.Windows.Forms.Button btnChangePassword;
+        private System.Windows.Forms.Button btnSwitchAccount;
+        private System.Windows.Forms.Button btnLogoutProfile;
+        
+        private System.Windows.Forms.GroupBox changePasswordGroupBox;
+        private System.Windows.Forms.Label lblOldPassword;
+        private System.Windows.Forms.Label lblNewPassword;
+        private System.Windows.Forms.Label lblConfirmPassword;
+        private System.Windows.Forms.TextBox txtOldPassword;
+        private System.Windows.Forms.TextBox txtNewPassword;
+        private System.Windows.Forms.TextBox txtConfirmPassword;
+        private System.Windows.Forms.Button btnConfirmChangePassword;
+        private System.Windows.Forms.Button btnCancelChangePassword;
+        private System.Windows.Forms.SplitContainer userListContainer;
+        private System.Windows.Forms.TextBox userSearchBox;
+        private System.Windows.Forms.Button newUserButton;
+        private Controls.HiddenScrollBarFlowLayoutPanel userListPanel;
     }
 }

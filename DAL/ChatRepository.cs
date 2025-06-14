@@ -36,7 +36,8 @@ namespace llm_agent.DAL
                         Title TEXT NOT NULL,
                         CreatedAt TEXT NOT NULL,
                         UpdatedAt TEXT NOT NULL,
-                        OrderIndex INTEGER DEFAULT 0
+                        OrderIndex INTEGER DEFAULT 0,
+                        UserId TEXT DEFAULT NULL REFERENCES Users(Id)
                     );";
 
                 // 创建聊天消息表
@@ -125,10 +126,37 @@ namespace llm_agent.DAL
                         }
                     }
                 }
+
+                // 检查ChatSessions表中是否存在UserId字段
+                bool userIdExists = false;
+                using (var command = new SQLiteCommand("PRAGMA table_info(ChatSessions);", connection))
+                {
+                    using (var reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            string columnName = reader["name"].ToString();
+                            if (columnName == "UserId")
+                            {
+                                userIdExists = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                // 如果UserId字段不存在，则添加该字段
+                if (!userIdExists)
+                {
+                    using (var command = new SQLiteCommand("ALTER TABLE ChatSessions ADD COLUMN UserId TEXT DEFAULT NULL REFERENCES Users(Id);", connection))
+                    {
+                        command.ExecuteNonQuery();
+                    }
+                }
             }
         }
 
-        public void SaveChatSession(ChatSession session)
+        public void SaveChatSession(ChatSession session, string userId = null)
         {
             if (session == null) return;
 
@@ -151,8 +179,19 @@ namespace llm_agent.DAL
                         int orderIndex = 0;
                         if (isNewSession)
                         {
-                            using (var command = new SQLiteCommand("SELECT MIN(OrderIndex) FROM ChatSessions", connection, transaction))
+                            string orderIndexSql = "SELECT MIN(OrderIndex) FROM ChatSessions";
+                            if (!string.IsNullOrEmpty(userId))
                             {
+                                orderIndexSql += " WHERE UserId = @userId";
+                            }
+
+                            using (var command = new SQLiteCommand(orderIndexSql, connection, transaction))
+                            {
+                                if (!string.IsNullOrEmpty(userId))
+                                {
+                                    command.Parameters.AddWithValue("@userId", userId);
+                                }
+
                                 var result = command.ExecuteScalar();
                                 if (result != DBNull.Value && result != null)
                                 {
@@ -172,8 +211,8 @@ namespace llm_agent.DAL
                         if (isNewSession)
                         {
                             upsertSessionSql = @"
-                                INSERT INTO ChatSessions (Id, Title, CreatedAt, UpdatedAt, OrderIndex)
-                                VALUES (@id, @title, @createdAt, @updatedAt, @orderIndex)";
+                                INSERT INTO ChatSessions (Id, Title, CreatedAt, UpdatedAt, OrderIndex, UserId)
+                                VALUES (@id, @title, @createdAt, @updatedAt, @orderIndex, @userId)";
                         }
                         else
                         {
@@ -194,6 +233,7 @@ namespace llm_agent.DAL
                             if (isNewSession)
                             {
                                 command.Parameters.AddWithValue("@orderIndex", orderIndex);
+                                command.Parameters.AddWithValue("@userId", userId == null ? DBNull.Value : userId);
                             }
                             
                             command.ExecuteNonQuery();
@@ -235,7 +275,7 @@ namespace llm_agent.DAL
             }
         }
 
-        public ChatSession LoadChatSession(string sessionId)
+        public ChatSession LoadChatSession(string sessionId, string userId = null)
         {
             if (string.IsNullOrEmpty(sessionId))
                 return null;
@@ -244,13 +284,22 @@ namespace llm_agent.DAL
             {
                 connection.Open();
 
-                // 获取会话信息
+                // 获取会话信息，如果提供了用户ID，则验证会话所有权
                 string selectSessionSql = "SELECT * FROM ChatSessions WHERE Id = @sessionId";
+                if (!string.IsNullOrEmpty(userId))
+                {
+                    selectSessionSql += " AND (UserId = @userId OR UserId IS NULL)";
+                }
+
                 ChatSession session = null;
 
                 using (var command = new SQLiteCommand(selectSessionSql, connection))
                 {
                     command.Parameters.AddWithValue("@sessionId", sessionId);
+                    if (!string.IsNullOrEmpty(userId))
+                    {
+                        command.Parameters.AddWithValue("@userId", userId);
+                    }
 
                     using (var reader = command.ExecuteReader())
                     {
@@ -267,7 +316,7 @@ namespace llm_agent.DAL
                         }
                         else
                         {
-                            return null; // 会话不存在
+                            return null; // 会话不存在或不属于该用户
                         }
                     }
                 }
@@ -302,7 +351,7 @@ namespace llm_agent.DAL
             }
         }
 
-        public List<ChatSession> GetAllSessions()
+        public List<ChatSession> GetAllSessions(string userId = null)
         {
             List<ChatSession> sessions = new List<ChatSession>();
 
@@ -310,11 +359,21 @@ namespace llm_agent.DAL
             {
                 connection.Open();
 
-                // 获取所有会话的基本信息
-                string selectSessionsSql = "SELECT * FROM ChatSessions ORDER BY OrderIndex ASC";
+                // 获取所有会话的基本信息，如果提供了用户ID，则只获取该用户的会话
+                string selectSessionsSql = "SELECT * FROM ChatSessions";
+                if (!string.IsNullOrEmpty(userId))
+                {
+                    selectSessionsSql += " WHERE UserId = @userId OR UserId IS NULL";
+                }
+                selectSessionsSql += " ORDER BY OrderIndex ASC";
 
                 using (var command = new SQLiteCommand(selectSessionsSql, connection))
                 {
+                    if (!string.IsNullOrEmpty(userId))
+                    {
+                        command.Parameters.AddWithValue("@userId", userId);
+                    }
+
                     using (var reader = command.ExecuteReader())
                     {
                         while (reader.Read())
@@ -363,7 +422,7 @@ namespace llm_agent.DAL
             return sessions;
         }
 
-        public void DeleteSession(string sessionId)
+        public void DeleteSession(string sessionId, string userId = null)
         {
             if (string.IsNullOrEmpty(sessionId))
                 return;
@@ -375,6 +434,23 @@ namespace llm_agent.DAL
                 {
                     try
                     {
+                        // 如果提供了用户ID，验证会话所有权
+                        if (!string.IsNullOrEmpty(userId))
+                        {
+                            string checkOwnershipSql = "SELECT COUNT(*) FROM ChatSessions WHERE Id = @sessionId AND (UserId = @userId OR UserId IS NULL)";
+                            using (var command = new SQLiteCommand(checkOwnershipSql, connection, transaction))
+                            {
+                                command.Parameters.AddWithValue("@sessionId", sessionId);
+                                command.Parameters.AddWithValue("@userId", userId);
+                                int count = Convert.ToInt32(command.ExecuteScalar());
+                                if (count == 0)
+                                {
+                                    // 会话不属于该用户，不执行删除
+                                    return;
+                                }
+                            }
+                        }
+
                         // 删除消息
                         string deleteMessagesSql = "DELETE FROM ChatMessages WHERE SessionId = @sessionId";
                         using (var command = new SQLiteCommand(deleteMessagesSql, connection, transaction))
@@ -402,7 +478,7 @@ namespace llm_agent.DAL
             }
         }
 
-        public void DeleteAllSessions()
+        public void DeleteAllSessions(string userId = null)
         {
             using (var connection = new SQLiteConnection(ConnectionString))
             {
@@ -411,18 +487,57 @@ namespace llm_agent.DAL
                 {
                     try
                     {
-                        // 删除所有消息
-                        string deleteAllMessagesSql = "DELETE FROM ChatMessages";
-                        using (var command = new SQLiteCommand(deleteAllMessagesSql, connection, transaction))
+                        if (string.IsNullOrEmpty(userId))
                         {
-                            command.ExecuteNonQuery();
-                        }
+                            // 删除所有消息
+                            string deleteAllMessagesSql = "DELETE FROM ChatMessages";
+                            using (var command = new SQLiteCommand(deleteAllMessagesSql, connection, transaction))
+                            {
+                                command.ExecuteNonQuery();
+                            }
 
-                        // 删除所有会话
-                        string deleteAllSessionsSql = "DELETE FROM ChatSessions";
-                        using (var command = new SQLiteCommand(deleteAllSessionsSql, connection, transaction))
+                            // 删除所有会话
+                            string deleteAllSessionsSql = "DELETE FROM ChatSessions";
+                            using (var command = new SQLiteCommand(deleteAllSessionsSql, connection, transaction))
+                            {
+                                command.ExecuteNonQuery();
+                            }
+                        }
+                        else
                         {
-                            command.ExecuteNonQuery();
+                            // 获取该用户的所有会话ID
+                            List<string> sessionIds = new List<string>();
+                            string selectSessionIdsSql = "SELECT Id FROM ChatSessions WHERE UserId = @userId OR UserId IS NULL";
+                            using (var command = new SQLiteCommand(selectSessionIdsSql, connection, transaction))
+                            {
+                                command.Parameters.AddWithValue("@userId", userId);
+                                using (var reader = command.ExecuteReader())
+                                {
+                                    while (reader.Read())
+                                    {
+                                        sessionIds.Add(reader["Id"].ToString());
+                                    }
+                                }
+                            }
+
+                            // 删除这些会话的所有消息
+                            foreach (var sessionId in sessionIds)
+                            {
+                                string deleteMessagesSql = "DELETE FROM ChatMessages WHERE SessionId = @sessionId";
+                                using (var command = new SQLiteCommand(deleteMessagesSql, connection, transaction))
+                                {
+                                    command.Parameters.AddWithValue("@sessionId", sessionId);
+                                    command.ExecuteNonQuery();
+                                }
+                            }
+
+                            // 删除该用户的所有会话
+                            string deleteSessionsSql = "DELETE FROM ChatSessions WHERE UserId = @userId OR UserId IS NULL";
+                            using (var command = new SQLiteCommand(deleteSessionsSql, connection, transaction))
+                            {
+                                command.Parameters.AddWithValue("@userId", userId);
+                                command.ExecuteNonQuery();
+                            }
                         }
 
                         transaction.Commit();
@@ -440,7 +555,8 @@ namespace llm_agent.DAL
         /// 更新会话的排序顺序
         /// </summary>
         /// <param name="sessions">会话列表，按照期望的显示顺序排列</param>
-        public void UpdateSessionOrder(List<ChatSession> sessions)
+        /// <param name="userId">用户ID，用于验证会话所有权</param>
+        public void UpdateSessionOrder(List<ChatSession> sessions, string userId = null)
         {
             if (sessions == null || sessions.Count == 0)
                 return;
@@ -453,6 +569,10 @@ namespace llm_agent.DAL
                     try
                     {
                         string updateOrderSql = "UPDATE ChatSessions SET OrderIndex = @orderIndex WHERE Id = @id";
+                        if (!string.IsNullOrEmpty(userId))
+                        {
+                            updateOrderSql += " AND (UserId = @userId OR UserId IS NULL)";
+                        }
                         
                         for (int i = 0; i < sessions.Count; i++)
                         {
@@ -460,10 +580,48 @@ namespace llm_agent.DAL
                             {
                                 command.Parameters.AddWithValue("@orderIndex", i);
                                 command.Parameters.AddWithValue("@id", sessions[i].Id);
+                                if (!string.IsNullOrEmpty(userId))
+                                {
+                                    command.Parameters.AddWithValue("@userId", userId);
+                                }
                                 command.ExecuteNonQuery();
                             }
                         }
                         
+                        transaction.Commit();
+                    }
+                    catch
+                    {
+                        transaction.Rollback();
+                        throw;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// 将无主会话分配给指定用户
+        /// </summary>
+        /// <param name="userId">用户ID</param>
+        public void AssignOrphanedSessionsToUser(string userId)
+        {
+            if (string.IsNullOrEmpty(userId))
+                return;
+
+            using (var connection = new SQLiteConnection(ConnectionString))
+            {
+                connection.Open();
+                using (var transaction = connection.BeginTransaction())
+                {
+                    try
+                    {
+                        string updateSessionsSql = "UPDATE ChatSessions SET UserId = @userId WHERE UserId IS NULL";
+                        using (var command = new SQLiteCommand(updateSessionsSql, connection, transaction))
+                        {
+                            command.Parameters.AddWithValue("@userId", userId);
+                            command.ExecuteNonQuery();
+                        }
+
                         transaction.Commit();
                     }
                     catch

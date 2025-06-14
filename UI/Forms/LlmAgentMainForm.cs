@@ -21,6 +21,7 @@ using llm_agent.DAL;
 using llm_agent.UI.Controls;
 using llm_agent.Common.Utils;
 using llm_agent.UI.Controls.ChatForm; // 添加对ChatForm命名空间的引用
+using llm_agent.Common; // 添加对Common命名空间的引用，用于访问UserSession
 
 namespace llm_agent.UI.Forms
 {
@@ -82,52 +83,105 @@ namespace llm_agent.UI.Forms
 
         public LlmAgentMainForm()
         {
-            InitializeComponent();
-            InitializeHttpClient();
-            InitializeProviderFactory();
-            InitializeChatHistoryManager();
-            InitializeChannelManager();
-            InitializeChannelService();
-            InitializePromptManager();
-            InitializeWebsiteManager();
-            LoadSettings();
+            try
+            {
+                InitializeComponent();
+                InitializeHttpClient();
+                InitializeProviderFactory();
+                InitializeChatHistoryManager();
+                InitializeChannelManager();
+                InitializeChannelService();
+                InitializePromptManager();
+                InitializeWebsiteManager();
+                LoadSettings();
 
-            // 设置KeyPreview为true，使窗体可以在控件之前处理键盘事件
-            this.KeyPreview = true;
-            // 添加KeyDown事件处理
-            this.KeyDown += LlmAgentMainForm_KeyDown;
-            // 添加窗体关闭事件处理
-            this.FormClosing += LlmAgentMainForm_FormClosing;
+                // 设置KeyPreview为true，使窗体可以在控件之前处理键盘事件
+                this.KeyPreview = true;
+                // 添加KeyDown事件处理
+                this.KeyDown += LlmAgentMainForm_KeyDown;
+                // 添加窗体关闭事件处理
+                this.FormClosing += LlmAgentMainForm_FormClosing;
 
-            SetupEvents();
-            SetupUI();
+                SetupEvents();
+                SetupUI();
+                
+                // 显示当前登录用户信息
+                UpdateUserInfo();
+            }
+            catch (Exception ex)
+            {
+                // 记录异常
+                Console.Error.WriteLine($"初始化主窗体时出错: {ex.Message}");
+                MessageBox.Show($"初始化应用程序时出错: {ex.Message}\n\n应用程序可能无法正常工作。", 
+                    "初始化错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void InitializeHttpClient()
         {
-            _httpClient = new HttpClient();
-            _httpClient.Timeout = TimeSpan.FromSeconds(300);
+            try
+            {
+                _httpClient = new HttpClient();
+                _httpClient.Timeout = TimeSpan.FromSeconds(300);
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"初始化HTTP客户端时出错: {ex.Message}");
+                throw;
+            }
         }
 
         private void InitializeProviderFactory()
         {
-            _providerFactory = new ProviderFactory(_httpClient);
+            try
+            {
+                _providerFactory = new ProviderFactory(_httpClient);
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"初始化提供商工厂时出错: {ex.Message}");
+                throw;
+            }
         }
 
         private void InitializeChatHistoryManager()
         {
-            _chatHistoryManager = new ChatHistoryManager();
-            // 不再自动创建新会话
+            try
+            {
+                _chatHistoryManager = new ChatHistoryManager();
+                // 不再自动创建新会话
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"初始化聊天历史管理器时出错: {ex.Message}");
+                throw;
+            }
         }
 
         private void InitializeChannelManager()
         {
-            _channelManager = new ChannelManager();
+            try
+            {
+                _channelManager = new ChannelManager();
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"初始化渠道管理器时出错: {ex.Message}");
+                throw;
+            }
         }
 
         private void InitializeChannelService()
         {
-            _channelService = new ChannelService(_httpClient);
+            try
+            {
+                _channelService = new ChannelService(_httpClient);
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"初始化渠道服务时出错: {ex.Message}");
+                throw;
+            }
         }
 
         /// <summary>
@@ -135,7 +189,15 @@ namespace llm_agent.UI.Forms
         /// </summary>
         private void InitializePromptManager()
         {
-            _promptManager = new PromptManager();
+            try
+            {
+                _promptManager = new PromptManager();
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"初始化提示词管理器时出错: {ex.Message}");
+                throw;
+            }
         }
 
         /// <summary>
@@ -143,7 +205,15 @@ namespace llm_agent.UI.Forms
         /// </summary>
         private void InitializeWebsiteManager()
         {
-            _websiteManager = new WebsiteManager();
+            try
+            {
+                _websiteManager = new WebsiteManager();
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"初始化网站管理器时出错: {ex.Message}");
+                throw;
+            }
         }
 
         private void LoadSettings()
@@ -177,6 +247,12 @@ namespace llm_agent.UI.Forms
             catch (Exception ex)
             {
                 Console.Error.WriteLine($"加载设置时出错: {ex.Message}");
+                // 使用默认设置，不抛出异常
+                _systemPrompt = "";
+                _useStreamResponse = true;
+                _enableMarkdown = false;
+                _currentProviderType = ProviderType.OpenAI;
+                _currentModelId = string.Empty;
             }
         }
 
@@ -338,8 +414,8 @@ namespace llm_agent.UI.Forms
             }
             else if (targetPanel == userProfilePanel)
             {
-                // 初始化用户资料面板
-                // 待实现
+                // 初始化用户资料页面
+                InitializeUserProfilePanel();
             }
         }
 
@@ -1155,19 +1231,23 @@ namespace llm_agent.UI.Forms
 
         private void SwitchToChat(ChatSession session)
         {
-            if (session == null)
-                return;
+            if (session == null) return;
 
-            // 将当前会话设为所选会话
-            var loadedSession = _chatHistoryManager.GetOrCreateSession(session.Id);
-            if (loadedSession == null)
-                return;
-
-            // 刷新会话列表
-            UpdateChatList();
-
-            // 显示对话内容
-            DisplayChatInterface();
+            try
+            {
+                // 获取当前用户ID
+                string userId = UserSession.Instance.GetCurrentUserId();
+                
+                // 设置当前会话
+                _chatHistoryManager.GetOrCreateSession(session.Id, userId);
+                
+                // 显示聊天界面
+                DisplayChatInterface();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"切换会话失败: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void DisplayChatInterface()
@@ -1198,39 +1278,24 @@ namespace llm_agent.UI.Forms
 
         private void CreateNewChat()
         {
-            // 创建新的聊天会话
-            var session = _chatHistoryManager.CreateNewSession();
-            if (session == null)
-                return;
-
-            // 初始化Chatbox控件
-            InitializeChatbox();
-
-            // 添加系统欢迎消息
-            string welcomeMessage = "欢迎使用AI助手，我可以帮助您回答问题、提供信息或与您聊天。请告诉我您需要什么帮助？";
-            ChatMessage systemMessage = new ChatMessage
+            try
             {
-                Role = ChatRole.Assistant,
-                Content = welcomeMessage,
-                Timestamp = DateTime.Now
-            };
-
-            // 添加消息到会话并保存
-            _chatHistoryManager.AddMessageToSession(session, systemMessage);
-
-            // 使用Chatbox显示消息
-            chatboxControl.AddMessage(ChatModelAdapter.ToTextChatModel(systemMessage));
-
-            // 重新初始化聊天列表
-            UpdateChatList();
-
-            // 确保切换到聊天界面
-            SwitchToPanel(chatPagePanel, chatNavButton);
-
-            // 设置Chatbox输入框焦点
-            var chatTextbox = chatboxControl.Controls.Find("chatTextbox", true).FirstOrDefault() as TextBox;
-            if (chatTextbox != null)
-                chatTextbox.Focus();
+                // 获取当前用户ID
+                string userId = UserSession.Instance.GetCurrentUserId();
+                
+                // 创建新会话，传入用户ID以关联所有权
+                var session = _chatHistoryManager.CreateNewSession(userId);
+                
+                // 更新会话列表
+                UpdateChatList();
+                
+                // 切换到新会话
+                SwitchToChat(session);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"创建新会话失败: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void ProviderChanged(object sender, EventArgs e)
@@ -1650,54 +1715,34 @@ namespace llm_agent.UI.Forms
 
         private void LlmAgentMainForm_Load(object sender, EventArgs e)
         {
-            // 初始化HTTP客户端
-            InitializeHttpClient();
-
-            // 初始化提供商工厂
-            InitializeProviderFactory();
-
-            // 初始化聊天历史管理器
-            InitializeChatHistoryManager();
-
-            // 初始化渠道管理器
-            InitializeChannelManager();
-
-            // 初始化渠道服务
-            InitializeChannelService();
-
-            // 初始化提示词管理器
-            InitializePromptManager();
-
-            // 配置界面元素
-            SetupUI();
-
-            // 设置事件处理
-            SetupEvents();
-
-            // 加载设置
-            LoadSettings();
-
-            // 启用Markdown支持选项
-            chkEnableMarkdown.Checked = _enableMarkdown;
-
-            // 已删除对streamCheckBox的初始化
-            // streamCheckBox.Checked = _useStreamResponse;
-
-            // 默认切换到聊天页面
-            SwitchToPanel(chatPagePanel, chatNavButton);
-
-            // 更新界面标题
-            UpdateTitle();
-
-            // 初始化聊天会话列表（左侧聊天历史）
-            InitializeChatTopics();
-
-            // 初始化聊天界面
-            DisplayChatInterface();
-
-            // 绑定表单快捷键
-            this.KeyDown += LlmAgentMainForm_KeyDown;
-            this.FormClosing += LlmAgentMainForm_FormClosing;
+            try
+            {
+                // 初始化聊天页面
+                InitializeChatPageModelSelector();
+                InitializeChatListPanel();
+                InitializeChatbox();
+                
+                // 初始化其他页面
+                InitializePromptsPanel();
+                InitializeAiWebsitePanel();
+                
+                // 加载聊天记录
+                LoadChatHistory();
+                
+                // 更新用户信息显示
+                UpdateUserInfo();
+                
+                // 默认显示聊天页面
+                SwitchToPanel(chatPagePanel, chatNavButton);
+                
+                // 更新窗口标题
+                UpdateTitle();
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"加载主窗体时出错: {ex.Message}");
+                MessageBox.Show($"加载应用程序时出错: {ex.Message}", "加载错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void panel1_Paint(object sender, PaintEventArgs e)
@@ -2798,38 +2843,27 @@ namespace llm_agent.UI.Forms
         // 清除所有聊天记录按钮点击事件
         private void ClearChatHistoryButton_Click(object sender, EventArgs e)
         {
-            var result = MessageBox.Show(
-                "确定要清除所有聊天记录吗？此操作无法恢复！",
-                "确认清除",
-                MessageBoxButtons.YesNo,
-                MessageBoxIcon.Warning);
-
-            if (result == DialogResult.Yes)
+            if (MessageBox.Show("确定要清除所有聊天记录吗？此操作不可恢复！", "确认", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
             {
                 try
                 {
-                    // 清除所有聊天记录
-                    _chatHistoryManager.ClearAllChatHistory();
-
-                    // 刷新聊天列表
+                    // 获取当前用户ID
+                    string userId = UserSession.Instance.GetCurrentUserId();
+                    
+                    // 清除聊天记录，传入用户ID以实现数据隔离
+                    _chatHistoryManager.ClearAllSessions(userId);
+                    
+                    // 更新聊天列表
                     UpdateChatList();
-
-                    // 切换到新的空聊天界面
-                    SwitchToPanel(chatPagePanel, chatNavButton);
-
-                    MessageBox.Show(
-                        "已成功清除所有聊天记录！",
-                        "操作成功",
-                        MessageBoxButtons.OK,
-                        MessageBoxIcon.Information);
+                    
+                    // 创建一个新的聊天会话
+                    CreateNewChat();
+                    
+                    MessageBox.Show("聊天记录已清除", "成功", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show(
-                        $"清除聊天记录失败: {ex.Message}",
-                        "操作失败",
-                        MessageBoxButtons.OK,
-                        MessageBoxIcon.Error);
+                    MessageBox.Show($"清除聊天记录失败: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
         }
@@ -2894,37 +2928,57 @@ namespace llm_agent.UI.Forms
 
         private void UpdateChatList()
         {
-            chatListPanel.Controls.Clear();
-
-            var sessions = _chatHistoryManager.GetAllSessions();
-            foreach (var session in sessions)
+            try
             {
-                var sessionItem = new ChatSessionItem();
-                sessionItem.Session = session;
-                sessionItem.OnSessionSelected += (s, e) => SwitchToChat(e);
-                sessionItem.OnSessionDeleted += (s, e) => DeleteChatSession(e);
-
-                // 添加到Panel之前先调整宽度
-                sessionItem.Width = chatListPanel.ClientSize.Width - sessionItem.Margin.Horizontal;
-
-                // 添加到控件集合
-                chatListPanel.Controls.Add(sessionItem);
-
-                // 在控件添加后再次调整大小，确保适应当前DPI设置
-                float dpiScaleFactor = sessionItem.CreateGraphics().DpiX / 96f;
-                int scaledHeight = (int)(85 * dpiScaleFactor);
-                sessionItem.Height = scaledHeight;
-
-                // 确保内部控件也正确调整大小
-                if (sessionItem.IsHandleCreated)
+                chatListPanel.Controls.Clear();
+                
+                // 获取当前用户ID
+                string userId = UserSession.Instance.GetCurrentUserId();
+                
+                // 获取聊天会话列表，传入用户ID以实现数据隔离
+                var sessions = _chatHistoryManager.GetAllSessions(userId);
+                
+                // 过滤搜索结果
+                if (!string.IsNullOrWhiteSpace(searchBox.Text))
                 {
-                    sessionItem.Invoke(new Action(() =>
-                    {
-                        typeof(ChatSessionItem).GetMethod("AdjustControlSizes",
-                            System.Reflection.BindingFlags.NonPublic |
-                            System.Reflection.BindingFlags.Instance)?.Invoke(sessionItem, null);
-                    }));
+                    string searchText = searchBox.Text.ToLower();
+                    sessions = sessions.Where(s => s.Title.ToLower().Contains(searchText)).ToList();
                 }
+                
+                // 为每个会话创建一个按钮
+                foreach (var session in sessions)
+                {
+                    var sessionItem = new ChatSessionItem();
+                    sessionItem.Session = session;
+                    sessionItem.OnSessionSelected += (s, e) => SwitchToChat(e);
+                    sessionItem.OnSessionDeleted += (s, e) => DeleteChatSession(e);
+
+                    // 添加到Panel之前先调整宽度
+                    sessionItem.Width = chatListPanel.ClientSize.Width - sessionItem.Margin.Horizontal;
+
+                    // 添加到控件集合
+                    chatListPanel.Controls.Add(sessionItem);
+
+                    // 在控件添加后再次调整大小，确保适应当前DPI设置
+                    float dpiScaleFactor = sessionItem.CreateGraphics().DpiX / 96f;
+                    int scaledHeight = (int)(85 * dpiScaleFactor);
+                    sessionItem.Height = scaledHeight;
+
+                    // 确保内部控件也正确调整大小
+                    if (sessionItem.IsHandleCreated)
+                    {
+                        sessionItem.Invoke(new Action(() =>
+                        {
+                            typeof(ChatSessionItem).GetMethod("AdjustControlSizes",
+                                System.Reflection.BindingFlags.NonPublic |
+                                System.Reflection.BindingFlags.Instance)?.Invoke(sessionItem, null);
+                        }));
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"更新聊天列表失败: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -2968,16 +3022,31 @@ namespace llm_agent.UI.Forms
 
         private void UpdateSessionOrder()
         {
-            var sessions = new List<ChatSession>();
-            foreach (Control control in chatListPanel.Controls)
+            try
             {
-                if (control is ChatSessionItem item)
+                // 获取当前用户ID
+                string userId = UserSession.Instance.GetCurrentUserId();
+                
+                // 获取所有会话控件
+                var chatButtons = chatListPanel.Controls.OfType<Button>().ToList();
+                
+                // 创建会话列表，按照控件顺序排列
+                var sessions = new List<ChatSession>();
+                foreach (var button in chatButtons)
                 {
-                    sessions.Add(item.Session);
+                    if (button.Tag is ChatSession session)
+                    {
+                        sessions.Add(session);
+                    }
                 }
+                
+                // 更新会话顺序，传入用户ID以验证所有权
+                _chatHistoryManager.UpdateSessionOrder(sessions, userId);
             }
-            // 取消注释此行，启用会话顺序更新功能
-            _chatHistoryManager.UpdateSessionOrder(sessions);
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"更新会话顺序失败: {ex.Message}");
+            }
         }
 
         private void SearchBox_TextChanged(object sender, EventArgs e)
@@ -3043,19 +3112,37 @@ namespace llm_agent.UI.Forms
         {
             if (session == null) return;
 
-            var result = MessageBox.Show(
-                string.Format("确定要删除会话 \"{0}\" 吗？", session.Title),
-                "删除确认",
-                MessageBoxButtons.YesNo,
-                MessageBoxIcon.Question);
-
-            if (result == DialogResult.Yes)
+            if (MessageBox.Show($"确定要删除会话 \"{session.Title}\" 吗？此操作不可恢复！", "确认删除", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
             {
-                // 从数据库中删除会话
-                _chatHistoryManager.DeleteChat(session.Id);
-
-                // 更新会话列表
-                UpdateChatList();
+                try
+                {
+                    // 获取当前用户ID
+                    string userId = UserSession.Instance.GetCurrentUserId();
+                    
+                    // 删除会话，传入用户ID以验证所有权
+                    _chatHistoryManager.DeleteChat(session.Id, userId);
+                    
+                    // 更新会话列表
+                    UpdateChatList();
+                    
+                    // 获取剩余会话
+                    var sessions = _chatHistoryManager.GetAllSessions(userId);
+                    
+                    // 如果还有会话，切换到第一个
+                    if (sessions.Count > 0)
+                    {
+                        SwitchToChat(sessions[0]);
+                    }
+                    else
+                    {
+                        // 如果没有会话，创建一个新的
+                        CreateNewChat();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"删除会话失败: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
         }
 
@@ -3902,5 +3989,630 @@ namespace llm_agent.UI.Forms
         }
 
         #endregion
+
+        /// <summary>
+        /// 更新用户信息显示
+        /// </summary>
+        private void UpdateUserInfo()
+        {
+            try
+            {
+                if (UserSession.Instance.IsLoggedIn)
+                {
+                    // 更新用户资料页面信息
+                    if (userProfilePanel.Visible)
+                    {
+                        LoadUserDetails();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"更新用户信息显示失败: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// 保存所有未保存的数据
+        /// </summary>
+        private void SaveAllPendingData()
+        {
+            try
+            {
+                // 保存当前会话（如果有）
+                var currentSession = _chatHistoryManager.GetCurrentSession();
+                if (currentSession != null)
+                {
+                    string userId = UserSession.Instance.GetCurrentUserId();
+                    _chatHistoryManager.SaveSession(currentSession, userId);
+                }
+
+                // 可以在这里添加其他需要保存的数据
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"保存数据时出错: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// 安全地重启应用程序
+        /// </summary>
+        private void RestartApplication()
+        {
+            try
+            {
+                // 创建启动新实例的进程信息
+                System.Diagnostics.ProcessStartInfo info = new System.Diagnostics.ProcessStartInfo();
+                info.FileName = Application.ExecutablePath;
+                info.Arguments = string.Join(" ", Environment.GetCommandLineArgs().Skip(1));
+                
+                // 启动新实例
+                System.Diagnostics.Process.Start(info);
+                
+                // 关闭当前实例
+                Application.Exit();
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"重启应用时出错: {ex.Message}");
+                // 如果重启失败，仍然尝试退出当前实例
+                Application.Exit();
+            }
+        }
+
+        /// <summary>
+        /// 加载聊天历史记录
+        /// </summary>
+        private void LoadChatHistory()
+        {
+            try
+            {
+                // 获取当前用户ID
+                string userId = UserSession.Instance.GetCurrentUserId();
+                
+                // 加载聊天记录，传入用户ID以实现数据隔离
+                var sessions = _chatHistoryManager.GetAllSessions(userId);
+                
+                // 更新聊天列表
+                UpdateChatList();
+                
+                // 如果没有会话，创建一个新的
+                if (sessions.Count == 0)
+                {
+                    CreateNewChat();
+                }
+                else
+                {
+                    // 切换到最近的会话
+                    SwitchToChat(sessions[0]);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"加载聊天历史记录失败: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        /// <summary>
+        /// 初始化用户资料页面
+        /// </summary>
+        private void InitializeUserProfilePanel()
+        {
+            try
+            {
+                // 加载用户列表
+                LoadUserList();
+                
+                // 加载用户详细信息
+                LoadUserDetails();
+                
+                // 确保修改密码区域隐藏
+                changePasswordGroupBox.Visible = false;
+                
+                // 清空密码输入框
+                txtOldPassword.Text = string.Empty;
+                txtNewPassword.Text = string.Empty;
+                txtConfirmPassword.Text = string.Empty;
+
+                // 绑定事件
+                userSearchBox.TextChanged += UserSearchBox_TextChanged;
+                newUserButton.Click += NewUserButton_Click;
+                userListPanel.SizeChanged += UserListPanel_SizeChanged;
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"初始化用户资料页面时出错: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// 加载用户列表
+        /// </summary>
+        private void LoadUserList(string searchTerm = "")
+        {
+            try
+            {
+                // 清空用户列表面板
+                userListPanel.Controls.Clear();
+                
+                // 获取当前用户ID
+                string currentUserId = UserSession.Instance.GetCurrentUserId();
+                
+                // 获取所有用户
+                var userService = new UserService();
+                var users = userService.GetAllUsers();
+
+                // 如果有搜索条件，则进行筛选
+                if (!string.IsNullOrWhiteSpace(searchTerm))
+                {
+                    users = users.Where(u => u.Username.IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) >= 0).ToList();
+                }
+                
+                // 为每个用户创建一个卡片
+                foreach (var user in users)
+                {
+                    var userCard = new UserCardItem
+                    {
+                        User = user,
+                        IsCurrentUser = user.Id == currentUserId,
+                    };
+                    userCard.Width = userListPanel.ClientSize.Width - userCard.Margin.Horizontal;
+                    userCard.OnUserSelected += UserCard_Selected;
+                    
+                    userListPanel.Controls.Add(userCard);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"加载用户列表时出错: {ex.Message}");
+            }
+        }
+        
+        /// <summary>
+        /// 用户搜索框文本变化事件处理
+        /// </summary>
+        private void UserSearchBox_TextChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                LoadUserList(userSearchBox.Text);
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"搜索用户时出错: {ex.Message}");
+            }
+        }
+        
+        /// <summary>
+        /// 用户列表大小变化事件处理
+        /// </summary>
+        private void UserListPanel_SizeChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                // 当面板大小改变时调整所有UserCardItem的宽度
+                FlowLayoutPanel panel = sender as FlowLayoutPanel;
+                if (panel == null) return;
+                
+                foreach (Control control in panel.Controls)
+                {
+                    if (control is UserCardItem userCard)
+                    {
+                        userCard.Width = panel.ClientSize.Width - userCard.Margin.Horizontal;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"调整用户卡片大小时出错: {ex.Message}");
+            }
+        }
+        
+        /// <summary>
+        /// 用户卡片选中事件处理
+        /// </summary>
+        private void UserCard_Selected(object sender, User user)
+        {
+            try
+            {
+                if (user == null) return;
+
+                // 切换选中的卡片高亮
+                foreach (var control in userListPanel.Controls)
+                {
+                    if (control is UserCardItem card)
+                    {
+                        // 这里不再需要手动设置IsCurrentUser来切换高亮，
+                        // 因为点击事件发生时，我们只关心显示详情。
+                        // 高亮状态的切换应由更明确的逻辑（如用户切换）处理。
+                    }
+                }
+                
+                // 显示用户详细信息
+                DisplayUserDetails(user);
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"选择用户卡片时出错: {ex.Message}");
+            }
+        }
+        
+        /// <summary>
+        /// 显示用户详细信息
+        /// </summary>
+        private void DisplayUserDetails(User user)
+        {
+            try
+            {
+                if (user == null) return;
+                
+                // 显示用户名
+                lblUserInfoTitle.Text = $"当前用户：{user.Username}";
+                
+                // 显示注册时间
+                string createdAtStr = user.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss");
+                lblUserCreatedAt.Text = $"注册时间：{createdAtStr}";
+                
+                // 显示上次登录时间
+                string lastLoginStr = user.LastLoginAt.HasValue 
+                    ? user.LastLoginAt.Value.ToString("yyyy-MM-dd HH:mm:ss") 
+                    : "首次登录";
+                lblUserLastLogin.Text = $"上次登录：{lastLoginStr}";
+                
+                // 获取该用户的对话数量
+                string userId = user.Id;
+                var chatHistoryManager = new ChatHistoryManager();
+                int chatCount = chatHistoryManager.GetAllSessions(userId).Count;
+                
+                // 添加对话数量显示
+                Label lblChatCount = new Label();
+                lblChatCount.AutoSize = true;
+                lblChatCount.Location = new System.Drawing.Point(20, 130);
+                lblChatCount.Name = "lblChatCount";
+                lblChatCount.Size = new System.Drawing.Size(200, 20);
+                lblChatCount.TabIndex = 3;
+                lblChatCount.Text = $"对话数量：{chatCount}";
+                
+                // 先移除已有的对话数量标签（如果有）
+                foreach (Control control in userInfoGroupBox.Controls)
+                {
+                    if (control.Name == "lblChatCount")
+                    {
+                        userInfoGroupBox.Controls.Remove(control);
+                        break;
+                    }
+                }
+                
+                // 添加新的对话数量标签
+                userInfoGroupBox.Controls.Add(lblChatCount);
+                
+                // 如果不是当前用户，显示"切换到该账号"按钮
+                btnSwitchAccount.Visible = user.Id != UserSession.Instance.GetCurrentUserId();
+                btnSwitchAccount.Tag = user; // 保存用户对象，供点击事件使用
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"显示用户详细信息时出错: {ex.Message}");
+            }
+        }
+        
+        /// <summary>
+        /// 新建用户按钮点击事件
+        /// </summary>
+        private void NewUserButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                // 显示创建新用户对话框
+                using (var registerForm = new RegisterForm())
+                {
+                    if (registerForm.ShowDialog() == DialogResult.OK)
+                    {
+                        // 刷新用户列表
+                        LoadUserList();
+                        
+                        // 显示成功消息
+                        MessageBox.Show("用户创建成功！", "成功", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"创建新用户时出错: {ex.Message}");
+                MessageBox.Show($"创建新用户时出错: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        /// <summary>
+        /// 加载用户详细信息
+        /// </summary>
+        private void LoadUserDetails()
+        {
+            try
+            {
+                if (UserSession.Instance.IsLoggedIn && UserSession.Instance.CurrentUser != null)
+                {
+                    var user = UserSession.Instance.CurrentUser;
+                    
+                    // 显示用户详细信息
+                    DisplayUserDetails(user);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"加载用户详细信息时出错: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// 修改密码按钮点击事件
+        /// </summary>
+        private void btnChangePassword_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                // 显示修改密码区域
+                changePasswordGroupBox.Visible = true;
+                
+                // 清空密码输入框
+                txtOldPassword.Text = string.Empty;
+                txtNewPassword.Text = string.Empty;
+                txtConfirmPassword.Text = string.Empty;
+                
+                // 设置焦点到旧密码输入框
+                txtOldPassword.Focus();
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"显示修改密码界面时出错: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// 确认修改密码按钮点击事件
+        /// </summary>
+        private void btnConfirmChangePassword_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                string oldPassword = txtOldPassword.Text;
+                string newPassword = txtNewPassword.Text;
+                string confirmPassword = txtConfirmPassword.Text;
+                
+                // 验证输入
+                if (string.IsNullOrWhiteSpace(oldPassword))
+                {
+                    MessageBox.Show("请输入当前密码", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    txtOldPassword.Focus();
+                    return;
+                }
+                
+                if (string.IsNullOrWhiteSpace(newPassword))
+                {
+                    MessageBox.Show("请输入新密码", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    txtNewPassword.Focus();
+                    return;
+                }
+                
+                if (newPassword.Length < 6)
+                {
+                    MessageBox.Show("新密码长度不能少于6个字符", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    txtNewPassword.Focus();
+                    return;
+                }
+                
+                if (newPassword != confirmPassword)
+                {
+                    MessageBox.Show("两次输入的新密码不一致", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    txtConfirmPassword.Focus();
+                    return;
+                }
+                
+                // 调用业务层修改密码
+                var userService = new UserService();
+                string userId = UserSession.Instance.GetCurrentUserId();
+                
+                if (userService.ChangePassword(userId, oldPassword, newPassword))
+                {
+                    MessageBox.Show("密码修改成功", "成功", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    
+                    // 隐藏修改密码区域
+                    changePasswordGroupBox.Visible = false;
+                }
+                else
+                {
+                    MessageBox.Show("密码修改失败，请检查当前密码是否正确", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    txtOldPassword.Focus();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"修改密码时出错: {ex.Message}");
+                MessageBox.Show($"修改密码时出错: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        /// <summary>
+        /// 取消修改密码按钮点击事件
+        /// </summary>
+        private void btnCancelChangePassword_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                // 隐藏修改密码区域
+                changePasswordGroupBox.Visible = false;
+                
+                // 清空密码输入框
+                txtOldPassword.Text = string.Empty;
+                txtNewPassword.Text = string.Empty;
+                txtConfirmPassword.Text = string.Empty;
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"取消修改密码时出错: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// 切换账号按钮点击事件
+        /// </summary>
+        private void btnSwitchAccount_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                // 获取要切换到的用户
+                User targetUser = btnSwitchAccount.Tag as User;
+                
+                if (targetUser == null)
+                {
+                    // 如果没有指定目标用户，显示登录窗体
+                    if (MessageBox.Show("确定要切换账号吗？当前会话数据将会保存。", "确认切换账号", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                    {
+                        // 更新用户最后登录时间
+                        string userId = UserSession.Instance.GetCurrentUserId();
+                        if (!string.IsNullOrEmpty(userId))
+                        {
+                            try
+                            {
+                                var userService = new UserService();
+                                userService.UpdateLastLoginTime(userId);
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.Error.WriteLine($"更新用户最后登录时间失败: {ex.Message}");
+                            }
+                        }
+
+                        // 保存所有未保存的数据
+                        SaveAllPendingData();
+
+                        // 清除当前用户会话
+                        UserSession.Instance.Logout();
+                        
+                        // 显示登录窗体
+                        using (var loginForm = new LoginForm())
+                        {
+                            // 隐藏主窗体
+                            this.Hide();
+                            
+                            // 如果登录成功，重新加载用户数据
+                            if (loginForm.ShowDialog() == DialogResult.OK)
+                            {
+                                // 更新用户信息显示
+                                UpdateUserInfo();
+                                
+                                // 重新加载聊天历史
+                                LoadChatHistory();
+                                
+                                // 重新显示主窗体
+                                this.Show();
+                            }
+                            else
+                            {
+                                // 如果登录取消，退出应用
+                                Application.Exit();
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    // 切换到指定用户
+                    if (MessageBox.Show($"确定要切换到用户 \"{targetUser.Username}\" 吗？当前会话数据将会保存。", "确认切换账号", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                    {
+                        // 更新当前用户最后登录时间
+                        string userId = UserSession.Instance.GetCurrentUserId();
+                        if (!string.IsNullOrEmpty(userId))
+                        {
+                            try
+                            {
+                                var userService = new UserService();
+                                userService.UpdateLastLoginTime(userId);
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.Error.WriteLine($"更新用户最后登录时间失败: {ex.Message}");
+                            }
+                        }
+
+                        // 保存所有未保存的数据
+                        SaveAllPendingData();
+
+                        // 设置新的当前用户
+                        UserSession.Instance.SetCurrentUser(targetUser);
+                        
+                        // 更新目标用户最后登录时间
+                        try
+                        {
+                            var userService = new UserService();
+                            userService.UpdateLastLoginTime(targetUser.Id);
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.Error.WriteLine($"更新目标用户最后登录时间失败: {ex.Message}");
+                        }
+                        
+                        // 更新用户信息显示
+                        UpdateUserInfo();
+                        
+                        // 重新加载用户列表（更新当前用户标记）
+                        LoadUserList();
+                        
+                        // 重新加载聊天历史
+                        LoadChatHistory();
+                        
+                        // 显示成功消息
+                        MessageBox.Show($"已成功切换到用户 \"{targetUser.Username}\"", "切换成功", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"切换账号时出错: {ex.Message}");
+                MessageBox.Show($"切换账号失败: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        /// <summary>
+        /// 用户资料页面登出按钮点击事件
+        /// </summary>
+        private void btnLogoutProfile_Click(object sender, EventArgs e)
+        {
+            if (MessageBox.Show("确定要退出登录吗？", "确认登出", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+            {
+                try
+                {
+                    // 更新用户最后登录时间
+                    string userId = UserSession.Instance.GetCurrentUserId();
+                    if (!string.IsNullOrEmpty(userId))
+                    {
+                        try
+                        {
+                            var userService = new UserService();
+                            userService.UpdateLastLoginTime(userId);
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.Error.WriteLine($"更新用户最后登录时间失败: {ex.Message}");
+                        }
+                    }
+
+                    // 保存所有未保存的数据
+                    SaveAllPendingData();
+
+                    // 清除当前用户会话
+                    UserSession.Instance.Logout();
+                    
+                    // 使用更安全的方式重启应用
+                    RestartApplication();
+                }
+                catch (Exception ex)
+                {
+                    Console.Error.WriteLine($"登出过程中出错: {ex.Message}");
+                    MessageBox.Show($"登出失败: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+        }
     }
 }
