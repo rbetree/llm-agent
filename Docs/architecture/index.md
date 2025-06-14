@@ -60,7 +60,7 @@ flowchart TD
 
 > 详细的数据存储架构、用户数据与应用数据分离方案、数据结构和技术栈，请参阅[数据存储](./data-storage.md)文档。
 
-### 1. SQLite数据库存储
+### 1. MySQL数据库存储
 
 用于持久化聊天会话、消息、模型信息和渠道配置：
 
@@ -186,7 +186,7 @@ flowchart LR
     B --> C["ChatHistoryManager"]
     C --> D["ChatRepository"]
     B --> E["创建消息对象"]
-    D --> F["SQLite数据库"]
+    D --> F["MySQL数据库"]
     E --> G["调用LLM API获取回复"]
     G --> H["更新UI显示"]
 ```
@@ -197,7 +197,7 @@ flowchart LR
 flowchart LR
     A["添加渠道按钮点击"] --> B["addChannelButton_Click"]
     B --> C["ChannelManager"]
-    C --> D["SQLite数据库"]
+    C --> D["MySQL数据库"]
     B --> E["创建Channel对象"]
     E --> F["更新UI显示新渠道"]
 ```
@@ -210,5 +210,5 @@ flowchart LR
     B --> C["ChatHistoryManager"]
     C --> D["ChatRepository"]
     B --> E["更新UI显示会话内容"]
-    D --> F["SQLite数据库"]
+    D --> F["MySQL数据库"]
 ``` 

@@ -9,14 +9,6 @@ namespace llm_agent.DAL
     /// </summary>
     public static class DatabaseConfig
     {
-        // 数据库类型：MySQL或SQLite
-        public static DatabaseType DatabaseType { get; set; } = DatabaseType.MySQL;
-        
-        // SQLite配置
-        private static readonly string SqliteDbName = "llm_agent.db";
-        private static readonly string SqliteDbPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, SqliteDbName);
-        public static string SqliteConnectionString => $"Data Source={SqliteDbPath};Version=3;";
-        
         // MySQL配置
         private static string _mysqlServer = "localhost";
         private static string _mysqlPort = "3306";
@@ -57,16 +49,10 @@ namespace llm_agent.DAL
         public static string MySqlConnectionString => 
             $"Server={_mysqlServer};Port={_mysqlPort};Database={_mysqlDatabase};Uid={_mysqlUsername};Pwd={_mysqlPassword};CharSet=utf8mb4;";
         
-        // 获取当前使用的数据库连接字符串
+        // 获取数据库连接字符串
         public static string GetConnectionString()
         {
-            return DatabaseType == DatabaseType.MySQL ? MySqlConnectionString : SqliteConnectionString;
-        }
-        
-        // 获取SQLite数据库文件路径
-        public static string GetSqliteDbPath()
-        {
-            return SqliteDbPath;
+            return MySqlConnectionString;
         }
         
         /// <summary>
@@ -75,20 +61,8 @@ namespace llm_agent.DAL
         /// <returns>是否成功配置</returns>
         public static bool ConfigureMySqlConnection()
         {
-            if (DatabaseType != DatabaseType.MySQL)
-                return true;
-                
             // 已经设置了密码，不需要再次提示
             return true;
         }
-    }
-    
-    /// <summary>
-    /// 数据库类型枚举
-    /// </summary>
-    public enum DatabaseType
-    {
-        SQLite,
-        MySQL
     }
 } 

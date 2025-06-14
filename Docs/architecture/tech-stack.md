@@ -10,7 +10,7 @@ LLM Agent项目采用了一系列现代技术和框架，以下是项目的核�
 
 ## 数据存储
 
-- **SQLite**: 轻量级嵌入式数据库，用于存储聊天历史和模型信息
+- **MySQL**: 关系型数据库，用于存储聊天历史和模型信息
 - **JSON**: 用于配置文件和渠道信息的序列化和持久化
 - **Settings API**: .NET内置的应用程序设置管理机制
 
@@ -23,7 +23,7 @@ LLM Agent项目采用了一系列现代技术和框架，以下是项目的核�
 ## 核心库和框架
 
 - **System.Text.Json**: 用于JSON序列化和反序列化
-- **System.Data.SQLite**: SQLite数据库访问
+- **MySQL.Data**: MySQL数据库访问
 - **System.Net.Http**: HTTP客户端实现
 - **System.ComponentModel**: 用于实现属性通知和数据绑定
 

@@ -43,7 +43,7 @@
 - **开发语言**: C# / .NET 8.0
 - **UI框架**: Windows Forms
 - **数据处理**: System.Text.Json
-- **数据存储**: System.Data.SQLite
+- **数据存储**: MySQL.Data
 - **网络通信**: System.Net.Http
 - **构建工具**: Visual Studio 2022
 - **Markdown渲染**: Markdig

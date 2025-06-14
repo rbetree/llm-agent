@@ -1,17 +1,14 @@
 using System;
 using System.Collections.Generic;
-using System.Data.SQLite;
 using System.IO;
 using System.Reflection;
+using MySql.Data.MySqlClient;
 
 namespace llm_agent.Properties 
 {
     public class Settings
     {
         private static Settings _default;
-        private static readonly string DbName = "llm_agent.db";
-        private static readonly string DbPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, DbName);
-        private static readonly string ConnectionString = $"Data Source={DbPath};Version=3;";
         
         public static Settings Default
         {
@@ -53,23 +50,18 @@ namespace llm_agent.Properties
         {
             try
             {
-                if (!File.Exists(DbPath))
-                {
-                    SQLiteConnection.CreateFile(DbPath);
-                }
-
-                using (var connection = new SQLiteConnection(ConnectionString))
+                using (var connection = new MySqlConnection(DAL.DatabaseConfig.GetConnectionString()))
                 {
                     connection.Open();
 
                     // 创建设置表
                     string createSettingsTableSql = @"
                         CREATE TABLE IF NOT EXISTS UserSettings (
-                            Key TEXT PRIMARY KEY,
-                            Value TEXT
+                            `Key` VARCHAR(255) PRIMARY KEY,
+                            `Value` TEXT
                         );";
 
-                    using (var command = new SQLiteCommand(createSettingsTableSql, connection))
+                    using (var command = new MySqlCommand(createSettingsTableSql, connection))
                     {
                         command.ExecuteNonQuery();
                     }
@@ -85,12 +77,12 @@ namespace llm_agent.Properties
         {
             try
             {
-                using (var connection = new SQLiteConnection(ConnectionString))
+                using (var connection = new MySqlConnection(DAL.DatabaseConfig.GetConnectionString()))
                 {
                     connection.Open();
-                    string selectAllSql = "SELECT Key, Value FROM UserSettings";
+                    string selectAllSql = "SELECT `Key`, `Value` FROM UserSettings";
 
-                    using (var command = new SQLiteCommand(selectAllSql, connection))
+                    using (var command = new MySqlCommand(selectAllSql, connection))
                     {
                         using (var reader = command.ExecuteReader())
                         {
@@ -136,7 +128,7 @@ namespace llm_agent.Properties
         {
             try
             {
-                using (var connection = new SQLiteConnection(ConnectionString))
+                using (var connection = new MySqlConnection(DAL.DatabaseConfig.GetConnectionString()))
                 {
                     connection.Open();
                     using (var transaction = connection.BeginTransaction())
@@ -160,12 +152,12 @@ namespace llm_agent.Properties
                                 
                                 // Upsert设置
                                 string upsertSql = @"
-                                    INSERT INTO UserSettings (Key, Value)
+                                    INSERT INTO UserSettings (`Key`, `Value`)
                                     VALUES (@key, @value)
-                                    ON CONFLICT(Key) DO UPDATE SET 
-                                    Value = @value";
+                                    ON DUPLICATE KEY UPDATE 
+                                    `Value` = @value";
                                 
-                                using (var command = new SQLiteCommand(upsertSql, connection, transaction))
+                                using (var command = new MySqlCommand(upsertSql, connection, transaction))
                                 {
                                     command.Parameters.AddWithValue("@key", key);
                                     command.Parameters.AddWithValue("@value", stringValue);

@@ -802,7 +802,7 @@ namespace llm_agent.UI.Forms
                 if (providerStr == "azureopenai")
                     providerStr = "openai"; // 特殊处理Azure OpenAI
 
-                // 保存到SQLite数据库
+                // 保存到MySQL数据库
                 _dbManager.SaveModels(modelsToSave, providerStr);
 
                 int enabledCount = modelsToSave.Count(m => m.Enabled);
