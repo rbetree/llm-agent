@@ -63,7 +63,7 @@
             // 
             // bodyPanel
             // 
-            bodyPanel.BackColor = System.Drawing.Color.SlateGray;
+            bodyPanel.BackColor = System.Drawing.Color.FromArgb(76, 76, 128);
             bodyPanel.Controls.Add(bodyTextBox);
             bodyPanel.Dock = System.Windows.Forms.DockStyle.Left;
             bodyPanel.Location = new System.Drawing.Point(8, 4);
@@ -76,7 +76,7 @@
             // bodyTextBox
             // 
             bodyTextBox.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
-            bodyTextBox.BackColor = System.Drawing.Color.LightSlateGray;
+            bodyTextBox.BackColor = System.Drawing.Color.FromArgb(76, 76, 128);
             bodyTextBox.BorderStyle = System.Windows.Forms.BorderStyle.None;
             bodyTextBox.Font = new System.Drawing.Font("Segoe UI Emoji", 9F);
             bodyTextBox.ForeColor = System.Drawing.Color.White;

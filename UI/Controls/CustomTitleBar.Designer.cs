@@ -28,79 +28,99 @@ namespace llm_agent.UI.Controls
         /// </summary>
         private void InitializeComponent()
         {
-            this.lblTitle = new System.Windows.Forms.Label();
-            this.btnClose = new System.Windows.Forms.Button();
-            this.btnMaximize = new System.Windows.Forms.Button();
-            this.btnMinimize = new System.Windows.Forms.Button();
-            this.SuspendLayout();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CustomTitleBar));
+            lblTitle = new System.Windows.Forms.Label();
+            btnClose = new System.Windows.Forms.Button();
+            btnMaximize = new System.Windows.Forms.Button();
+            btnMinimize = new System.Windows.Forms.Button();
+            picLogo = new System.Windows.Forms.PictureBox();
+            ((System.ComponentModel.ISupportInitialize)picLogo).BeginInit();
+            SuspendLayout();
             // 
             // lblTitle
             // 
-            this.lblTitle.AutoSize = true;
-            this.lblTitle.Font = new System.Drawing.Font("Microsoft YaHei UI", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.lblTitle.ForeColor = System.Drawing.Color.White;
-            this.lblTitle.Location = new System.Drawing.Point(12, 9);
-            this.lblTitle.Name = "lblTitle";
-            this.lblTitle.Size = new System.Drawing.Size(64, 20);
-            this.lblTitle.TabIndex = 0;
-            this.lblTitle.Text = "LLM Agent";
-            this.lblTitle.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            lblTitle.AutoSize = true;
+            lblTitle.Font = new System.Drawing.Font("Microsoft YaHei UI", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 134);
+            lblTitle.ForeColor = System.Drawing.Color.White;
+            lblTitle.Location = new System.Drawing.Point(79, 19);
+            lblTitle.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            lblTitle.Name = "lblTitle";
+            lblTitle.Size = new System.Drawing.Size(104, 24);
+            lblTitle.TabIndex = 0;
+            lblTitle.Text = "LLM Agent";
+            lblTitle.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // btnClose
             // 
-            this.btnClose.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnClose.FlatAppearance.BorderSize = 0;
-            this.btnClose.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnClose.Font = new System.Drawing.Font("Microsoft YaHei UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.btnClose.ForeColor = System.Drawing.Color.White;
-            this.btnClose.Location = new System.Drawing.Point(760, 0);
-            this.btnClose.Name = "btnClose";
-            this.btnClose.Size = new System.Drawing.Size(40, 30);
-            this.btnClose.TabIndex = 1;
-            this.btnClose.Text = "✕";
-            this.btnClose.UseVisualStyleBackColor = true;
+            btnClose.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
+            btnClose.FlatAppearance.BorderSize = 0;
+            btnClose.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            btnClose.Font = new System.Drawing.Font("Microsoft YaHei UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 134);
+            btnClose.ForeColor = System.Drawing.Color.White;
+            btnClose.Location = new System.Drawing.Point(1136, 5);
+            btnClose.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            btnClose.Name = "btnClose";
+            btnClose.Size = new System.Drawing.Size(60, 50);
+            btnClose.TabIndex = 1;
+            btnClose.Text = "✕";
+            btnClose.UseVisualStyleBackColor = true;
             // 
             // btnMaximize
             // 
-            this.btnMaximize.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnMaximize.FlatAppearance.BorderSize = 0;
-            this.btnMaximize.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnMaximize.Font = new System.Drawing.Font("Microsoft YaHei UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.btnMaximize.ForeColor = System.Drawing.Color.White;
-            this.btnMaximize.Location = new System.Drawing.Point(720, 0);
-            this.btnMaximize.Name = "btnMaximize";
-            this.btnMaximize.Size = new System.Drawing.Size(40, 30);
-            this.btnMaximize.TabIndex = 2;
-            this.btnMaximize.Text = "☐";
-            this.btnMaximize.UseVisualStyleBackColor = true;
+            btnMaximize.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
+            btnMaximize.FlatAppearance.BorderSize = 0;
+            btnMaximize.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            btnMaximize.Font = new System.Drawing.Font("Microsoft YaHei UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 134);
+            btnMaximize.ForeColor = System.Drawing.Color.White;
+            btnMaximize.Location = new System.Drawing.Point(1082, 5);
+            btnMaximize.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            btnMaximize.Name = "btnMaximize";
+            btnMaximize.Size = new System.Drawing.Size(60, 50);
+            btnMaximize.TabIndex = 2;
+            btnMaximize.Text = "☐";
+            btnMaximize.UseVisualStyleBackColor = true;
             // 
             // btnMinimize
             // 
-            this.btnMinimize.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnMinimize.FlatAppearance.BorderSize = 0;
-            this.btnMinimize.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnMinimize.Font = new System.Drawing.Font("Microsoft YaHei UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.btnMinimize.ForeColor = System.Drawing.Color.White;
-            this.btnMinimize.Location = new System.Drawing.Point(680, 0);
-            this.btnMinimize.Name = "btnMinimize";
-            this.btnMinimize.Size = new System.Drawing.Size(40, 30);
-            this.btnMinimize.TabIndex = 3;
-            this.btnMinimize.Text = "—";
-            this.btnMinimize.UseVisualStyleBackColor = true;
+            btnMinimize.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
+            btnMinimize.FlatAppearance.BorderSize = 0;
+            btnMinimize.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            btnMinimize.Font = new System.Drawing.Font("Microsoft YaHei UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 134);
+            btnMinimize.ForeColor = System.Drawing.Color.White;
+            btnMinimize.Location = new System.Drawing.Point(1026, 5);
+            btnMinimize.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            btnMinimize.Name = "btnMinimize";
+            btnMinimize.Size = new System.Drawing.Size(60, 50);
+            btnMinimize.TabIndex = 3;
+            btnMinimize.Text = "—";
+            btnMinimize.UseVisualStyleBackColor = true;
+            // 
+            // picLogo
+            // 
+            picLogo.Image = (System.Drawing.Image)resources.GetObject("picLogo.Image");
+            picLogo.Location = new System.Drawing.Point(3, 2);
+            picLogo.Name = "picLogo";
+            picLogo.Size = new System.Drawing.Size(69, 55);
+            picLogo.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            picLogo.TabIndex = 4;
+            picLogo.TabStop = false;
             // 
             // CustomTitleBar
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(76)))), ((int)(((byte)(76)))), ((int)(((byte)(128)))));
-            this.Controls.Add(this.btnMinimize);
-            this.Controls.Add(this.btnMaximize);
-            this.Controls.Add(this.btnClose);
-            this.Controls.Add(this.lblTitle);
-            this.Name = "CustomTitleBar";
-            this.Size = new System.Drawing.Size(800, 40);
-            this.ResumeLayout(false);
-            this.PerformLayout();
+            AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
+            AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            BackColor = System.Drawing.Color.FromArgb(100, 101, 165);
+            Controls.Add(picLogo);
+            Controls.Add(btnMinimize);
+            Controls.Add(btnMaximize);
+            Controls.Add(btnClose);
+            Controls.Add(lblTitle);
+            Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            Name = "CustomTitleBar";
+            Size = new System.Drawing.Size(1200, 60);
+            ((System.ComponentModel.ISupportInitialize)picLogo).EndInit();
+            ResumeLayout(false);
+            PerformLayout();
 
         }
 
@@ -110,5 +130,6 @@ namespace llm_agent.UI.Controls
         private System.Windows.Forms.Button btnClose;
         private System.Windows.Forms.Button btnMaximize;
         private System.Windows.Forms.Button btnMinimize;
+        private System.Windows.Forms.PictureBox picLogo;
     }
 } 

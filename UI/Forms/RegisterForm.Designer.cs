@@ -28,119 +28,119 @@ namespace llm_agent.UI.Forms
         /// </summary>
         private void InitializeComponent()
         {
-            this.lblUsername = new System.Windows.Forms.Label();
-            this.txtUsername = new System.Windows.Forms.TextBox();
-            this.lblPassword = new System.Windows.Forms.Label();
-            this.txtPassword = new System.Windows.Forms.TextBox();
-            this.lblConfirmPassword = new System.Windows.Forms.Label();
-            this.txtConfirmPassword = new System.Windows.Forms.TextBox();
-            this.btnCreate = new System.Windows.Forms.Button();
-            this.btnCancel = new System.Windows.Forms.Button();
-            this.lblTitle = new System.Windows.Forms.Label();
-            this.SuspendLayout();
-            // 
-            // lblTitle
-            // 
-            this.lblTitle.AutoSize = true;
-            this.lblTitle.Font = new System.Drawing.Font("Microsoft YaHei UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            this.lblTitle.Location = new System.Drawing.Point(30, 20);
-            this.lblTitle.Name = "lblTitle";
-            this.lblTitle.Size = new System.Drawing.Size(112, 27);
-            this.lblTitle.TabIndex = 0;
-            this.lblTitle.Text = "创建新用户";
+            lblUsername = new System.Windows.Forms.Label();
+            txtUsername = new System.Windows.Forms.TextBox();
+            lblPassword = new System.Windows.Forms.Label();
+            txtPassword = new System.Windows.Forms.TextBox();
+            lblConfirmPassword = new System.Windows.Forms.Label();
+            txtConfirmPassword = new System.Windows.Forms.TextBox();
+            btnCreate = new System.Windows.Forms.Button();
+            btnCancel = new System.Windows.Forms.Button();
+            lblTitle = new System.Windows.Forms.Label();
+            SuspendLayout();
             // 
             // lblUsername
             // 
-            this.lblUsername.AutoSize = true;
-            this.lblUsername.Location = new System.Drawing.Point(30, 70);
-            this.lblUsername.Name = "lblUsername";
-            this.lblUsername.Size = new System.Drawing.Size(69, 20);
-            this.lblUsername.TabIndex = 1;
-            this.lblUsername.Text = "用户名：";
+            lblUsername.AutoSize = true;
+            lblUsername.Location = new System.Drawing.Point(34, 70);
+            lblUsername.Name = "lblUsername";
+            lblUsername.Size = new System.Drawing.Size(69, 20);
+            lblUsername.TabIndex = 1;
+            lblUsername.Text = "用户名：";
             // 
             // txtUsername
             // 
-            this.txtUsername.Location = new System.Drawing.Point(30, 95);
-            this.txtUsername.Name = "txtUsername";
-            this.txtUsername.Size = new System.Drawing.Size(300, 27);
-            this.txtUsername.TabIndex = 2;
+            txtUsername.Location = new System.Drawing.Point(34, 95);
+            txtUsername.Name = "txtUsername";
+            txtUsername.Size = new System.Drawing.Size(337, 27);
+            txtUsername.TabIndex = 2;
             // 
             // lblPassword
             // 
-            this.lblPassword.AutoSize = true;
-            this.lblPassword.Location = new System.Drawing.Point(30, 135);
-            this.lblPassword.Name = "lblPassword";
-            this.lblPassword.Size = new System.Drawing.Size(54, 20);
-            this.lblPassword.TabIndex = 3;
-            this.lblPassword.Text = "密码：";
+            lblPassword.AutoSize = true;
+            lblPassword.Location = new System.Drawing.Point(34, 135);
+            lblPassword.Name = "lblPassword";
+            lblPassword.Size = new System.Drawing.Size(54, 20);
+            lblPassword.TabIndex = 3;
+            lblPassword.Text = "密码：";
             // 
             // txtPassword
             // 
-            this.txtPassword.Location = new System.Drawing.Point(30, 160);
-            this.txtPassword.Name = "txtPassword";
-            this.txtPassword.PasswordChar = '*';
-            this.txtPassword.Size = new System.Drawing.Size(300, 27);
-            this.txtPassword.TabIndex = 4;
+            txtPassword.Location = new System.Drawing.Point(34, 160);
+            txtPassword.Name = "txtPassword";
+            txtPassword.PasswordChar = '*';
+            txtPassword.Size = new System.Drawing.Size(337, 27);
+            txtPassword.TabIndex = 4;
             // 
             // lblConfirmPassword
             // 
-            this.lblConfirmPassword.AutoSize = true;
-            this.lblConfirmPassword.Location = new System.Drawing.Point(30, 200);
-            this.lblConfirmPassword.Name = "lblConfirmPassword";
-            this.lblConfirmPassword.Size = new System.Drawing.Size(84, 20);
-            this.lblConfirmPassword.TabIndex = 5;
-            this.lblConfirmPassword.Text = "确认密码：";
+            lblConfirmPassword.AutoSize = true;
+            lblConfirmPassword.Location = new System.Drawing.Point(34, 200);
+            lblConfirmPassword.Name = "lblConfirmPassword";
+            lblConfirmPassword.Size = new System.Drawing.Size(84, 20);
+            lblConfirmPassword.TabIndex = 5;
+            lblConfirmPassword.Text = "确认密码：";
             // 
             // txtConfirmPassword
             // 
-            this.txtConfirmPassword.Location = new System.Drawing.Point(30, 225);
-            this.txtConfirmPassword.Name = "txtConfirmPassword";
-            this.txtConfirmPassword.PasswordChar = '*';
-            this.txtConfirmPassword.Size = new System.Drawing.Size(300, 27);
-            this.txtConfirmPassword.TabIndex = 6;
+            txtConfirmPassword.Location = new System.Drawing.Point(34, 225);
+            txtConfirmPassword.Name = "txtConfirmPassword";
+            txtConfirmPassword.PasswordChar = '*';
+            txtConfirmPassword.Size = new System.Drawing.Size(337, 27);
+            txtConfirmPassword.TabIndex = 6;
             // 
             // btnCreate
             // 
-            this.btnCreate.Location = new System.Drawing.Point(70, 275);
-            this.btnCreate.Name = "btnCreate";
-            this.btnCreate.Size = new System.Drawing.Size(94, 29);
-            this.btnCreate.TabIndex = 7;
-            this.btnCreate.Text = "创建";
-            this.btnCreate.UseVisualStyleBackColor = true;
-            this.btnCreate.Click += new System.EventHandler(this.btnCreate_Click);
+            btnCreate.Location = new System.Drawing.Point(79, 275);
+            btnCreate.Name = "btnCreate";
+            btnCreate.Size = new System.Drawing.Size(106, 29);
+            btnCreate.TabIndex = 7;
+            btnCreate.Text = "创建";
+            btnCreate.UseVisualStyleBackColor = true;
+            btnCreate.Click += btnCreate_Click;
             // 
             // btnCancel
             // 
-            this.btnCancel.Location = new System.Drawing.Point(190, 275);
-            this.btnCancel.Name = "btnCancel";
-            this.btnCancel.Size = new System.Drawing.Size(94, 29);
-            this.btnCancel.TabIndex = 8;
-            this.btnCancel.Text = "取消";
-            this.btnCancel.UseVisualStyleBackColor = true;
-            this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
+            btnCancel.Location = new System.Drawing.Point(214, 275);
+            btnCancel.Name = "btnCancel";
+            btnCancel.Size = new System.Drawing.Size(106, 29);
+            btnCancel.TabIndex = 8;
+            btnCancel.Text = "取消";
+            btnCancel.UseVisualStyleBackColor = true;
+            btnCancel.Click += btnCancel_Click;
+            // 
+            // lblTitle
+            // 
+            lblTitle.AutoSize = true;
+            lblTitle.Font = new System.Drawing.Font("Microsoft YaHei UI", 12F, System.Drawing.FontStyle.Bold);
+            lblTitle.Location = new System.Drawing.Point(34, 20);
+            lblTitle.Name = "lblTitle";
+            lblTitle.Size = new System.Drawing.Size(112, 27);
+            lblTitle.TabIndex = 0;
+            lblTitle.Text = "创建新用户";
             // 
             // RegisterForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(360, 330);
-            this.Controls.Add(this.btnCancel);
-            this.Controls.Add(this.btnCreate);
-            this.Controls.Add(this.txtConfirmPassword);
-            this.Controls.Add(this.lblConfirmPassword);
-            this.Controls.Add(this.txtPassword);
-            this.Controls.Add(this.lblPassword);
-            this.Controls.Add(this.txtUsername);
-            this.Controls.Add(this.lblUsername);
-            this.Controls.Add(this.lblTitle);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
-            this.MaximizeBox = false;
-            this.MinimizeBox = false;
-            this.Name = "RegisterForm";
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "创建新用户";
-            this.ResumeLayout(false);
-            this.PerformLayout();
+            AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
+            AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            ClientSize = new System.Drawing.Size(405, 330);
+            Controls.Add(btnCancel);
+            Controls.Add(btnCreate);
+            Controls.Add(txtConfirmPassword);
+            Controls.Add(lblConfirmPassword);
+            Controls.Add(txtPassword);
+            Controls.Add(lblPassword);
+            Controls.Add(txtUsername);
+            Controls.Add(lblUsername);
+            Controls.Add(lblTitle);
+            FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            MaximizeBox = false;
+            MinimizeBox = false;
+            Name = "RegisterForm";
+            StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
+            Text = "创建新用户";
+            ResumeLayout(false);
+            PerformLayout();
 
         }
 

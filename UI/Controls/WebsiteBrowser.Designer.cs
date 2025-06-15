@@ -28,140 +28,147 @@ namespace llm_agent.UI.Controls
         /// </summary>
         private void InitializeComponent()
         {
-            this.panelToolbar = new System.Windows.Forms.Panel();
-            this.btnGo = new System.Windows.Forms.Button();
-            this.txtUrl = new System.Windows.Forms.TextBox();
-            this.btnStop = new System.Windows.Forms.Button();
-            this.btnRefresh = new System.Windows.Forms.Button();
-            this.btnForward = new System.Windows.Forms.Button();
-            this.btnBack = new System.Windows.Forms.Button();
-            this.panelBrowser = new System.Windows.Forms.Panel();
-            this.panelToolbar.SuspendLayout();
-            this.SuspendLayout();
+            panelToolbar = new System.Windows.Forms.Panel();
+            btnGo = new System.Windows.Forms.Button();
+            txtUrl = new System.Windows.Forms.TextBox();
+            btnStop = new System.Windows.Forms.Button();
+            btnRefresh = new System.Windows.Forms.Button();
+            btnForward = new System.Windows.Forms.Button();
+            btnBack = new System.Windows.Forms.Button();
+            panelBrowser = new System.Windows.Forms.Panel();
+            panelToolbar.SuspendLayout();
+            SuspendLayout();
             // 
             // panelToolbar
             // 
-            this.panelToolbar.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(240)))), ((int)(((byte)(240)))));
-            this.panelToolbar.Controls.Add(this.btnGo);
-            this.panelToolbar.Controls.Add(this.txtUrl);
-            this.panelToolbar.Controls.Add(this.btnStop);
-            this.panelToolbar.Controls.Add(this.btnRefresh);
-            this.panelToolbar.Controls.Add(this.btnForward);
-            this.panelToolbar.Controls.Add(this.btnBack);
-            this.panelToolbar.Dock = System.Windows.Forms.DockStyle.Top;
-            this.panelToolbar.Location = new System.Drawing.Point(0, 0);
-            this.panelToolbar.Name = "panelToolbar";
-            this.panelToolbar.Padding = new System.Windows.Forms.Padding(8);
-            this.panelToolbar.Size = new System.Drawing.Size(800, 44);
-            this.panelToolbar.TabIndex = 0;
+            panelToolbar.BackColor = System.Drawing.Color.FromArgb(240, 240, 240);
+            panelToolbar.Controls.Add(btnGo);
+            panelToolbar.Controls.Add(txtUrl);
+            panelToolbar.Controls.Add(btnStop);
+            panelToolbar.Controls.Add(btnRefresh);
+            panelToolbar.Controls.Add(btnForward);
+            panelToolbar.Controls.Add(btnBack);
+            panelToolbar.Dock = System.Windows.Forms.DockStyle.Top;
+            panelToolbar.Location = new System.Drawing.Point(0, 0);
+            panelToolbar.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            panelToolbar.Name = "panelToolbar";
+            panelToolbar.Size = new System.Drawing.Size(1029, 52);
+            panelToolbar.TabIndex = 0;
             // 
             // btnGo
             // 
-            this.btnGo.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnGo.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(122)))), ((int)(((byte)(183)))));
-            this.btnGo.FlatAppearance.BorderSize = 0;
-            this.btnGo.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnGo.Font = new System.Drawing.Font("Microsoft YaHei UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.btnGo.ForeColor = System.Drawing.Color.White;
-            this.btnGo.Location = new System.Drawing.Point(744, 8);
-            this.btnGo.Name = "btnGo";
-            this.btnGo.Size = new System.Drawing.Size(48, 28);
-            this.btnGo.TabIndex = 5;
-            this.btnGo.Text = "转到";
-            this.btnGo.UseVisualStyleBackColor = false;
-            this.btnGo.Click += new System.EventHandler(this.btnGo_Click);
+            btnGo.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
+            btnGo.BackColor = System.Drawing.Color.FromArgb(76, 76, 128);
+            btnGo.FlatAppearance.BorderSize = 0;
+            btnGo.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            btnGo.Font = new System.Drawing.Font("Microsoft YaHei UI", 9F);
+            btnGo.ForeColor = System.Drawing.Color.White;
+            btnGo.Location = new System.Drawing.Point(953, 9);
+            btnGo.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            btnGo.Name = "btnGo";
+            btnGo.Size = new System.Drawing.Size(62, 33);
+            btnGo.TabIndex = 5;
+            btnGo.Text = "转到";
+            btnGo.UseVisualStyleBackColor = false;
+            btnGo.Click += btnGo_Click;
             // 
             // txtUrl
             // 
-            this.txtUrl.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtUrl.Font = new System.Drawing.Font("Microsoft YaHei UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.txtUrl.Location = new System.Drawing.Point(152, 10);
-            this.txtUrl.Name = "txtUrl";
-            this.txtUrl.PlaceholderText = "输入网址或搜索内容...";
-            this.txtUrl.Size = new System.Drawing.Size(586, 23);
-            this.txtUrl.TabIndex = 4;
-            this.txtUrl.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtUrl_KeyDown);
+            txtUrl.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
+            txtUrl.Font = new System.Drawing.Font("Microsoft YaHei UI", 9F);
+            txtUrl.Location = new System.Drawing.Point(196, 12);
+            txtUrl.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            txtUrl.Name = "txtUrl";
+            txtUrl.PlaceholderText = "输入网址或搜索内容...";
+            txtUrl.Size = new System.Drawing.Size(749, 27);
+            txtUrl.TabIndex = 4;
+            txtUrl.KeyDown += txtUrl_KeyDown;
             // 
             // btnStop
             // 
-            this.btnStop.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(217)))), ((int)(((byte)(83)))), ((int)(((byte)(79)))));
-            this.btnStop.FlatAppearance.BorderSize = 0;
-            this.btnStop.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnStop.Font = new System.Drawing.Font("Microsoft YaHei UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.btnStop.ForeColor = System.Drawing.Color.White;
-            this.btnStop.Location = new System.Drawing.Point(116, 8);
-            this.btnStop.Name = "btnStop";
-            this.btnStop.Size = new System.Drawing.Size(30, 28);
-            this.btnStop.TabIndex = 3;
-            this.btnStop.Text = "⏹";
-            this.btnStop.UseVisualStyleBackColor = false;
-            this.btnStop.Click += new System.EventHandler(this.btnStop_Click);
+            btnStop.BackColor = System.Drawing.Color.FromArgb(217, 83, 79);
+            btnStop.FlatAppearance.BorderSize = 0;
+            btnStop.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            btnStop.Font = new System.Drawing.Font("Microsoft YaHei UI", 9F);
+            btnStop.ForeColor = System.Drawing.Color.White;
+            btnStop.Location = new System.Drawing.Point(149, 9);
+            btnStop.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            btnStop.Name = "btnStop";
+            btnStop.Size = new System.Drawing.Size(39, 33);
+            btnStop.TabIndex = 3;
+            btnStop.Text = "⏹";
+            btnStop.UseVisualStyleBackColor = false;
+            btnStop.Click += btnStop_Click;
             // 
             // btnRefresh
             // 
-            this.btnRefresh.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(92)))), ((int)(((byte)(184)))), ((int)(((byte)(92)))));
-            this.btnRefresh.FlatAppearance.BorderSize = 0;
-            this.btnRefresh.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnRefresh.Font = new System.Drawing.Font("Microsoft YaHei UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.btnRefresh.ForeColor = System.Drawing.Color.White;
-            this.btnRefresh.Location = new System.Drawing.Point(80, 8);
-            this.btnRefresh.Name = "btnRefresh";
-            this.btnRefresh.Size = new System.Drawing.Size(30, 28);
-            this.btnRefresh.TabIndex = 2;
-            this.btnRefresh.Text = "🔄";
-            this.btnRefresh.UseVisualStyleBackColor = false;
-            this.btnRefresh.Click += new System.EventHandler(this.btnRefresh_Click);
+            btnRefresh.BackColor = System.Drawing.Color.FromArgb(92, 184, 92);
+            btnRefresh.FlatAppearance.BorderSize = 0;
+            btnRefresh.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            btnRefresh.Font = new System.Drawing.Font("Microsoft YaHei UI", 9F);
+            btnRefresh.ForeColor = System.Drawing.Color.White;
+            btnRefresh.Location = new System.Drawing.Point(103, 9);
+            btnRefresh.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            btnRefresh.Name = "btnRefresh";
+            btnRefresh.Size = new System.Drawing.Size(39, 33);
+            btnRefresh.TabIndex = 2;
+            btnRefresh.Text = "🔄";
+            btnRefresh.UseVisualStyleBackColor = false;
+            btnRefresh.Click += btnRefresh_Click;
             // 
             // btnForward
             // 
-            this.btnForward.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(108)))), ((int)(((byte)(117)))), ((int)(((byte)(125)))));
-            this.btnForward.FlatAppearance.BorderSize = 0;
-            this.btnForward.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnForward.Font = new System.Drawing.Font("Microsoft YaHei UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.btnForward.ForeColor = System.Drawing.Color.White;
-            this.btnForward.Location = new System.Drawing.Point(44, 8);
-            this.btnForward.Name = "btnForward";
-            this.btnForward.Size = new System.Drawing.Size(30, 28);
-            this.btnForward.TabIndex = 1;
-            this.btnForward.Text = "▶";
-            this.btnForward.UseVisualStyleBackColor = false;
-            this.btnForward.Click += new System.EventHandler(this.btnForward_Click);
+            btnForward.BackColor = System.Drawing.Color.FromArgb(108, 117, 125);
+            btnForward.FlatAppearance.BorderSize = 0;
+            btnForward.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            btnForward.Font = new System.Drawing.Font("Microsoft YaHei UI", 9F);
+            btnForward.ForeColor = System.Drawing.Color.White;
+            btnForward.Location = new System.Drawing.Point(57, 9);
+            btnForward.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            btnForward.Name = "btnForward";
+            btnForward.Size = new System.Drawing.Size(39, 33);
+            btnForward.TabIndex = 1;
+            btnForward.Text = "▶";
+            btnForward.UseVisualStyleBackColor = false;
+            btnForward.Click += btnForward_Click;
             // 
             // btnBack
             // 
-            this.btnBack.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(108)))), ((int)(((byte)(117)))), ((int)(((byte)(125)))));
-            this.btnBack.FlatAppearance.BorderSize = 0;
-            this.btnBack.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnBack.Font = new System.Drawing.Font("Microsoft YaHei UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.btnBack.ForeColor = System.Drawing.Color.White;
-            this.btnBack.Location = new System.Drawing.Point(8, 8);
-            this.btnBack.Name = "btnBack";
-            this.btnBack.Size = new System.Drawing.Size(30, 28);
-            this.btnBack.TabIndex = 0;
-            this.btnBack.Text = "◀";
-            this.btnBack.UseVisualStyleBackColor = false;
-            this.btnBack.Click += new System.EventHandler(this.btnBack_Click);
+            btnBack.BackColor = System.Drawing.Color.FromArgb(108, 117, 125);
+            btnBack.FlatAppearance.BorderSize = 0;
+            btnBack.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            btnBack.Font = new System.Drawing.Font("Microsoft YaHei UI", 9F);
+            btnBack.ForeColor = System.Drawing.Color.White;
+            btnBack.Location = new System.Drawing.Point(10, 9);
+            btnBack.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            btnBack.Name = "btnBack";
+            btnBack.Size = new System.Drawing.Size(39, 33);
+            btnBack.TabIndex = 0;
+            btnBack.Text = "◀";
+            btnBack.UseVisualStyleBackColor = false;
+            btnBack.Click += btnBack_Click;
             // 
             // panelBrowser
             // 
-            this.panelBrowser.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panelBrowser.Location = new System.Drawing.Point(0, 44);
-            this.panelBrowser.Name = "panelBrowser";
-            this.panelBrowser.Size = new System.Drawing.Size(800, 556);
-            this.panelBrowser.TabIndex = 1;
+            panelBrowser.Dock = System.Windows.Forms.DockStyle.Fill;
+            panelBrowser.Location = new System.Drawing.Point(0, 52);
+            panelBrowser.Margin = new System.Windows.Forms.Padding(0, 0, 0, 0);
+            panelBrowser.Name = "panelBrowser";
+            panelBrowser.Size = new System.Drawing.Size(1029, 654);
+            panelBrowser.TabIndex = 1;
             // 
             // WebsiteBrowser
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.Controls.Add(this.panelBrowser);
-            this.Controls.Add(this.panelToolbar);
-            this.Name = "WebsiteBrowser";
-            this.Size = new System.Drawing.Size(800, 600);
-            this.panelToolbar.ResumeLayout(false);
-            this.panelToolbar.PerformLayout();
-            this.ResumeLayout(false);
+            AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
+            AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            Controls.Add(panelBrowser);
+            Controls.Add(panelToolbar);
+            Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            Name = "WebsiteBrowser";
+            Size = new System.Drawing.Size(1029, 706);
+            panelToolbar.ResumeLayout(false);
+            panelToolbar.PerformLayout();
+            ResumeLayout(false);
 
         }
 

@@ -328,6 +328,9 @@ namespace llm_agent.UI.Forms
 
             // 设置数据页面"清除所有聊天记录"按钮事件
             clearChatHistoryButton.Click += ClearChatHistoryButton_Click;
+            
+            // 用户页面事件
+            newUserButton.Click += NewUserButton_Click;
         }
 
         private void InitializeChatPageModelSelector()
@@ -361,7 +364,7 @@ namespace llm_agent.UI.Forms
             }
 
             // 高亮当前活动按钮
-            activeButton.BackColor = Color.FromArgb(240, 240, 240);
+            activeButton.BackColor = Color.FromArgb(76, 76, 128);
 
             // 执行特定面板的初始化操作
             InitializePanel(targetPanel);
@@ -1012,52 +1015,6 @@ namespace llm_agent.UI.Forms
                 this.Controls.Add(this.customTitleBar);
             }
 
-            // 添加自定义字体支持
-            var fontCollection = new System.Drawing.Text.PrivateFontCollection();
-            var fontPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Fonts", "remixicon.ttf");
-            try
-            {
-                if (File.Exists(fontPath))
-                {
-                    fontCollection.AddFontFile(fontPath);
-                    if (fontCollection.Families.Length > 0)
-                    {
-                        Font remixIconFont = new Font(fontCollection.Families[0], 24);
-
-                        // 为导航按钮添加图标
-                        AddIconToNavButton(avatarButton, "\uef7c", remixIconFont);
-                        AddIconToNavButton(chatNavButton, "\uec2e", remixIconFont);
-                        AddIconToNavButton(promptsNavButton, "\ueda4", remixIconFont);
-                        AddIconToNavButton(websiteNavButton, "\ueb7c", remixIconFont);
-                        // 移除filesNavButton图标添加
-                        AddIconToNavButton(settingsNavButton, "\uee4a", remixIconFont);
-                        AddIconToNavButton(avatarButton, "👤", remixIconFont);
-                        AddIconToNavButton(channelNavButton, "🔌", remixIconFont);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"加载字体时出错: {ex.Message}");
-            }
-
-            // 已移除以下代码，不再配置chatModelComboBox
-            // // 配置聊天模型下拉框
-            // chatModelComboBox.DropDownStyle = ComboBoxStyle.DropDownList;
-            // chatModelComboBox.Width = 180;
-            // chatModelComboBox.Location = new Point(10, 10);
-
-            // 创建并初始化头像图片
-            var avatarImage = new PictureBox
-            {
-                Width = 36,
-                Height = 36,
-                BackColor = Color.LightGray,
-                // 已移除此引用，使用纯色背景替代
-                // Image = Properties.Resources.defaultAvatar,
-                SizeMode = PictureBoxSizeMode.StretchImage
-            };
-
             try
             {
                 // 设置窗体标题
@@ -1069,15 +1026,6 @@ namespace llm_agent.UI.Forms
                 // 填充API密钥和主机
                 txtApiKey.Text = GetApiKey();
                 txtApiHost.Text = GetApiHost();
-
-                // 添加图标到导航按钮
-                AddIconToNavButton(chatNavButton, "💬");
-                AddIconToNavButton(websiteNavButton, "🌐");
-                AddIconToNavButton(promptsNavButton, "📝");
-                // 移除filesNavButton图标添加
-                AddIconToNavButton(settingsNavButton, "⚙️");
-                AddIconToNavButton(avatarButton, "👤");
-                AddIconToNavButton(channelNavButton, "🔌");
 
                 // 更新导航按钮工具提示
                 toolTip1.SetToolTip(avatarButton, "用户");
@@ -1139,47 +1087,6 @@ namespace llm_agent.UI.Forms
             {
                 MessageBox.Show($"设置UI时出错: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-        }
-
-        // 为导航按钮添加图标（修改方法签名，接受Font参数）
-        private void AddIconToNavButton(Button button, string iconText, Font? iconFont = null)
-        {
-            // 使用传入的字体或默认系统字体
-            Font font = iconFont ?? new Font("Segoe UI Symbol", 22, FontStyle.Regular);
-
-            // 创建图标标签
-            Label iconLabel = new Label
-            {
-                Text = iconText,
-                Font = font,
-                Size = new Size(button.Width, button.Height), // 修改为与按钮大小一致
-                Location = new Point(0, 0), // 修改为从按钮左上角开始
-                TextAlign = ContentAlignment.MiddleCenter,
-                BackColor = Color.Transparent,
-                ForeColor = Color.FromArgb(80, 80, 80),
-                Enabled = false // 禁用Label以允许事件传递给按钮
-            };
-
-            button.Controls.Add(iconLabel);
-
-            // 添加悬停效果
-            button.MouseEnter += (s, e) =>
-            {
-                if (button.BackColor != Color.FromArgb(240, 240, 240)) // 如果不是当前活动按钮
-                {
-                    button.BackColor = Color.FromArgb(245, 245, 245);
-                }
-                iconLabel.ForeColor = Color.FromArgb(0, 120, 212);
-            };
-
-            button.MouseLeave += (s, e) =>
-            {
-                if (button.BackColor != Color.FromArgb(240, 240, 240)) // 如果不是当前活动按钮
-                {
-                    button.BackColor = Color.Transparent;
-                }
-                iconLabel.ForeColor = Color.FromArgb(80, 80, 80);
-            };
         }
 
         private void InitializeChatTopics()
@@ -1417,33 +1324,15 @@ namespace llm_agent.UI.Forms
 
         private void UpdateTitle()
         {
-            var currentSession = _chatHistoryManager.GetCurrentSession(UserSession.Instance.CurrentUser?.Id);
-            if (currentSession != null)
+            // 使用设计器中设置的文本，不再动态修改
+            if (this.customTitleBar != null)
             {
-                string providerName = GetProviderDisplayName(_currentProviderType);
-                string modelName = GetCurrentModelName();
-                string title = $"LLM Agent - {currentSession.Title} - {providerName}/{modelName}";
-                
-                // 添加null检查，确保customTitleBar已初始化
-                if (this.customTitleBar != null)
-                {
-                    this.customTitleBar.Text = title;
-                }
-                else
-                {
-                    this.Text = title; // 回退到设置窗体标题
-                }
+                // 保留customTitleBar的空值检查逻辑
+                // 标题文本已在设计器中设置，不需要在此处修改
             }
             else
             {
-                if (this.customTitleBar != null)
-                {
-                    this.customTitleBar.Text = "LLM Agent";
-                }
-                else
-                {
-                    this.Text = "LLM Agent"; // 回退到设置窗体标题
-                }
+                this.Text = "LLM-Agent"; // 回退到设置窗体标题
             }
         }
 
@@ -4137,7 +4026,6 @@ namespace llm_agent.UI.Forms
 
                 // 绑定事件
                 userSearchBox.TextChanged += UserSearchBox_TextChanged;
-                newUserButton.Click += NewUserButton_Click;
                 userListPanel.SizeChanged += UserListPanel_SizeChanged;
             }
             catch (Exception ex)
@@ -4158,23 +4046,10 @@ namespace llm_agent.UI.Forms
                 
                 // 获取当前用户ID
                 string currentUserId = UserSession.Instance.GetCurrentUserId();
-                
-                // 获取用户列表
-                List<User> users;
-                
-                // 根据当前用户是否为管理员决定显示所有用户还是仅显示已登录用户
-                if (UserSession.Instance.IsCurrentUserAdmin())
-                {
-                    // 管理员可以看到所有用户
-                    var userService = new UserService();
-                    users = userService.GetAllUsers();
-                }
-                else
-                {
-                    // 普通用户只能看到已登录的用户
-                    var loggedInUserService = new LoggedInUserService();
-                    users = loggedInUserService.GetLoggedInUsers();
-                }
+
+                // 总是获取所有注册用户
+                var userService = new UserService();
+                List<User> users = userService.GetAllUsers();
 
                 // 如果有搜索条件，则进行筛选
                 if (!string.IsNullOrWhiteSpace(searchTerm))

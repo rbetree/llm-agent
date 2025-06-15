@@ -44,7 +44,7 @@
             // 
             // topPanel
             // 
-            topPanel.BackColor = System.Drawing.Color.FromArgb(100, 101, 165);
+            topPanel.BackColor = System.Drawing.Color.FromArgb(76, 76, 128);
             topPanel.Controls.Add(streamCheckBox);
             topPanel.Controls.Add(modelComboBox);
             topPanel.Dock = System.Windows.Forms.DockStyle.Top;
@@ -85,18 +85,18 @@
             // 
             // bottomPanel
             // 
-            bottomPanel.BackColor = System.Drawing.Color.FromArgb(100, 101, 165);
+            bottomPanel.BackColor = System.Drawing.Color.FromArgb(76, 76, 128);
             bottomPanel.Controls.Add(chatTextbox);
             bottomPanel.Controls.Add(attachButton);
             bottomPanel.Controls.Add(removeButton);
             bottomPanel.Controls.Add(sendButton);
             bottomPanel.Dock = System.Windows.Forms.DockStyle.Bottom;
             bottomPanel.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            bottomPanel.Location = new System.Drawing.Point(0, 844);
+            bottomPanel.Location = new System.Drawing.Point(0, 823);
             bottomPanel.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             bottomPanel.Name = "bottomPanel";
             bottomPanel.Padding = new System.Windows.Forms.Padding(23, 16, 23, 16);
-            bottomPanel.Size = new System.Drawing.Size(936, 83);
+            bottomPanel.Size = new System.Drawing.Size(936, 104);
             bottomPanel.TabIndex = 1;
             // 
             // chatTextbox
@@ -106,7 +106,7 @@
             chatTextbox.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             chatTextbox.Multiline = true;
             chatTextbox.Name = "chatTextbox";
-            chatTextbox.Size = new System.Drawing.Size(696, 51);
+            chatTextbox.Size = new System.Drawing.Size(696, 72);
             chatTextbox.TabIndex = 7;
             // 
             // attachButton
@@ -121,10 +121,11 @@
             attachButton.Location = new System.Drawing.Point(719, 16);
             attachButton.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             attachButton.Name = "attachButton";
-            attachButton.Size = new System.Drawing.Size(53, 51);
+            attachButton.Size = new System.Drawing.Size(53, 72);
             attachButton.TabIndex = 6;
             attachButton.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             attachButton.UseVisualStyleBackColor = false;
+            attachButton.Visible = false;
             // 
             // removeButton
             // 
@@ -136,7 +137,7 @@
             removeButton.Location = new System.Drawing.Point(772, 16);
             removeButton.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             removeButton.Name = "removeButton";
-            removeButton.Size = new System.Drawing.Size(28, 51);
+            removeButton.Size = new System.Drawing.Size(28, 72);
             removeButton.TabIndex = 5;
             removeButton.Text = "X";
             removeButton.UseVisualStyleBackColor = false;
@@ -144,14 +145,14 @@
             // 
             // sendButton
             // 
-            sendButton.BackColor = System.Drawing.Color.LightSlateGray;
+            sendButton.BackColor = System.Drawing.Color.FromArgb(76, 76, 128);
             sendButton.Dock = System.Windows.Forms.DockStyle.Right;
             sendButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             sendButton.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold);
             sendButton.Location = new System.Drawing.Point(800, 16);
-            sendButton.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
+            sendButton.Margin = new System.Windows.Forms.Padding(0);
             sendButton.Name = "sendButton";
-            sendButton.Size = new System.Drawing.Size(113, 51);
+            sendButton.Size = new System.Drawing.Size(113, 72);
             sendButton.TabIndex = 1;
             sendButton.Text = "Send";
             sendButton.UseVisualStyleBackColor = false;
@@ -163,7 +164,7 @@
             itemsPanel.Location = new System.Drawing.Point(0, 52);
             itemsPanel.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             itemsPanel.Name = "itemsPanel";
-            itemsPanel.Size = new System.Drawing.Size(936, 792);
+            itemsPanel.Size = new System.Drawing.Size(936, 771);
             itemsPanel.TabIndex = 2;
             // 
             // Chatbox
