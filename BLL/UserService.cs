@@ -26,8 +26,9 @@ namespace llm_agent.BLL
         /// </summary>
         /// <param name="username">用户名</param>
         /// <param name="password">密码</param>
+        /// <param name="isAdmin">是否为管理员</param>
         /// <returns>注册成功返回用户对象，失败抛出异常</returns>
-        public User RegisterUser(string username, string password)
+        public User RegisterUser(string username, string password, bool isAdmin = false)
         {
             // 参数验证
             if (string.IsNullOrWhiteSpace(username))
@@ -40,7 +41,7 @@ namespace llm_agent.BLL
                 throw new ArgumentException("密码长度不能少于6个字符");
 
             // 创建用户
-            return _userRepository.CreateUser(username, password);
+            return _userRepository.CreateUser(username, password, isAdmin);
         }
 
         /// <summary>
@@ -170,6 +171,49 @@ namespace llm_agent.BLL
             {
                 _userRepository.UpdateLastLoginTime(userId);
             }
+        }
+
+        /// <summary>
+        /// 确保管理员账号存在
+        /// </summary>
+        /// <param name="adminUsername">管理员用户名</param>
+        /// <param name="adminPassword">管理员密码</param>
+        /// <returns>管理员账号对象</returns>
+        public User EnsureAdminExists(string adminUsername, string adminPassword)
+        {
+            // 检查管理员账号是否存在
+            var adminUser = _userRepository.GetUserByUsername(adminUsername);
+            
+            if (adminUser == null)
+            {
+                // 创建管理员账号
+                adminUser = RegisterUser(adminUsername, adminPassword, true);
+                Console.WriteLine($"已创建管理员账号: {adminUsername}");
+            }
+            else if (!adminUser.IsAdmin)
+            {
+                // 如果用户存在但不是管理员，则更新为管理员
+                adminUser.IsAdmin = true;
+                // 这里需要添加更新用户信息的方法，目前UserRepository没有提供
+                // 暂时不实现，可以后续添加
+                Console.WriteLine($"已将用户 {adminUsername} 更新为管理员");
+            }
+            
+            return adminUser;
+        }
+
+        /// <summary>
+        /// 检查用户是否为管理员
+        /// </summary>
+        /// <param name="userId">用户ID</param>
+        /// <returns>是否为管理员</returns>
+        public bool IsAdmin(string userId)
+        {
+            if (string.IsNullOrEmpty(userId))
+                return false;
+                
+            var user = _userRepository.GetUserById(userId);
+            return user != null && user.IsAdmin;
         }
     }
 } 

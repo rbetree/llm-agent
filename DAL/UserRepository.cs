@@ -31,8 +31,9 @@ namespace llm_agent.DAL
         /// </summary>
         /// <param name="username">用户名</param>
         /// <param name="password">密码明文</param>
+        /// <param name="isAdmin">是否为管理员</param>
         /// <returns>创建的用户对象</returns>
-        public User CreateUser(string username, string password)
+        public User CreateUser(string username, string password, bool isAdmin = false)
         {
             // 检查用户名是否已存在
             if (GetUserByUsername(username) != null)
@@ -50,15 +51,16 @@ namespace llm_agent.DAL
                 Username = username,
                 PasswordHash = passwordHash,
                 Salt = salt,
-                CreatedAt = DateTime.Now
+                CreatedAt = DateTime.Now,
+                IsAdmin = isAdmin
             };
 
             using (var connection = new SQLiteConnection(ConnectionString))
             {
                 connection.Open();
                 string insertSql = @"
-                    INSERT INTO Users (Id, Username, PasswordHash, Salt, CreatedAt, LastLoginAt)
-                    VALUES (@id, @username, @passwordHash, @salt, @createdAt, @lastLoginAt)";
+                    INSERT INTO Users (Id, Username, PasswordHash, Salt, CreatedAt, LastLoginAt, IsAdmin)
+                    VALUES (@id, @username, @passwordHash, @salt, @createdAt, @lastLoginAt, @isAdmin)";
 
                 using (var command = new SQLiteCommand(insertSql, connection))
                 {
@@ -68,6 +70,7 @@ namespace llm_agent.DAL
                     command.Parameters.AddWithValue("@salt", user.Salt);
                     command.Parameters.AddWithValue("@createdAt", user.CreatedAt.ToString("o"));
                     command.Parameters.AddWithValue("@lastLoginAt", user.LastLoginAt.HasValue ? user.LastLoginAt.Value.ToString("o") : DBNull.Value);
+                    command.Parameters.AddWithValue("@isAdmin", user.IsAdmin ? 1 : 0);
 
                     command.ExecuteNonQuery();
                 }
@@ -107,7 +110,9 @@ namespace llm_agent.DAL
                                 Salt = reader["Salt"].ToString(),
                                 CreatedAt = DateTime.Parse(reader["CreatedAt"].ToString()),
                                 LastLoginAt = reader.IsDBNull(reader.GetOrdinal("LastLoginAt")) ? 
-                                    (DateTime?)null : DateTime.Parse(reader["LastLoginAt"].ToString())
+                                    (DateTime?)null : DateTime.Parse(reader["LastLoginAt"].ToString()),
+                                IsAdmin = reader.IsDBNull(reader.GetOrdinal("IsAdmin")) ? 
+                                    false : Convert.ToBoolean(Convert.ToInt32(reader["IsAdmin"]))
                             };
                         }
                     }
@@ -148,7 +153,9 @@ namespace llm_agent.DAL
                                 Salt = reader["Salt"].ToString(),
                                 CreatedAt = DateTime.Parse(reader["CreatedAt"].ToString()),
                                 LastLoginAt = reader.IsDBNull(reader.GetOrdinal("LastLoginAt")) ? 
-                                    (DateTime?)null : DateTime.Parse(reader["LastLoginAt"].ToString())
+                                    (DateTime?)null : DateTime.Parse(reader["LastLoginAt"].ToString()),
+                                IsAdmin = reader.IsDBNull(reader.GetOrdinal("IsAdmin")) ? 
+                                    false : Convert.ToBoolean(Convert.ToInt32(reader["IsAdmin"]))
                             };
                         }
                     }
@@ -185,7 +192,9 @@ namespace llm_agent.DAL
                                 Salt = reader["Salt"].ToString(),
                                 CreatedAt = DateTime.Parse(reader["CreatedAt"].ToString()),
                                 LastLoginAt = reader.IsDBNull(reader.GetOrdinal("LastLoginAt")) ? 
-                                    (DateTime?)null : DateTime.Parse(reader["LastLoginAt"].ToString())
+                                    (DateTime?)null : DateTime.Parse(reader["LastLoginAt"].ToString()),
+                                IsAdmin = reader.IsDBNull(reader.GetOrdinal("IsAdmin")) ? 
+                                    false : Convert.ToBoolean(Convert.ToInt32(reader["IsAdmin"]))
                             });
                         }
                     }

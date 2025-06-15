@@ -37,12 +37,47 @@ namespace llm_agent.DAL
                         PasswordHash TEXT NOT NULL,
                         Salt TEXT NOT NULL,
                         CreatedAt TEXT NOT NULL,
-                        LastLoginAt TEXT
+                        LastLoginAt TEXT,
+                        IsAdmin INTEGER NOT NULL DEFAULT 0
                     );";
 
                 using (var command = new SQLiteCommand(createUsersTableSql, connection))
                 {
                     command.ExecuteNonQuery();
+                }
+
+                // 检查Users表中是否存在IsAdmin字段
+                bool isAdminExists = false;
+                try
+                {
+                    using (var command = new SQLiteCommand("PRAGMA table_info(Users);", connection))
+                    {
+                        using (var reader = command.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                string columnName = reader["name"].ToString();
+                                if (columnName == "IsAdmin")
+                                {
+                                    isAdminExists = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
+                    // 如果Users表存在但IsAdmin字段不存在，则添加该字段
+                    if (!isAdminExists)
+                    {
+                        using (var command = new SQLiteCommand("ALTER TABLE Users ADD COLUMN IsAdmin INTEGER NOT NULL DEFAULT 0;", connection))
+                        {
+                            command.ExecuteNonQuery();
+                        }
+                    }
+                }
+                catch (SQLiteException ex)
+                {
+                    Console.Error.WriteLine($"检查Users表结构时出错: {ex.Message}");
                 }
 
                 // 创建模型表
@@ -183,6 +218,19 @@ namespace llm_agent.DAL
                 catch (SQLiteException)
                 {
                     // 如果ChatSessions表不存在，则忽略错误，因为ChatRepository会创建该表
+                }
+
+                // 创建已登录用户表
+                string createLoggedInUsersTableSql = @"
+                    CREATE TABLE IF NOT EXISTS LoggedInUsers (
+                        UserId TEXT PRIMARY KEY,
+                        LastLoginAt TEXT NOT NULL,
+                        FOREIGN KEY (UserId) REFERENCES Users(Id) ON DELETE CASCADE
+                    );";
+
+                using (var command = new SQLiteCommand(createLoggedInUsersTableSql, connection))
+                {
+                    command.ExecuteNonQuery();
                 }
             }
         }

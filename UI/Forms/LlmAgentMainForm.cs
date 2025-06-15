@@ -4139,9 +4139,22 @@ namespace llm_agent.UI.Forms
                 // 获取当前用户ID
                 string currentUserId = UserSession.Instance.GetCurrentUserId();
                 
-                // 获取所有用户
-                var userService = new UserService();
-                var users = userService.GetAllUsers();
+                // 获取用户列表
+                List<User> users;
+                
+                // 根据当前用户是否为管理员决定显示所有用户还是仅显示已登录用户
+                if (UserSession.Instance.IsCurrentUserAdmin())
+                {
+                    // 管理员可以看到所有用户
+                    var userService = new UserService();
+                    users = userService.GetAllUsers();
+                }
+                else
+                {
+                    // 普通用户只能看到已登录的用户
+                    var loggedInUserService = new LoggedInUserService();
+                    users = loggedInUserService.GetLoggedInUsers();
+                }
 
                 // 如果有搜索条件，则进行筛选
                 if (!string.IsNullOrWhiteSpace(searchTerm))
@@ -4286,6 +4299,29 @@ namespace llm_agent.UI.Forms
                 
                 // 添加新的对话数量标签
                 userInfoGroupBox.Controls.Add(lblChatCount);
+                
+                // 添加管理员状态显示
+                Label lblAdminStatus = new Label();
+                lblAdminStatus.AutoSize = true;
+                lblAdminStatus.Location = new System.Drawing.Point(20, 160);
+                lblAdminStatus.Name = "lblAdminStatus";
+                lblAdminStatus.Size = new System.Drawing.Size(200, 20);
+                lblAdminStatus.TabIndex = 4;
+                lblAdminStatus.Text = user.IsAdmin ? "管理员：是" : "管理员：否";
+                lblAdminStatus.ForeColor = user.IsAdmin ? System.Drawing.Color.Red : System.Drawing.Color.Black;
+                
+                // 先移除已有的管理员状态标签（如果有）
+                foreach (Control control in userInfoGroupBox.Controls)
+                {
+                    if (control.Name == "lblAdminStatus")
+                    {
+                        userInfoGroupBox.Controls.Remove(control);
+                        break;
+                    }
+                }
+                
+                // 添加新的管理员状态标签
+                userInfoGroupBox.Controls.Add(lblAdminStatus);
                 
                 // 如果不是当前用户，显示"切换到该账号"按钮
                 btnSwitchAccount.Visible = user.Id != UserSession.Instance.GetCurrentUserId();
@@ -4488,7 +4524,7 @@ namespace llm_agent.UI.Forms
                         SaveAllPendingData();
 
                         // 清除当前用户会话
-                        UserSession.Instance.Logout();
+                        UserSession.Instance.Logout(false); // 不从已登录用户列表中移除
                         
                         // 显示登录窗体
                         using (var loginForm = new LoginForm())
@@ -4518,52 +4554,111 @@ namespace llm_agent.UI.Forms
                 }
                 else
                 {
-                    // 切换到指定用户
-                    if (MessageBox.Show($"确定要切换到用户 \"{targetUser.Username}\" 吗？当前会话数据将会保存。", "确认切换账号", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                    // 检查目标用户是否已登录
+                    var loggedInUserService = new LoggedInUserService();
+                    bool isLoggedIn = loggedInUserService.IsUserLoggedIn(targetUser.Id);
+                    
+                    if (isLoggedIn)
                     {
-                        // 更新当前用户最后登录时间
-                        string userId = UserSession.Instance.GetCurrentUserId();
-                        if (!string.IsNullOrEmpty(userId))
+                        // 如果用户已登录，直接切换
+                        if (MessageBox.Show($"确定要切换到用户 \"{targetUser.Username}\" 吗？当前会话数据将会保存。", "确认切换账号", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                         {
+                            // 更新当前用户最后登录时间
+                            string userId = UserSession.Instance.GetCurrentUserId();
+                            if (!string.IsNullOrEmpty(userId))
+                            {
+                                try
+                                {
+                                    var userService = new UserService();
+                                    userService.UpdateLastLoginTime(userId);
+                                }
+                                catch (Exception ex)
+                                {
+                                    Console.Error.WriteLine($"更新用户最后登录时间失败: {ex.Message}");
+                                }
+                            }
+
+                            // 保存所有未保存的数据
+                            SaveAllPendingData();
+
+                            // 设置新的当前用户
+                            UserSession.Instance.SetCurrentUser(targetUser);
+                            
+                            // 更新目标用户最后登录时间
                             try
                             {
                                 var userService = new UserService();
-                                userService.UpdateLastLoginTime(userId);
+                                userService.UpdateLastLoginTime(targetUser.Id);
                             }
                             catch (Exception ex)
                             {
-                                Console.Error.WriteLine($"更新用户最后登录时间失败: {ex.Message}");
+                                Console.Error.WriteLine($"更新目标用户最后登录时间失败: {ex.Message}");
+                            }
+                            
+                            // 更新用户信息显示
+                            UpdateUserInfo();
+                            
+                            // 重新加载用户列表（更新当前用户标记）
+                            LoadUserList();
+                            
+                            // 重新加载聊天历史
+                            LoadChatHistory();
+                            
+                            // 显示成功消息
+                            MessageBox.Show($"已成功切换到用户 \"{targetUser.Username}\"", "切换成功", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        }
+                    }
+                    else
+                    {
+                        // 如果用户未登录，需要输入密码验证
+                        using (var passwordForm = new PasswordVerificationForm(targetUser.Username))
+                        {
+                            if (passwordForm.ShowDialog() == DialogResult.OK)
+                            {
+                                // 验证密码
+                                var userService = new UserService();
+                                var user = userService.Login(targetUser.Username, passwordForm.Password);
+                                
+                                if (user != null)
+                                {
+                                    // 更新当前用户最后登录时间
+                                    string userId = UserSession.Instance.GetCurrentUserId();
+                                    if (!string.IsNullOrEmpty(userId))
+                                    {
+                                        try
+                                        {
+                                            userService.UpdateLastLoginTime(userId);
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            Console.Error.WriteLine($"更新用户最后登录时间失败: {ex.Message}");
+                                        }
+                                    }
+
+                                    // 保存所有未保存的数据
+                                    SaveAllPendingData();
+
+                                    // 设置新的当前用户
+                                    UserSession.Instance.SetCurrentUser(user);
+                                    
+                                    // 更新用户信息显示
+                                    UpdateUserInfo();
+                                    
+                                    // 重新加载用户列表（更新当前用户标记）
+                                    LoadUserList();
+                                    
+                                    // 重新加载聊天历史
+                                    LoadChatHistory();
+                                    
+                                    // 显示成功消息
+                                    MessageBox.Show($"已成功切换到用户 \"{user.Username}\"", "切换成功", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                }
+                                else
+                                {
+                                    MessageBox.Show("密码验证失败，无法切换用户", "验证失败", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                }
                             }
                         }
-
-                        // 保存所有未保存的数据
-                        SaveAllPendingData();
-
-                        // 设置新的当前用户
-                        UserSession.Instance.SetCurrentUser(targetUser);
-                        
-                        // 更新目标用户最后登录时间
-                        try
-                        {
-                            var userService = new UserService();
-                            userService.UpdateLastLoginTime(targetUser.Id);
-                        }
-                        catch (Exception ex)
-                        {
-                            Console.Error.WriteLine($"更新目标用户最后登录时间失败: {ex.Message}");
-                        }
-                        
-                        // 更新用户信息显示
-                        UpdateUserInfo();
-                        
-                        // 重新加载用户列表（更新当前用户标记）
-                        LoadUserList();
-                        
-                        // 重新加载聊天历史
-                        LoadChatHistory();
-                        
-                        // 显示成功消息
-                        MessageBox.Show($"已成功切换到用户 \"{targetUser.Username}\"", "切换成功", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
                 }
             }
@@ -4579,9 +4674,9 @@ namespace llm_agent.UI.Forms
         /// </summary>
         private void btnLogoutProfile_Click(object sender, EventArgs e)
         {
-            if (MessageBox.Show("确定要退出登录吗？", "确认登出", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+            try
             {
-                try
+                if (MessageBox.Show("确定要退出登录吗？", "确认退出", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                 {
                     // 更新用户最后登录时间
                     string userId = UserSession.Instance.GetCurrentUserId();
@@ -4604,14 +4699,36 @@ namespace llm_agent.UI.Forms
                     // 清除当前用户会话
                     UserSession.Instance.Logout();
                     
-                    // 使用更安全的方式重启应用
-                    RestartApplication();
+                    // 显示登录窗体
+                    using (var loginForm = new LoginForm())
+                    {
+                        // 隐藏主窗体
+                        this.Hide();
+                        
+                        // 如果登录成功，重新加载用户数据
+                        if (loginForm.ShowDialog() == DialogResult.OK)
+                        {
+                            // 更新用户信息显示
+                            UpdateUserInfo();
+                            
+                            // 重新加载聊天历史
+                            LoadChatHistory();
+                            
+                            // 重新显示主窗体
+                            this.Show();
+                        }
+                        else
+                        {
+                            // 如果登录取消，退出应用
+                            Application.Exit();
+                        }
+                    }
                 }
-                catch (Exception ex)
-                {
-                    Console.Error.WriteLine($"登出过程中出错: {ex.Message}");
-                    MessageBox.Show($"登出失败: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"退出登录时出错: {ex.Message}");
+                MessageBox.Show($"退出登录失败: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
     }

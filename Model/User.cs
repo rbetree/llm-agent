@@ -36,5 +36,10 @@ namespace llm_agent.Model
         /// 用户最后登录时间
         /// </summary>
         public DateTime? LastLoginAt { get; set; } = null;
+        
+        /// <summary>
+        /// 是否为管理员账号
+        /// </summary>
+        public bool IsAdmin { get; set; } = false;
     }
 } 

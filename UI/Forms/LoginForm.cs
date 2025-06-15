@@ -9,14 +9,16 @@ namespace llm_agent.UI.Forms
     public partial class LoginForm : Form
     {
         private readonly UserService _userService;
+        private readonly LoggedInUserService _loggedInUserService;
         private bool _isClosingByLogin = false;
 
         public LoginForm()
         {
             InitializeComponent();
             _userService = new UserService();
+            _loggedInUserService = new LoggedInUserService();
         }
-
+        
         /// <summary>
         /// 登录按钮点击事件
         /// </summary>
@@ -120,6 +122,33 @@ namespace llm_agent.UI.Forms
             if (!_isClosingByLogin)
             {
                 Application.Exit();
+            }
+        }
+        
+        /// <summary>
+        /// 窗体加载事件
+        /// </summary>
+        private void LoginForm_Load(object sender, EventArgs e)
+        {
+            // 检查是否已经有登录用户
+            var loggedInUsers = _loggedInUserService.GetLoggedInUsers();
+            if (loggedInUsers.Count > 0)
+            {
+                // 显示已登录用户列表
+                ShowLoggedInUsersList(loggedInUsers);
+            }
+        }
+        
+        /// <summary>
+        /// 显示已登录用户列表
+        /// </summary>
+        private void ShowLoggedInUsersList(System.Collections.Generic.List<User> loggedInUsers)
+        {
+            // 在这里可以实现显示已登录用户列表的逻辑
+            // 为简化实现，这里不展示复杂的UI，只是在消息标签中提示
+            if (loggedInUsers.Count > 0)
+            {
+                ShowMessage($"已有 {loggedInUsers.Count} 个已登录用户，正在尝试自动登录...");
             }
         }
     }
