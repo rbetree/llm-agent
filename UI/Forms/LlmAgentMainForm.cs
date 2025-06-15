@@ -86,6 +86,7 @@ namespace llm_agent.UI.Forms
             try
             {
                 InitializeComponent();
+                this.FormBorderStyle = FormBorderStyle.None; // Add this line
                 InitializeHttpClient();
                 InitializeProviderFactory();
                 InitializeChatHistoryManager();
@@ -1002,6 +1003,15 @@ namespace llm_agent.UI.Forms
 
         private void SetupUI()
         {
+            // 初始化自定义标题栏
+            if (this.customTitleBar == null)
+            {
+                this.customTitleBar = new UI.Controls.CustomTitleBar();
+                this.customTitleBar.Dock = DockStyle.Top;
+                this.customTitleBar.Text = "LLM Agent";
+                this.Controls.Add(this.customTitleBar);
+            }
+
             // 添加自定义字体支持
             var fontCollection = new System.Drawing.Text.PrivateFontCollection();
             var fontPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Fonts", "remixicon.ttf");
@@ -1407,23 +1417,33 @@ namespace llm_agent.UI.Forms
 
         private void UpdateTitle()
         {
-            // 从选中的聊天模型获取信息
-            string modelInfo = string.IsNullOrEmpty(_currentModelId) ? "未选择模型" : _currentModelId;
-
-            // 如果当前模型是带提供商前缀的格式，则分离显示
-            if (modelInfo.Contains(":"))
+            var currentSession = _chatHistoryManager.GetCurrentSession(UserSession.Instance.CurrentUser?.Id);
+            if (currentSession != null)
             {
-                string[] parts = modelInfo.Split(new[] { ':' }, 2);
-                string provider = parts[0].Trim();
-                string model = parts[1].Trim();
-
-                this.Text = $"LLM Agent - {provider} - {model}";
+                string providerName = GetProviderDisplayName(_currentProviderType);
+                string modelName = GetCurrentModelName();
+                string title = $"LLM Agent - {currentSession.Title} - {providerName}/{modelName}";
+                
+                // 添加null检查，确保customTitleBar已初始化
+                if (this.customTitleBar != null)
+                {
+                    this.customTitleBar.Text = title;
+                }
+                else
+                {
+                    this.Text = title; // 回退到设置窗体标题
+                }
             }
             else
             {
-                // 否则使用当前提供商和模型
-                string provider = GetProviderDisplayName(_currentProviderType);
-                this.Text = $"LLM Agent - {provider} - {modelInfo}";
+                if (this.customTitleBar != null)
+                {
+                    this.customTitleBar.Text = "LLM Agent";
+                }
+                else
+                {
+                    this.Text = "LLM Agent"; // 回退到设置窗体标题
+                }
             }
         }
 

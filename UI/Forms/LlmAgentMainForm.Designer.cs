@@ -1618,7 +1618,7 @@ namespace llm_agent.UI.Forms
             MinimumSize = new System.Drawing.Size(888, 564);
             Name = "LlmAgentMainForm";
             StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            Text = "LLM Agent";
+            Text = "LLM Agent - 测试 - Qwen/Qwen2.5-7B-Instruct";
             Load += LlmAgentMainForm_Load;
             mainSplitContainer.Panel1.ResumeLayout(false);
             mainSplitContainer.Panel2.ResumeLayout(false);
@@ -1813,5 +1813,6 @@ namespace llm_agent.UI.Forms
         private System.Windows.Forms.TextBox userSearchBox;
         private System.Windows.Forms.Button newUserButton;
         private Controls.HiddenScrollBarFlowLayoutPanel userListPanel;
+        private Controls.CustomTitleBar customTitleBar;
     }
 }
