@@ -57,6 +57,8 @@ namespace llm_agent.UI.Forms
             this.txtName.Name = "txtName";
             this.txtName.Size = new System.Drawing.Size(390, 23);
             this.txtName.TabIndex = 1;
+            this.txtName.BackColor = System.Drawing.Color.WhiteSmoke;
+            this.txtName.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             //
             // lblUrl
             //
@@ -76,6 +78,8 @@ namespace llm_agent.UI.Forms
             this.txtUrl.PlaceholderText = "https://example.com";
             this.txtUrl.Size = new System.Drawing.Size(390, 23);
             this.txtUrl.TabIndex = 3;
+            this.txtUrl.BackColor = System.Drawing.Color.WhiteSmoke;
+            this.txtUrl.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             //
             // lblUsername
             //
@@ -95,6 +99,8 @@ namespace llm_agent.UI.Forms
             this.txtUsername.PlaceholderText = "可选，用于自动填充登录表单";
             this.txtUsername.Size = new System.Drawing.Size(200, 23);
             this.txtUsername.TabIndex = 5;
+            this.txtUsername.BackColor = System.Drawing.Color.WhiteSmoke;
+            this.txtUsername.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             //
             // lblPassword
             //
@@ -115,11 +121,15 @@ namespace llm_agent.UI.Forms
             this.txtPassword.Size = new System.Drawing.Size(200, 23);
             this.txtPassword.TabIndex = 7;
             this.txtPassword.UseSystemPasswordChar = true;
+            this.txtPassword.BackColor = System.Drawing.Color.WhiteSmoke;
+            this.txtPassword.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             //
             // btnOK
             //
-            this.btnOK.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(122)))), ((int)(((byte)(183)))));
+            this.btnOK.BackColor = System.Drawing.Color.FromArgb(100, 101, 165);
             this.btnOK.FlatAppearance.BorderSize = 0;
+            this.btnOK.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(76, 76, 128);
+            this.btnOK.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(76, 76, 128);
             this.btnOK.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnOK.Font = new System.Drawing.Font("Microsoft YaHei UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.btnOK.ForeColor = System.Drawing.Color.White;
@@ -132,24 +142,24 @@ namespace llm_agent.UI.Forms
             //
             // btnCancel
             //
-            this.btnCancel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(108)))), ((int)(((byte)(117)))), ((int)(((byte)(125)))));
+            this.btnCancel.BackColor = System.Drawing.Color.Transparent;
             this.btnCancel.FlatAppearance.BorderSize = 0;
             this.btnCancel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnCancel.Font = new System.Drawing.Font("Microsoft YaHei UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.btnCancel.ForeColor = System.Drawing.Color.White;
+            this.btnCancel.ForeColor = System.Drawing.Color.Gray;
             this.btnCancel.Location = new System.Drawing.Point(375, 220);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(75, 30);
             this.btnCancel.TabIndex = 9;
             this.btnCancel.Text = "取消";
-            this.btnCancel.UseVisualStyleBackColor = false;
+            this.btnCancel.UseVisualStyleBackColor = true;
             //
             // AddWebsiteForm
             //
             this.AcceptButton = this.btnOK;
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = System.Drawing.Color.White;
+            this.BackColor = System.Drawing.Color.FromArgb(248, 249, 250);
             this.CancelButton = this.btnCancel;
             this.ClientSize = new System.Drawing.Size(484, 270);
             this.Controls.Add(this.btnCancel);

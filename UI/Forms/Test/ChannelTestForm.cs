@@ -19,6 +19,7 @@ namespace llm_agent.UI.Forms
         private readonly ChannelService _channelService;
         private readonly ChannelManager _channelManager;
         private List<Channel> _enabledChannels = new List<Channel>(); // 存储所有启用的渠道
+        private const string DEFAULT_TEST_MESSAGE = "你好，请简要介绍一下你自己"; // 默认测试消息，保留以供参考
         
         // 批量测试模式构造函数
         public ChannelTestForm()
@@ -60,12 +61,7 @@ namespace llm_agent.UI.Forms
                 _enabledChannels = _channelManager.GetEnabledChannels();
                 
                 // 更新UI
-                lblChannelInfo.Text = $"发现 {_enabledChannels.Count} 个启用的渠道:";
-                
-                // 清空现有内容并添加标题
-                txtChannelInfo.Clear();
-                txtChannelInfo.AppendText($"共有 {_enabledChannels.Count} 个启用的渠道可供测试\r\n");
-                txtChannelInfo.AppendText("每个渠道将使用其第一个可用模型进行联通测试\r\n\r\n");
+                lblChannelInfo.Text = $"请选择要进行测试的渠道: (发现 {_enabledChannels.Count} 个启用的渠道)";
                 
                 // 填充渠道列表
                 channelListBox.Items.Clear();
@@ -75,21 +71,12 @@ namespace llm_agent.UI.Forms
                         $"将使用模型: {channel.SupportedModels[0]}" : "无可用模型";
                     
                     channelListBox.Items.Add($"{channel.Name} ({channel.ProviderType}) - {modelInfo}", true);
-                    
-                    // 在信息文本框中添加渠道信息
-                    txtChannelInfo.AppendText($"- {channel.Name} ({channel.ProviderType})\r\n");
-                    txtChannelInfo.AppendText($"  API主机: {channel.ApiHost}\r\n");
-                    txtChannelInfo.AppendText($"  {modelInfo}\r\n\r\n");
                 }
                 
                 // 更新状态
                 lblStatus.Text = $"已加载 {_enabledChannels.Count} 个渠道，请选择要测试的渠道";
                 btnTest.Text = "开始批量测试";
                 btnTest.Enabled = true;
-                
-                // 隐藏单渠道测试的控件
-                lblModel.Visible = false;
-                cboModel.Visible = false;
             }
             catch (Exception ex)
             {
@@ -106,45 +93,32 @@ namespace llm_agent.UI.Forms
                 lblStatus.Text = "正在加载渠道信息...";
                 btnTest.Enabled = false;
                 
-                // 加载渠道信息
-                txtChannelInfo.Text = $"渠道: {_channel.Name}\r\n";
-                txtChannelInfo.Text += $"类型: {_channel.ProviderType}\r\n";
-                txtChannelInfo.Text += $"API主机: {_channel.ApiHost}\r\n";
-                txtChannelInfo.Text += $"使用流式响应: {(_channel.UseStreamResponse ? "是" : "否")}\r\n";
-                
                 // 隐藏渠道列表
                 channelListBox.Visible = false;
+                
+                // 更新标题
+                lblChannelInfo.Text = $"渠道: {_channel.Name} ({_channel.ProviderType})";
                 
                 // 如果渠道没有模型，尝试获取
                 if (_channel.SupportedModels == null || _channel.SupportedModels.Count == 0)
                 {
-                    txtChannelInfo.Text += "正在获取渠道模型...\r\n";
-                    
                     try {
                         var models = _channelService.GetChannelModelsAsync(_channel);
                         
                         if (models != null && models.Count > 0)
                         {
                             _channel.SupportedModels = models;
-                            txtChannelInfo.Text += $"可用模型数量: {models.Count}\r\n";
-                        }
-                        else
-                        {
-                            txtChannelInfo.Text += "未能获取到可用模型\r\n";
                         }
                     }
                     catch (Exception ex)
                     {
-                        txtChannelInfo.Text += $"获取模型失败: {ex.Message}\r\n";
+                        txtLog.Text = $"获取模型失败: {ex.Message}";
                     }
-                }
-                else
-                {
-                    txtChannelInfo.Text += $"可用模型数量: {_channel.SupportedModels.Count}\r\n";
                 }
                 
                 // 更新状态
                 lblStatus.Text = "渠道信息加载完成";
+                btnTest.Text = "测试";
                 btnTest.Enabled = true;
             }
             catch (Exception ex)
@@ -192,7 +166,7 @@ namespace llm_agent.UI.Forms
                 AppendLog("使用系统默认测试消息");
                 AppendLog("----------------------------------------");
                 
-                // 执行测试
+                // 执行测试，移除第三个参数
                 var result = await _channelService.TestChannelConnectionAsync(_channel, modelToTest);
                 
                 if (result.success)
@@ -250,69 +224,66 @@ namespace llm_agent.UI.Forms
                 lblStatus.Text = "批量测试中...";
                 txtLog.Clear();
                 
-                // 添加测试信息
-                AppendLog($"开始批量测试 {selectedIndexes.Count} 个渠道...");
+                AppendLog($"开始批量测试 {selectedIndexes.Count} 个渠道");
                 AppendLog($"时间: {DateTime.Now}");
-                AppendLog("========================================");
+                AppendLog("----------------------------------------");
                 
-                // 计数器
                 int successCount = 0;
                 int failCount = 0;
                 
-                // 依次测试每个选中的渠道
+                // 逐个测试选中的渠道
                 for (int i = 0; i < selectedIndexes.Count; i++)
                 {
                     int index = selectedIndexes[i];
-                    var channel = _enabledChannels[index];
+                    Channel channel = _enabledChannels[index];
                     
-                    // 选择要测试的模型 - 使用第一个可用模型
+                    // 更新状态
+                    lblStatus.Text = $"正在测试 {i + 1}/{selectedIndexes.Count}: {channel.Name}";
+                    
+                    // 添加测试信息
+                    AppendLog($"测试渠道 {i + 1}/{selectedIndexes.Count}: {channel.Name} ({channel.ProviderType})");
+                    
+                    // 选择第一个模型进行测试（如果有）
                     string modelToTest = channel.SupportedModels.Count > 0 ? 
-                        channel.SupportedModels[0] : "default-model";
+                        channel.SupportedModels[0] : "未知模型";
                     
-                    // 更新状态栏
-                    lblStatus.Text = $"正在测试 ({i+1}/{selectedIndexes.Count}): {channel.Name}";
-                    
-                    // 添加测试日志
-                    AppendLog($"测试渠道 {i+1}/{selectedIndexes.Count}: {channel.Name}");
                     AppendLog($"模型: {modelToTest}");
-                    AppendLog("----------------------------------------");
                     
-                    // 执行测试
                     try
                     {
+                        // 执行测试，移除第三个参数
                         var result = await _channelService.TestChannelConnectionAsync(channel, modelToTest);
                         
                         if (result.success)
                         {
                             successCount++;
                             AppendLog("测试结果: 成功");
-                            AppendLog($"响应: {result.response.Substring(0, Math.Min(100, result.response.Length))}...");
+                            AppendLog("响应摘要: " + (result.response.Length > 100 ? result.response.Substring(0, 100) + "..." : result.response));
                         }
                         else
                         {
                             failCount++;
                             AppendLog("测试结果: 失败");
-                            AppendLog($"错误信息: {result.response}");
+                            AppendLog("错误信息: " + result.response);
                         }
                     }
                     catch (Exception ex)
                     {
                         failCount++;
-                        AppendLog("测试结果: 异常");
-                        AppendLog($"错误: {ex.Message}");
+                        AppendLog($"测试出错: {ex.Message}");
                     }
                     
                     AppendLog("----------------------------------------");
                 }
                 
-                // 测试完成，显示汇总信息
-                AppendLog("========================================");
-                AppendLog($"测试完成! 成功: {successCount}, 失败: {failCount}");
-                lblStatus.Text = $"批量测试完成 - 成功: {successCount}, 失败: {failCount}";
+                // 更新最终状态
+                lblStatus.Text = $"测试完成: {successCount} 成功, {failCount} 失败";
+                AppendLog($"批量测试完成: {successCount} 个渠道成功, {failCount} 个渠道失败");
+                AppendLog($"完成时间: {DateTime.Now}");
             }
             catch (Exception ex)
             {
-                lblStatus.Text = "测试过程中发生错误";
+                lblStatus.Text = "批量测试时发生错误";
                 AppendLog($"错误: {ex.Message}");
                 AppendLog(ex.StackTrace);
             }
@@ -324,7 +295,6 @@ namespace llm_agent.UI.Forms
             }
         }
         
-        // 添加日志的辅助方法
         private void AppendLog(string message)
         {
             txtLog.AppendText(message + Environment.NewLine);

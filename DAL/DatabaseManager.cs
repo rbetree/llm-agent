@@ -86,7 +86,6 @@ namespace llm_agent.DAL
                         Id TEXT PRIMARY KEY,
                         Name TEXT NOT NULL,
                         ProviderType TEXT NOT NULL,
-                        Category INTEGER NOT NULL,
                         ContextLength INTEGER,
                         TokenPrice REAL,
                         Enabled INTEGER NOT NULL DEFAULT 1
@@ -257,8 +256,8 @@ namespace llm_agent.DAL
 
                         // 插入新的模型记录
                         string insertSql = @"
-                            INSERT INTO Models (Id, Name, ProviderType, Category, ContextLength, TokenPrice, Enabled)
-                            VALUES (@id, @name, @providerType, @category, @contextLength, @tokenPrice, @enabled)";
+                            INSERT INTO Models (Id, Name, ProviderType, ContextLength, TokenPrice, Enabled)
+                            VALUES (@id, @name, @providerType, @contextLength, @tokenPrice, @enabled)";
 
                         foreach (var model in models)
                         {
@@ -267,7 +266,6 @@ namespace llm_agent.DAL
                                 command.Parameters.AddWithValue("@id", model.Id);
                                 command.Parameters.AddWithValue("@name", model.Name);
                                 command.Parameters.AddWithValue("@providerType", model.ProviderType.ToLower());
-                                command.Parameters.AddWithValue("@category", (int)model.Category);
                                 command.Parameters.AddWithValue("@contextLength", model.ContextLength.HasValue ? (object)model.ContextLength.Value : DBNull.Value);
                                 command.Parameters.AddWithValue("@tokenPrice", model.TokenPrice.HasValue ? (object)model.TokenPrice.Value : DBNull.Value);
                                 command.Parameters.AddWithValue("@enabled", model.Enabled ? 1 : 0);
@@ -306,8 +304,7 @@ namespace llm_agent.DAL
                             var model = new ModelInfo(
                                 reader["Id"].ToString(),
                                 reader["Name"].ToString(),
-                                reader["ProviderType"].ToString(),
-                                (ModelCategory)Convert.ToInt32(reader["Category"])
+                                reader["ProviderType"].ToString()
                             );
 
                             if (!reader.IsDBNull(reader.GetOrdinal("ContextLength")))

@@ -43,23 +43,7 @@ namespace llm_agent.UI.Forms
             btnSave = new Button();
             btnCancel = new Button();
             btnFetchModels = new Button();
-            groupBoxModelDetails = new GroupBox();
-            btnUpdateModel = new Button();
-            chkEnabled = new CheckBox();
-            numTokenPrice = new NumericUpDown();
-            label5 = new Label();
-            numContextLength = new NumericUpDown();
-            label4 = new Label();
-            cboCategory = new ComboBox();
-            label3 = new Label();
-            txtModelName = new TextBox();
-            label2 = new Label();
-            txtModelId = new TextBox();
-            label1 = new Label();
             btnClearAllModels = new Button();
-            groupBoxModelDetails.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)numTokenPrice).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)numContextLength).BeginInit();
             SuspendLayout();
             //
             // lblProvider
@@ -80,10 +64,12 @@ namespace llm_agent.UI.Forms
             txtProvider.ReadOnly = true;
             txtProvider.Size = new Size(392, 38);
             txtProvider.TabIndex = 1;
+            txtProvider.BackColor = System.Drawing.Color.WhiteSmoke;
+            txtProvider.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             //
             // modelListView
             //
-            modelListView.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            modelListView.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             modelListView.CheckBoxes = true;
             modelListView.Columns.AddRange(new ColumnHeader[] { columnHeader1, columnHeader2, columnHeader3, columnHeader4 });
             modelListView.FullRowSelect = true;
@@ -94,8 +80,8 @@ namespace llm_agent.UI.Forms
             modelListView.TabIndex = 2;
             modelListView.UseCompatibleStateImageBehavior = false;
             modelListView.View = View.Details;
+            modelListView.BackColor = System.Drawing.Color.White;
             modelListView.ItemChecked += modelListView_ItemChecked;
-            modelListView.SelectedIndexChanged += modelListView_SelectedIndexChanged;
             //
             // columnHeader1
             //
@@ -113,31 +99,41 @@ namespace llm_agent.UI.Forms
             //
             // columnHeader4
             //
-            columnHeader4.Text = "分类";
+            columnHeader4.Text = "提供商";
             columnHeader4.Width = 100;
             //
             // btnSave
             //
             btnSave.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            btnSave.Location = new Point(1043, 829);
+            btnSave.Location = new Point(1043, 490);
             btnSave.Margin = new Padding(5, 5, 5, 5);
             btnSave.Name = "btnSave";
             btnSave.Size = new Size(164, 45);
             btnSave.TabIndex = 3;
             btnSave.Text = "保存";
-            btnSave.UseVisualStyleBackColor = true;
+            btnSave.BackColor = System.Drawing.Color.FromArgb(100, 101, 165);
+            btnSave.ForeColor = System.Drawing.Color.White;
+            btnSave.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            btnSave.FlatAppearance.BorderSize = 0;
+            btnSave.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(76, 76, 128);
+            btnSave.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(76, 76, 128);
+            btnSave.UseVisualStyleBackColor = false;
             btnSave.Click += btnSave_Click;
             //
             // btnCancel
             //
             btnCancel.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             btnCancel.DialogResult = DialogResult.Cancel;
-            btnCancel.Location = new Point(1214, 829);
+            btnCancel.Location = new Point(1214, 490);
             btnCancel.Margin = new Padding(5, 5, 5, 5);
             btnCancel.Name = "btnCancel";
             btnCancel.Size = new Size(164, 45);
             btnCancel.TabIndex = 4;
             btnCancel.Text = "取消";
+            btnCancel.BackColor = System.Drawing.Color.Transparent;
+            btnCancel.ForeColor = System.Drawing.Color.Gray;
+            btnCancel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            btnCancel.FlatAppearance.BorderSize = 0;
             btnCancel.UseVisualStyleBackColor = true;
             //
             // btnFetchModels
@@ -149,150 +145,14 @@ namespace llm_agent.UI.Forms
             btnFetchModels.Size = new Size(268, 45);
             btnFetchModels.TabIndex = 5;
             btnFetchModels.Text = "从API获取模型列表";
-            btnFetchModels.UseVisualStyleBackColor = true;
+            btnFetchModels.BackColor = System.Drawing.Color.FromArgb(100, 101, 165);
+            btnFetchModels.ForeColor = System.Drawing.Color.White;
+            btnFetchModels.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            btnFetchModels.FlatAppearance.BorderSize = 0;
+            btnFetchModels.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(76, 76, 128);
+            btnFetchModels.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(76, 76, 128);
+            btnFetchModels.UseVisualStyleBackColor = false;
             btnFetchModels.Click += btnFetchModels_Click;
-            //
-            // groupBoxModelDetails
-            //
-            groupBoxModelDetails.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            groupBoxModelDetails.Controls.Add(btnUpdateModel);
-            groupBoxModelDetails.Controls.Add(chkEnabled);
-            groupBoxModelDetails.Controls.Add(numTokenPrice);
-            groupBoxModelDetails.Controls.Add(label5);
-            groupBoxModelDetails.Controls.Add(numContextLength);
-            groupBoxModelDetails.Controls.Add(label4);
-            groupBoxModelDetails.Controls.Add(cboCategory);
-            groupBoxModelDetails.Controls.Add(label3);
-            groupBoxModelDetails.Controls.Add(txtModelName);
-            groupBoxModelDetails.Controls.Add(label2);
-            groupBoxModelDetails.Controls.Add(txtModelId);
-            groupBoxModelDetails.Controls.Add(label1);
-            groupBoxModelDetails.Location = new Point(21, 501);
-            groupBoxModelDetails.Margin = new Padding(2, 2, 2, 2);
-            groupBoxModelDetails.Name = "groupBoxModelDetails";
-            groupBoxModelDetails.Padding = new Padding(2, 2, 2, 2);
-            groupBoxModelDetails.Size = new Size(1358, 299);
-            groupBoxModelDetails.TabIndex = 6;
-            groupBoxModelDetails.TabStop = false;
-            groupBoxModelDetails.Text = "模型详情";
-            //
-            // btnUpdateModel
-            //
-            btnUpdateModel.Location = new Point(1138, 231);
-            btnUpdateModel.Margin = new Padding(2, 2, 2, 2);
-            btnUpdateModel.Name = "btnUpdateModel";
-            btnUpdateModel.Size = new Size(164, 45);
-            btnUpdateModel.TabIndex = 11;
-            btnUpdateModel.Text = "更新";
-            btnUpdateModel.UseVisualStyleBackColor = true;
-            btnUpdateModel.Click += btnUpdateModel_Click;
-            //
-            // chkEnabled
-            //
-            chkEnabled.AutoSize = true;
-            chkEnabled.Location = new Point(1138, 50);
-            chkEnabled.Margin = new Padding(2, 2, 2, 2);
-            chkEnabled.Name = "chkEnabled";
-            chkEnabled.Size = new Size(94, 35);
-            chkEnabled.TabIndex = 10;
-            chkEnabled.Text = "启用";
-            chkEnabled.UseVisualStyleBackColor = true;
-            //
-            // numTokenPrice
-            //
-            numTokenPrice.DecimalPlaces = 5;
-            numTokenPrice.Increment = new decimal(new int[] { 1, 0, 0, 196608 });
-            numTokenPrice.Location = new Point(310, 231);
-            numTokenPrice.Margin = new Padding(5, 5, 5, 5);
-            numTokenPrice.Maximum = new decimal(new int[] { 1, 0, 0, 0 });
-            numTokenPrice.Name = "numTokenPrice";
-            numTokenPrice.Size = new Size(612, 38);
-            numTokenPrice.TabIndex = 9;
-            //
-            // label5
-            //
-            label5.AutoSize = true;
-            label5.Location = new Point(40, 234);
-            label5.Margin = new Padding(5, 0, 5, 0);
-            label5.Name = "label5";
-            label5.Size = new Size(253, 31);
-            label5.TabIndex = 8;
-            label5.Text = "Token价格($/1000)：";
-            //
-            // numContextLength
-            //
-            numContextLength.Location = new Point(310, 175);
-            numContextLength.Margin = new Padding(5, 5, 5, 5);
-            numContextLength.Maximum = new decimal(new int[] { 1000000, 0, 0, 0 });
-            numContextLength.Name = "numContextLength";
-            numContextLength.Size = new Size(612, 38);
-            numContextLength.TabIndex = 7;
-            //
-            // label4
-            //
-            label4.AutoSize = true;
-            label4.Location = new Point(40, 180);
-            label4.Margin = new Padding(5, 0, 5, 0);
-            label4.Name = "label4";
-            label4.Size = new Size(251, 31);
-            label4.TabIndex = 6;
-            label4.Text = "上下文长度(tokens)：";
-            //
-            // cboCategory
-            //
-            cboCategory.DropDownStyle = ComboBoxStyle.DropDownList;
-            cboCategory.FormattingEnabled = true;
-            cboCategory.Location = new Point(310, 122);
-            cboCategory.Margin = new Padding(5, 5, 5, 5);
-            cboCategory.Name = "cboCategory";
-            cboCategory.Size = new Size(610, 39);
-            cboCategory.TabIndex = 5;
-            //
-            // label3
-            //
-            label3.AutoSize = true;
-            label3.Location = new Point(40, 129);
-            label3.Margin = new Padding(5, 0, 5, 0);
-            label3.Name = "label3";
-            label3.Size = new Size(134, 31);
-            label3.TabIndex = 4;
-            label3.Text = "模型分类：";
-            //
-            // txtModelName
-            //
-            txtModelName.Location = new Point(310, 71);
-            txtModelName.Margin = new Padding(5, 5, 5, 5);
-            txtModelName.Name = "txtModelName";
-            txtModelName.Size = new Size(610, 38);
-            txtModelName.TabIndex = 3;
-            //
-            // label2
-            //
-            label2.AutoSize = true;
-            label2.Location = new Point(40, 76);
-            label2.Margin = new Padding(5, 0, 5, 0);
-            label2.Name = "label2";
-            label2.Size = new Size(134, 31);
-            label2.TabIndex = 2;
-            label2.Text = "模型名称：";
-            //
-            // txtModelId
-            //
-            txtModelId.Location = new Point(310, 20);
-            txtModelId.Margin = new Padding(5, 5, 5, 5);
-            txtModelId.Name = "txtModelId";
-            txtModelId.Size = new Size(610, 38);
-            txtModelId.TabIndex = 1;
-            //
-            // label1
-            //
-            label1.AutoSize = true;
-            label1.Location = new Point(40, 25);
-            label1.Margin = new Padding(5, 0, 5, 0);
-            label1.Name = "label1";
-            label1.Size = new Size(111, 31);
-            label1.TabIndex = 0;
-            label1.Text = "模型ID：";
             //
             // btnClearAllModels
             //
@@ -302,8 +162,14 @@ namespace llm_agent.UI.Forms
             btnClearAllModels.Name = "btnClearAllModels";
             btnClearAllModels.Size = new Size(268, 45);
             btnClearAllModels.TabIndex = 7;
-            btnClearAllModels.Text = "清除所有模型";
-            btnClearAllModels.UseVisualStyleBackColor = true;
+            btnClearAllModels.Text = "清除所有";
+            btnClearAllModels.BackColor = System.Drawing.Color.FromArgb(100, 101, 165);
+            btnClearAllModels.ForeColor = System.Drawing.Color.White;
+            btnClearAllModels.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            btnClearAllModels.FlatAppearance.BorderSize = 0;
+            btnClearAllModels.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(76, 76, 128);
+            btnClearAllModels.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(76, 76, 128);
+            btnClearAllModels.UseVisualStyleBackColor = false;
             btnClearAllModels.Click += btnClearAllModels_Click;
             //
             // ModelManagementForm
@@ -312,8 +178,7 @@ namespace llm_agent.UI.Forms
             AutoScaleDimensions = new SizeF(8F, 16F);
             AutoScaleMode = AutoScaleMode.Font;
             CancelButton = btnCancel;
-            ClientSize = new Size(1400, 899);
-            Controls.Add(groupBoxModelDetails);
+            ClientSize = new Size(1400, 550);
             Controls.Add(btnFetchModels);
             Controls.Add(btnCancel);
             Controls.Add(btnSave);
@@ -328,10 +193,7 @@ namespace llm_agent.UI.Forms
             StartPosition = FormStartPosition.CenterParent;
             Text = "模型管理";
             Load += ModelManagementForm_Load;
-            groupBoxModelDetails.ResumeLayout(false);
-            groupBoxModelDetails.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)numTokenPrice).EndInit();
-            ((System.ComponentModel.ISupportInitialize)numContextLength).EndInit();
+            BackColor = System.Drawing.Color.FromArgb(248, 249, 250);
             ResumeLayout(false);
             PerformLayout();
         }
@@ -347,19 +209,6 @@ namespace llm_agent.UI.Forms
         private System.Windows.Forms.Button btnSave;
         private System.Windows.Forms.Button btnCancel;
         private System.Windows.Forms.Button btnFetchModels;
-        private System.Windows.Forms.GroupBox groupBoxModelDetails;
-        private System.Windows.Forms.NumericUpDown numTokenPrice;
-        private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.NumericUpDown numContextLength;
-        private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.ComboBox cboCategory;
-        private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.TextBox txtModelName;
-        private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.TextBox txtModelId;
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.CheckBox chkEnabled;
-        private System.Windows.Forms.Button btnUpdateModel;
         private System.Windows.Forms.Button btnClearAllModels;
 
         protected override void Dispose(bool disposing)
@@ -405,7 +254,6 @@ namespace llm_agent.UI.Forms
                             model.Id,
                             model.Name,
                             model.ProviderType,
-                            model.Category,
                             model.ContextLength,
                             model.TokenPrice));
                     }
@@ -424,18 +272,8 @@ namespace llm_agent.UI.Forms
                 // 设置提供商名称
                 txtProvider.Text = _providerName;
 
-                // 加载模型分类下拉框
-                cboCategory.Items.Clear();
-                foreach (ModelCategory category in Enum.GetValues(typeof(ModelCategory)))
-                {
-                    cboCategory.Items.Add(category);
-                }
-
                 // 显示模型列表
                 RefreshModelListView();
-
-                // 禁用详情区域，直到选中一个模型
-                EnableModelDetailsGroup(false);
             }
             catch (Exception ex)
             {
@@ -452,7 +290,7 @@ namespace llm_agent.UI.Forms
                 ListViewItem item = new ListViewItem("");
                 item.SubItems.Add(model.Id);
                 item.SubItems.Add(model.Name);
-                item.SubItems.Add(model.Category.ToString());
+                item.SubItems.Add(model.ProviderType); // 显示提供商类型而不是分类
                 item.Checked = model.Enabled; // 使用模型的启用状态
                 item.Tag = model;
 
@@ -460,63 +298,8 @@ namespace llm_agent.UI.Forms
             }
         }
 
-        private void EnableModelDetailsGroup(bool enable)
-        {
-            foreach (Control control in groupBoxModelDetails.Controls)
-            {
-                if (control != btnUpdateModel)
-                {
-                    control.Enabled = enable;
-                }
-            }
-            btnUpdateModel.Enabled = enable;
-        }
-
-        private void DisplayModelDetails(ModelInfo model)
-        {
-            if (model == null)
-            {
-                EnableModelDetailsGroup(false);
-                return;
-            }
-
-            EnableModelDetailsGroup(true);
-
-            txtModelId.Text = model.Id;
-            txtModelName.Text = model.Name;
-
-            // 设置分类
-            cboCategory.SelectedItem = model.Category;
-
-            // 设置上下文长度和token价格
-            numContextLength.Value = model.ContextLength ?? 0;
-            numTokenPrice.Value = model.TokenPrice.HasValue ? (decimal)model.TokenPrice.Value : 0;
-
-            // 设置启用状态
-            chkEnabled.Checked = model.Enabled;
-        }
-
-        private void modelListView_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (modelListView.SelectedItems.Count > 0)
-            {
-                var selectedModel = modelListView.SelectedItems[0].Tag as ModelInfo;
-                DisplayModelDetails(selectedModel);
-            }
-            else
-            {
-                EnableModelDetailsGroup(false);
-            }
-        }
-
         private void modelListView_ItemChecked(object sender, ItemCheckedEventArgs e)
         {
-            if (modelListView.SelectedItems.Count > 0 &&
-                modelListView.SelectedItems[0] == e.Item)
-            {
-                chkEnabled.Checked = e.Item.Checked;
-            }
-
             // 标记为已修改
             if (e.Item.Tag is ModelInfo model)
             {
@@ -525,59 +308,6 @@ namespace llm_agent.UI.Forms
                     _modifiedModels.Add(model);
                 }
             }
-        }
-
-        private void btnUpdateModel_Click(object sender, EventArgs e)
-        {
-            if (modelListView.SelectedItems.Count == 0)
-                return;
-
-            var selectedItem = modelListView.SelectedItems[0];
-            var model = selectedItem.Tag as ModelInfo;
-
-            if (model == null)
-                return;
-
-            // 验证输入
-            if (string.IsNullOrWhiteSpace(txtModelId.Text))
-            {
-                MessageBox.Show("模型ID不能为空", "验证错误", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
-            if (string.IsNullOrWhiteSpace(txtModelName.Text))
-            {
-                MessageBox.Show("模型名称不能为空", "验证错误", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
-            if (cboCategory.SelectedItem == null)
-            {
-                MessageBox.Show("请选择模型分类", "验证错误", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
-            // 更新模型信息
-            model.Id = txtModelId.Text;
-            model.Name = txtModelName.Text;
-            model.Category = (ModelCategory)cboCategory.SelectedItem;
-            model.ContextLength = (int)numContextLength.Value;
-            model.TokenPrice = (double)numTokenPrice.Value;
-            model.Enabled = chkEnabled.Checked;
-
-            // 更新列表项
-            selectedItem.SubItems[1].Text = model.Id;
-            selectedItem.SubItems[2].Text = model.Name;
-            selectedItem.SubItems[3].Text = model.Category.ToString();
-            selectedItem.Checked = chkEnabled.Checked;
-
-            // 标记为已修改
-            if (!_modifiedModels.Contains(model))
-            {
-                _modifiedModels.Add(model);
-            }
-
-            MessageBox.Show("模型信息已更新", "成功", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private async void btnFetchModels_Click(object sender, EventArgs e)
@@ -687,8 +417,7 @@ namespace llm_agent.UI.Forms
                         var newModel = new ModelInfo(
                             modelId,
                             modelId, // 初始时名称与ID相同
-                            providerStr,
-                            ModelCategory.Chat
+                            providerStr
                         );
 
                         newModel.Enabled = true; // 确保新添加的模型默认启用
@@ -898,9 +627,6 @@ namespace llm_agent.UI.Forms
 
                     // 刷新列表视图
                     RefreshModelListView();
-
-                    // 禁用详情区域
-                    EnableModelDetailsGroup(false);
 
                     MessageBox.Show(
                         $"{_providerName}的所有模型已被清除，共删除{modelCount}个模型记录。",
