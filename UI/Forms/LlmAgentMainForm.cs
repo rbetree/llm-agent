@@ -1182,7 +1182,11 @@ namespace llm_agent.UI.Forms
             }
 
             if (currentSession.Messages.Count == 0)
+            {
+                // 显示空会话界面提示
+                InitializeChatboxForEmptySession(chatboxControl);
                 return;
+            }
 
             // 使用Chatbox显示当前会话的所有消息
             RefreshChatMessages(chatboxControl, currentSession.Messages);
@@ -3419,12 +3423,28 @@ namespace llm_agent.UI.Forms
 
             chatbox.ClearMessages();
 
+            // 检查当前是否有活动会话
+            var currentSession = _chatHistoryManager.GetCurrentSession();
+            string welcomeContent;
+
+            if (currentSession != null)
+            {
+                // 有会话但没有消息的情况
+                welcomeContent = "这是一个新的对话。请在下方输入您的问题，开始与AI助手交流。";
+            }
+            else
+            {
+                // 没有活动会话的情况
+                welcomeContent = "当前没有活动的聊天。您可以开始新的对话或选择一个现有对话。";
+            }
+
             var welcomeMessage = new ChatMessage
             {
-                Role = ChatRole.System, // 或者 Assistant
-                Content = "当前没有活动的聊天。您可以开始新的对话或选择一个现有对话。",
+                Role = ChatRole.System,
+                Content = welcomeContent,
                 Timestamp = DateTime.Now
             };
+            
             // 确保 ChatModelAdapter.ToTextChatModel 不会返回 null
             var chatModel = ChatModelAdapter.ToTextChatModel(welcomeMessage);
             if (chatModel != null) // 添加 null 检查
