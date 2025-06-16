@@ -72,7 +72,7 @@ namespace llm_agent.UI.Controls
             btnMaximize.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             btnMaximize.Font = new System.Drawing.Font("Microsoft YaHei UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 134);
             btnMaximize.ForeColor = System.Drawing.Color.White;
-            btnMaximize.Location = new System.Drawing.Point(1082, 5);
+            btnMaximize.Location = new System.Drawing.Point(1059, 5);
             btnMaximize.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             btnMaximize.Name = "btnMaximize";
             btnMaximize.Size = new System.Drawing.Size(60, 50);
@@ -87,7 +87,7 @@ namespace llm_agent.UI.Controls
             btnMinimize.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             btnMinimize.Font = new System.Drawing.Font("Microsoft YaHei UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 134);
             btnMinimize.ForeColor = System.Drawing.Color.White;
-            btnMinimize.Location = new System.Drawing.Point(1026, 5);
+            btnMinimize.Location = new System.Drawing.Point(977, 2);
             btnMinimize.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             btnMinimize.Name = "btnMinimize";
             btnMinimize.Size = new System.Drawing.Size(60, 50);

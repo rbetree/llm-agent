@@ -39,6 +39,37 @@ namespace llm_agent.UI.Forms
             promptsNavButton = new System.Windows.Forms.Button();
             avatarButton = new System.Windows.Forms.Button();
             channelNavButton = new System.Windows.Forms.Button();
+            settingsPanel = new System.Windows.Forms.Panel();
+            settingsPageSplitContainer = new System.Windows.Forms.SplitContainer();
+            settingsMenuPanel = new System.Windows.Forms.Panel();
+            aboutSettingsButton = new System.Windows.Forms.Button();
+            dataSettingsButton = new System.Windows.Forms.Button();
+            generalSettingsButton = new System.Windows.Forms.Button();
+            shortcutSettingsButton = new System.Windows.Forms.Button();
+            settingsContentContainer = new System.Windows.Forms.Panel();
+            shortcutSettingsContainer = new System.Windows.Forms.Panel();
+            lvShortcuts = new System.Windows.Forms.ListView();
+            lblShortcutsTitle = new System.Windows.Forms.Label();
+            generalSettingsContainer = new System.Windows.Forms.Panel();
+            grpGeneralSettings = new System.Windows.Forms.GroupBox();
+            btnSaveGeneralSettings = new System.Windows.Forms.Button();
+            txtSystemPrompt = new System.Windows.Forms.TextBox();
+            lblSystemPrompt = new System.Windows.Forms.Label();
+            dataSettingsContainer = new System.Windows.Forms.Panel();
+            grpDataManagement = new System.Windows.Forms.GroupBox();
+            btnRestoreData = new System.Windows.Forms.Button();
+            btnBackupData = new System.Windows.Forms.Button();
+            clearChatHistoryButton = new System.Windows.Forms.Button();
+            aboutContainer = new System.Windows.Forms.Panel();
+            lblGitHub = new System.Windows.Forms.LinkLabel();
+            lblLicense = new System.Windows.Forms.Label();
+            lblDeveloper = new System.Windows.Forms.Label();
+            lblVersion = new System.Windows.Forms.Label();
+            lblAppName = new System.Windows.Forms.Label();
+            picAppIcon = new System.Windows.Forms.PictureBox();
+            lblFeatures = new System.Windows.Forms.Label();
+            lblTechStack = new System.Windows.Forms.Label();
+            lblDocumentation = new System.Windows.Forms.LinkLabel();
             chatPagePanel = new System.Windows.Forms.Panel();
             chatPageSplitContainer = new System.Windows.Forms.SplitContainer();
             chatListContainer = new System.Windows.Forms.SplitContainer();
@@ -78,19 +109,6 @@ namespace llm_agent.UI.Forms
             newWebsiteButton = new System.Windows.Forms.Button();
             websiteListPanel = new llm_agent.UI.Controls.HiddenScrollBarFlowLayoutPanel();
             aiWebsiteContentPanel = new System.Windows.Forms.Panel();
-            settingsPanel = new System.Windows.Forms.Panel();
-            settingsPageSplitContainer = new System.Windows.Forms.SplitContainer();
-            settingsMenuPanel = new System.Windows.Forms.Panel();
-            aboutSettingsButton = new System.Windows.Forms.Button();
-            dataSettingsButton = new System.Windows.Forms.Button();
-            generalSettingsButton = new System.Windows.Forms.Button();
-            shortcutSettingsButton = new System.Windows.Forms.Button();
-            settingsContentContainer = new System.Windows.Forms.Panel();
-            dataSettingsContainer = new System.Windows.Forms.Panel();
-            clearChatHistoryButton = new System.Windows.Forms.Button();
-            aboutContainer = new System.Windows.Forms.Panel();
-            generalSettingsContainer = new System.Windows.Forms.Panel();
-            shortcutSettingsContainer = new System.Windows.Forms.Panel();
             userProfilePanel = new System.Windows.Forms.Panel();
             userProfilePageSplitContainer = new System.Windows.Forms.SplitContainer();
             userProfileMenuPanel = new System.Windows.Forms.Panel();
@@ -132,9 +150,9 @@ namespace llm_agent.UI.Forms
             welcomeStatsLabel = new System.Windows.Forms.Label();
             welcomeDescriptionLabel = new System.Windows.Forms.Label();
             welcomeTitleLabel = new System.Windows.Forms.Label();
+            chkEnableMarkdown = new System.Windows.Forms.CheckBox();
             settingsContentPanel = new System.Windows.Forms.Panel();
             generalSettingsGroup = new System.Windows.Forms.GroupBox();
-            chkEnableMarkdown = new System.Windows.Forms.CheckBox();
             btnSaveSettings = new System.Windows.Forms.Button();
             chkStreamResponse = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)mainSplitContainer).BeginInit();
@@ -142,6 +160,20 @@ namespace llm_agent.UI.Forms
             mainSplitContainer.Panel2.SuspendLayout();
             mainSplitContainer.SuspendLayout();
             navPanel.SuspendLayout();
+            settingsPanel.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)settingsPageSplitContainer).BeginInit();
+            settingsPageSplitContainer.Panel1.SuspendLayout();
+            settingsPageSplitContainer.Panel2.SuspendLayout();
+            settingsPageSplitContainer.SuspendLayout();
+            settingsMenuPanel.SuspendLayout();
+            settingsContentContainer.SuspendLayout();
+            shortcutSettingsContainer.SuspendLayout();
+            generalSettingsContainer.SuspendLayout();
+            grpGeneralSettings.SuspendLayout();
+            dataSettingsContainer.SuspendLayout();
+            grpDataManagement.SuspendLayout();
+            aboutContainer.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)picAppIcon).BeginInit();
             chatPagePanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)chatPageSplitContainer).BeginInit();
             chatPageSplitContainer.Panel1.SuspendLayout();
@@ -170,14 +202,6 @@ namespace llm_agent.UI.Forms
             websiteListContainer.Panel1.SuspendLayout();
             websiteListContainer.Panel2.SuspendLayout();
             websiteListContainer.SuspendLayout();
-            settingsPanel.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)settingsPageSplitContainer).BeginInit();
-            settingsPageSplitContainer.Panel1.SuspendLayout();
-            settingsPageSplitContainer.Panel2.SuspendLayout();
-            settingsPageSplitContainer.SuspendLayout();
-            settingsMenuPanel.SuspendLayout();
-            settingsContentContainer.SuspendLayout();
-            dataSettingsContainer.SuspendLayout();
             userProfilePanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)userProfilePageSplitContainer).BeginInit();
             userProfilePageSplitContainer.Panel1.SuspendLayout();
@@ -222,10 +246,10 @@ namespace llm_agent.UI.Forms
             // 
             // mainSplitContainer.Panel2
             // 
+            mainSplitContainer.Panel2.Controls.Add(settingsPanel);
             mainSplitContainer.Panel2.Controls.Add(chatPagePanel);
             mainSplitContainer.Panel2.Controls.Add(channelPanel);
             mainSplitContainer.Panel2.Controls.Add(aiWebsitePanel);
-            mainSplitContainer.Panel2.Controls.Add(settingsPanel);
             mainSplitContainer.Panel2.Controls.Add(userProfilePanel);
             mainSplitContainer.Panel2.Controls.Add(promptsPanel);
             mainSplitContainer.Size = new System.Drawing.Size(1300, 800);
@@ -353,6 +377,428 @@ namespace llm_agent.UI.Forms
             channelNavButton.TabIndex = 8;
             channelNavButton.UseVisualStyleBackColor = false;
             channelNavButton.Click += channelNavButton_Click;
+            // 
+            // settingsPanel
+            // 
+            settingsPanel.Controls.Add(settingsPageSplitContainer);
+            settingsPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            settingsPanel.Location = new System.Drawing.Point(0, 0);
+            settingsPanel.Margin = new System.Windows.Forms.Padding(4);
+            settingsPanel.Name = "settingsPanel";
+            settingsPanel.Padding = new System.Windows.Forms.Padding(0, 0, 10, 10);
+            settingsPanel.Size = new System.Drawing.Size(1229, 800);
+            settingsPanel.TabIndex = 1;
+            settingsPanel.Visible = false;
+            // 
+            // settingsPageSplitContainer
+            // 
+            settingsPageSplitContainer.Dock = System.Windows.Forms.DockStyle.Fill;
+            settingsPageSplitContainer.FixedPanel = System.Windows.Forms.FixedPanel.Panel1;
+            settingsPageSplitContainer.Location = new System.Drawing.Point(0, 0);
+            settingsPageSplitContainer.Margin = new System.Windows.Forms.Padding(0);
+            settingsPageSplitContainer.Name = "settingsPageSplitContainer";
+            // 
+            // settingsPageSplitContainer.Panel1
+            // 
+            settingsPageSplitContainer.Panel1.Controls.Add(settingsMenuPanel);
+            // 
+            // settingsPageSplitContainer.Panel2
+            // 
+            settingsPageSplitContainer.Panel2.Controls.Add(settingsContentContainer);
+            settingsPageSplitContainer.Size = new System.Drawing.Size(1219, 790);
+            settingsPageSplitContainer.SplitterDistance = 283;
+            settingsPageSplitContainer.SplitterWidth = 1;
+            settingsPageSplitContainer.TabIndex = 0;
+            // 
+            // settingsMenuPanel
+            // 
+            settingsMenuPanel.BackColor = System.Drawing.Color.FromArgb(76, 76, 128);
+            settingsMenuPanel.Controls.Add(aboutSettingsButton);
+            settingsMenuPanel.Controls.Add(dataSettingsButton);
+            settingsMenuPanel.Controls.Add(generalSettingsButton);
+            settingsMenuPanel.Controls.Add(shortcutSettingsButton);
+            settingsMenuPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            settingsMenuPanel.Location = new System.Drawing.Point(0, 0);
+            settingsMenuPanel.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            settingsMenuPanel.Name = "settingsMenuPanel";
+            settingsMenuPanel.Padding = new System.Windows.Forms.Padding(0, 20, 0, 0);
+            settingsMenuPanel.Size = new System.Drawing.Size(283, 790);
+            settingsMenuPanel.TabIndex = 0;
+            // 
+            // aboutSettingsButton
+            // 
+            aboutSettingsButton.BackColor = System.Drawing.Color.FromArgb(76, 76, 128);
+            aboutSettingsButton.Cursor = System.Windows.Forms.Cursors.Hand;
+            aboutSettingsButton.FlatAppearance.BorderSize = 0;
+            aboutSettingsButton.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(100, 101, 165);
+            aboutSettingsButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            aboutSettingsButton.Font = new System.Drawing.Font("Microsoft YaHei UI", 10F);
+            aboutSettingsButton.ForeColor = System.Drawing.Color.White;
+            aboutSettingsButton.Location = new System.Drawing.Point(0, 142);
+            aboutSettingsButton.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            aboutSettingsButton.Name = "aboutSettingsButton";
+            aboutSettingsButton.Padding = new System.Windows.Forms.Padding(21, 0, 0, 0);
+            aboutSettingsButton.Size = new System.Drawing.Size(283, 49);
+            aboutSettingsButton.TabIndex = 4;
+            aboutSettingsButton.Text = "关于";
+            aboutSettingsButton.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            aboutSettingsButton.UseVisualStyleBackColor = false;
+            // 
+            // dataSettingsButton
+            // 
+            dataSettingsButton.BackColor = System.Drawing.Color.FromArgb(76, 76, 128);
+            dataSettingsButton.Cursor = System.Windows.Forms.Cursors.Hand;
+            dataSettingsButton.FlatAppearance.BorderSize = 0;
+            dataSettingsButton.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(100, 101, 165);
+            dataSettingsButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            dataSettingsButton.Font = new System.Drawing.Font("Microsoft YaHei UI", 10F);
+            dataSettingsButton.ForeColor = System.Drawing.Color.White;
+            dataSettingsButton.Location = new System.Drawing.Point(-1, 96);
+            dataSettingsButton.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            dataSettingsButton.Name = "dataSettingsButton";
+            dataSettingsButton.Padding = new System.Windows.Forms.Padding(21, 0, 0, 0);
+            dataSettingsButton.Size = new System.Drawing.Size(283, 49);
+            dataSettingsButton.TabIndex = 3;
+            dataSettingsButton.Text = "数据设置";
+            dataSettingsButton.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            dataSettingsButton.UseVisualStyleBackColor = false;
+            // 
+            // generalSettingsButton
+            // 
+            generalSettingsButton.BackColor = System.Drawing.Color.FromArgb(76, 76, 128);
+            generalSettingsButton.Cursor = System.Windows.Forms.Cursors.Hand;
+            generalSettingsButton.FlatAppearance.BorderSize = 0;
+            generalSettingsButton.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(100, 101, 165);
+            generalSettingsButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            generalSettingsButton.Font = new System.Drawing.Font("Microsoft YaHei UI", 10F);
+            generalSettingsButton.ForeColor = System.Drawing.Color.White;
+            generalSettingsButton.Location = new System.Drawing.Point(0, 0);
+            generalSettingsButton.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            generalSettingsButton.Name = "generalSettingsButton";
+            generalSettingsButton.Padding = new System.Windows.Forms.Padding(21, 0, 0, 0);
+            generalSettingsButton.Size = new System.Drawing.Size(283, 49);
+            generalSettingsButton.TabIndex = 1;
+            generalSettingsButton.Text = "常规设置";
+            generalSettingsButton.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            generalSettingsButton.UseVisualStyleBackColor = false;
+            // 
+            // shortcutSettingsButton
+            // 
+            shortcutSettingsButton.BackColor = System.Drawing.Color.FromArgb(76, 76, 128);
+            shortcutSettingsButton.Cursor = System.Windows.Forms.Cursors.Hand;
+            shortcutSettingsButton.FlatAppearance.BorderSize = 0;
+            shortcutSettingsButton.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(100, 101, 165);
+            shortcutSettingsButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            shortcutSettingsButton.Font = new System.Drawing.Font("Microsoft YaHei UI", 10F);
+            shortcutSettingsButton.ForeColor = System.Drawing.Color.White;
+            shortcutSettingsButton.Location = new System.Drawing.Point(-1, 48);
+            shortcutSettingsButton.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            shortcutSettingsButton.Name = "shortcutSettingsButton";
+            shortcutSettingsButton.Padding = new System.Windows.Forms.Padding(21, 0, 0, 0);
+            shortcutSettingsButton.Size = new System.Drawing.Size(283, 49);
+            shortcutSettingsButton.TabIndex = 2;
+            shortcutSettingsButton.Text = "快捷方式设置";
+            shortcutSettingsButton.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            shortcutSettingsButton.UseVisualStyleBackColor = false;
+            shortcutSettingsButton.Click += shortcutSettingsButton_Click;
+            // 
+            // settingsContentContainer
+            // 
+            settingsContentContainer.Controls.Add(shortcutSettingsContainer);
+            settingsContentContainer.Controls.Add(generalSettingsContainer);
+            settingsContentContainer.Controls.Add(dataSettingsContainer);
+            settingsContentContainer.Controls.Add(aboutContainer);
+            settingsContentContainer.Dock = System.Windows.Forms.DockStyle.Fill;
+            settingsContentContainer.Location = new System.Drawing.Point(0, 0);
+            settingsContentContainer.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            settingsContentContainer.Name = "settingsContentContainer";
+            settingsContentContainer.Size = new System.Drawing.Size(935, 790);
+            settingsContentContainer.TabIndex = 0;
+            // 
+            // shortcutSettingsContainer
+            // 
+            shortcutSettingsContainer.BackColor = System.Drawing.Color.White;
+            shortcutSettingsContainer.Controls.Add(lvShortcuts);
+            shortcutSettingsContainer.Controls.Add(lblShortcutsTitle);
+            shortcutSettingsContainer.Dock = System.Windows.Forms.DockStyle.Fill;
+            shortcutSettingsContainer.Location = new System.Drawing.Point(0, 0);
+            shortcutSettingsContainer.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            shortcutSettingsContainer.Name = "shortcutSettingsContainer";
+            shortcutSettingsContainer.Padding = new System.Windows.Forms.Padding(20);
+            shortcutSettingsContainer.Size = new System.Drawing.Size(935, 790);
+            shortcutSettingsContainer.TabIndex = 2;
+            shortcutSettingsContainer.Visible = false;
+            // 
+            // lvShortcuts
+            // 
+            lvShortcuts.Font = new System.Drawing.Font("Microsoft YaHei UI", 9F);
+            lvShortcuts.FullRowSelect = true;
+            lvShortcuts.GridLines = true;
+            lvShortcuts.Location = new System.Drawing.Point(20, 55);
+            lvShortcuts.Name = "lvShortcuts";
+            lvShortcuts.Size = new System.Drawing.Size(655, 486);
+            lvShortcuts.TabIndex = 1;
+            lvShortcuts.UseCompatibleStateImageBehavior = false;
+            lvShortcuts.View = System.Windows.Forms.View.Details;
+            // 
+            // lblShortcutsTitle
+            // 
+            lblShortcutsTitle.AutoSize = true;
+            lblShortcutsTitle.Font = new System.Drawing.Font("Microsoft YaHei UI", 12F, System.Drawing.FontStyle.Bold);
+            lblShortcutsTitle.Location = new System.Drawing.Point(20, 20);
+            lblShortcutsTitle.Name = "lblShortcutsTitle";
+            lblShortcutsTitle.Size = new System.Drawing.Size(112, 27);
+            lblShortcutsTitle.TabIndex = 0;
+            lblShortcutsTitle.Text = "键盘快捷键";
+            // 
+            // generalSettingsContainer
+            // 
+            generalSettingsContainer.BackColor = System.Drawing.Color.White;
+            generalSettingsContainer.Controls.Add(grpGeneralSettings);
+            generalSettingsContainer.Dock = System.Windows.Forms.DockStyle.Fill;
+            generalSettingsContainer.Location = new System.Drawing.Point(0, 0);
+            generalSettingsContainer.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            generalSettingsContainer.Name = "generalSettingsContainer";
+            generalSettingsContainer.Padding = new System.Windows.Forms.Padding(20);
+            generalSettingsContainer.Size = new System.Drawing.Size(935, 790);
+            generalSettingsContainer.TabIndex = 3;
+            generalSettingsContainer.Visible = false;
+            // 
+            // grpGeneralSettings
+            // 
+            grpGeneralSettings.Controls.Add(btnSaveGeneralSettings);
+            grpGeneralSettings.Controls.Add(txtSystemPrompt);
+            grpGeneralSettings.Controls.Add(lblSystemPrompt);
+            grpGeneralSettings.Font = new System.Drawing.Font("Microsoft YaHei UI", 10F);
+            grpGeneralSettings.Location = new System.Drawing.Point(20, 20);
+            grpGeneralSettings.Name = "grpGeneralSettings";
+            grpGeneralSettings.Size = new System.Drawing.Size(661, 442);
+            grpGeneralSettings.TabIndex = 0;
+            grpGeneralSettings.TabStop = false;
+            grpGeneralSettings.Text = "常规设置";
+            // 
+            // btnSaveGeneralSettings
+            // 
+            btnSaveGeneralSettings.BackColor = System.Drawing.Color.FromArgb(100, 101, 165);
+            btnSaveGeneralSettings.Cursor = System.Windows.Forms.Cursors.Hand;
+            btnSaveGeneralSettings.FlatAppearance.BorderSize = 0;
+            btnSaveGeneralSettings.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            btnSaveGeneralSettings.Font = new System.Drawing.Font("Microsoft YaHei UI", 9F, System.Drawing.FontStyle.Bold);
+            btnSaveGeneralSettings.ForeColor = System.Drawing.Color.White;
+            btnSaveGeneralSettings.Location = new System.Drawing.Point(540, 363);
+            btnSaveGeneralSettings.Name = "btnSaveGeneralSettings";
+            btnSaveGeneralSettings.Size = new System.Drawing.Size(100, 35);
+            btnSaveGeneralSettings.TabIndex = 3;
+            btnSaveGeneralSettings.Text = "保存设置";
+            btnSaveGeneralSettings.UseVisualStyleBackColor = false;
+            // 
+            // txtSystemPrompt
+            // 
+            txtSystemPrompt.Font = new System.Drawing.Font("Microsoft YaHei UI", 9F);
+            txtSystemPrompt.Location = new System.Drawing.Point(20, 55);
+            txtSystemPrompt.Multiline = true;
+            txtSystemPrompt.Name = "txtSystemPrompt";
+            txtSystemPrompt.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            txtSystemPrompt.Size = new System.Drawing.Size(620, 284);
+            txtSystemPrompt.TabIndex = 1;
+            // 
+            // lblSystemPrompt
+            // 
+            lblSystemPrompt.AutoSize = true;
+            lblSystemPrompt.Font = new System.Drawing.Font("Microsoft YaHei UI", 9F);
+            lblSystemPrompt.Location = new System.Drawing.Point(20, 30);
+            lblSystemPrompt.Name = "lblSystemPrompt";
+            lblSystemPrompt.Size = new System.Drawing.Size(99, 20);
+            lblSystemPrompt.TabIndex = 0;
+            lblSystemPrompt.Text = "系统提示词：";
+            // 
+            // dataSettingsContainer
+            // 
+            dataSettingsContainer.BackColor = System.Drawing.Color.White;
+            dataSettingsContainer.Controls.Add(grpDataManagement);
+            dataSettingsContainer.Controls.Add(clearChatHistoryButton);
+            dataSettingsContainer.Dock = System.Windows.Forms.DockStyle.Fill;
+            dataSettingsContainer.Location = new System.Drawing.Point(0, 0);
+            dataSettingsContainer.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            dataSettingsContainer.Name = "dataSettingsContainer";
+            dataSettingsContainer.Padding = new System.Windows.Forms.Padding(20);
+            dataSettingsContainer.Size = new System.Drawing.Size(935, 790);
+            dataSettingsContainer.TabIndex = 4;
+            dataSettingsContainer.Visible = false;
+            // 
+            // grpDataManagement
+            // 
+            grpDataManagement.Controls.Add(btnRestoreData);
+            grpDataManagement.Controls.Add(btnBackupData);
+            grpDataManagement.Font = new System.Drawing.Font("Microsoft YaHei UI", 10F);
+            grpDataManagement.Location = new System.Drawing.Point(30, 34);
+            grpDataManagement.Name = "grpDataManagement";
+            grpDataManagement.Size = new System.Drawing.Size(400, 150);
+            grpDataManagement.TabIndex = 1;
+            grpDataManagement.TabStop = false;
+            grpDataManagement.Text = "数据管理";
+            // 
+            // btnRestoreData
+            // 
+            btnRestoreData.BackColor = System.Drawing.Color.FromArgb(100, 101, 165);
+            btnRestoreData.Cursor = System.Windows.Forms.Cursors.Hand;
+            btnRestoreData.FlatAppearance.BorderSize = 0;
+            btnRestoreData.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            btnRestoreData.Font = new System.Drawing.Font("Microsoft YaHei UI", 9F, System.Drawing.FontStyle.Bold);
+            btnRestoreData.ForeColor = System.Drawing.Color.White;
+            btnRestoreData.Location = new System.Drawing.Point(160, 40);
+            btnRestoreData.Name = "btnRestoreData";
+            btnRestoreData.Size = new System.Drawing.Size(120, 40);
+            btnRestoreData.TabIndex = 1;
+            btnRestoreData.Text = "恢复数据";
+            btnRestoreData.UseVisualStyleBackColor = false;
+            // 
+            // btnBackupData
+            // 
+            btnBackupData.BackColor = System.Drawing.Color.FromArgb(100, 101, 165);
+            btnBackupData.Cursor = System.Windows.Forms.Cursors.Hand;
+            btnBackupData.FlatAppearance.BorderSize = 0;
+            btnBackupData.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            btnBackupData.Font = new System.Drawing.Font("Microsoft YaHei UI", 9F, System.Drawing.FontStyle.Bold);
+            btnBackupData.ForeColor = System.Drawing.Color.White;
+            btnBackupData.Location = new System.Drawing.Point(20, 40);
+            btnBackupData.Name = "btnBackupData";
+            btnBackupData.Size = new System.Drawing.Size(120, 40);
+            btnBackupData.TabIndex = 0;
+            btnBackupData.Text = "备份数据";
+            btnBackupData.UseVisualStyleBackColor = false;
+            // 
+            // clearChatHistoryButton
+            // 
+            clearChatHistoryButton.BackColor = System.Drawing.Color.FromArgb(100, 101, 165);
+            clearChatHistoryButton.Cursor = System.Windows.Forms.Cursors.Hand;
+            clearChatHistoryButton.FlatAppearance.BorderSize = 0;
+            clearChatHistoryButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            clearChatHistoryButton.Font = new System.Drawing.Font("Microsoft YaHei UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 134);
+            clearChatHistoryButton.ForeColor = System.Drawing.Color.White;
+            clearChatHistoryButton.Location = new System.Drawing.Point(50, 210);
+            clearChatHistoryButton.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            clearChatHistoryButton.Name = "clearChatHistoryButton";
+            clearChatHistoryButton.Size = new System.Drawing.Size(162, 74);
+            clearChatHistoryButton.TabIndex = 0;
+            clearChatHistoryButton.Text = "清除所有聊天记录";
+            clearChatHistoryButton.UseVisualStyleBackColor = false;
+            // 
+            // aboutContainer
+            // 
+            aboutContainer.BackColor = System.Drawing.Color.White;
+            aboutContainer.Controls.Add(lblGitHub);
+            aboutContainer.Controls.Add(lblLicense);
+            aboutContainer.Controls.Add(lblDeveloper);
+            aboutContainer.Controls.Add(lblVersion);
+            aboutContainer.Controls.Add(lblAppName);
+            aboutContainer.Controls.Add(picAppIcon);
+            aboutContainer.Controls.Add(lblFeatures);
+            aboutContainer.Controls.Add(lblTechStack);
+            aboutContainer.Controls.Add(lblDocumentation);
+            aboutContainer.Dock = System.Windows.Forms.DockStyle.Fill;
+            aboutContainer.Location = new System.Drawing.Point(0, 0);
+            aboutContainer.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            aboutContainer.Name = "aboutContainer";
+            aboutContainer.Padding = new System.Windows.Forms.Padding(20);
+            aboutContainer.Size = new System.Drawing.Size(935, 790);
+            aboutContainer.TabIndex = 5;
+            aboutContainer.Visible = false;
+            // 
+            // lblGitHub
+            // 
+            lblGitHub.AutoSize = true;
+            lblGitHub.Font = new System.Drawing.Font("Microsoft YaHei UI", 9F);
+            lblGitHub.Location = new System.Drawing.Point(20, 270);
+            lblGitHub.Name = "lblGitHub";
+            lblGitHub.Size = new System.Drawing.Size(344, 20);
+            lblGitHub.TabIndex = 5;
+            lblGitHub.TabStop = true;
+            lblGitHub.Text = "GitHub: https://github.com/rbetree/llm-agent";
+            lblGitHub.LinkClicked += lblGitHub_Click;
+            // 
+            // lblLicense
+            // 
+            lblLicense.AutoSize = true;
+            lblLicense.Font = new System.Drawing.Font("Microsoft YaHei UI", 9F);
+            lblLicense.Location = new System.Drawing.Point(20, 150);
+            lblLicense.Name = "lblLicense";
+            lblLicense.Size = new System.Drawing.Size(97, 20);
+            lblLicense.TabIndex = 4;
+            lblLicense.Text = "许可证：MIT";
+            // 
+            // lblDeveloper
+            // 
+            lblDeveloper.AutoSize = true;
+            lblDeveloper.Font = new System.Drawing.Font("Microsoft YaHei UI", 9F);
+            lblDeveloper.Location = new System.Drawing.Point(20, 120);
+            lblDeveloper.Name = "lblDeveloper";
+            lblDeveloper.Size = new System.Drawing.Size(124, 20);
+            lblDeveloper.TabIndex = 3;
+            lblDeveloper.Text = "开发者：rbetree";
+            // 
+            // lblVersion
+            // 
+            lblVersion.AutoSize = true;
+            lblVersion.Font = new System.Drawing.Font("Microsoft YaHei UI", 10F);
+            lblVersion.ForeColor = System.Drawing.Color.Gray;
+            lblVersion.Location = new System.Drawing.Point(100, 65);
+            lblVersion.Name = "lblVersion";
+            lblVersion.Size = new System.Drawing.Size(87, 23);
+            lblVersion.TabIndex = 2;
+            lblVersion.Text = "版本 1.0.0";
+            // 
+            // lblAppName
+            // 
+            lblAppName.AutoSize = true;
+            lblAppName.Font = new System.Drawing.Font("Microsoft YaHei UI", 16F, System.Drawing.FontStyle.Bold);
+            lblAppName.Location = new System.Drawing.Point(100, 30);
+            lblAppName.Name = "lblAppName";
+            lblAppName.Size = new System.Drawing.Size(164, 36);
+            lblAppName.TabIndex = 1;
+            lblAppName.Text = "LLM Agent";
+            // 
+            // picAppIcon
+            // 
+            picAppIcon.Image = (System.Drawing.Image)resources.GetObject("picAppIcon.Image");
+            picAppIcon.Location = new System.Drawing.Point(20, 20);
+            picAppIcon.Name = "picAppIcon";
+            picAppIcon.Size = new System.Drawing.Size(64, 64);
+            picAppIcon.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            picAppIcon.TabIndex = 0;
+            picAppIcon.TabStop = false;
+            // 
+            // lblFeatures
+            // 
+            lblFeatures.AutoSize = true;
+            lblFeatures.Font = new System.Drawing.Font("Microsoft YaHei UI", 9F);
+            lblFeatures.Location = new System.Drawing.Point(20, 180);
+            lblFeatures.Name = "lblFeatures";
+            lblFeatures.Size = new System.Drawing.Size(414, 20);
+            lblFeatures.TabIndex = 6;
+            lblFeatures.Text = "应用特点：多模型支持、美观交互体验、多轮对话、安全可靠";
+            // 
+            // lblTechStack
+            // 
+            lblTechStack.AutoSize = true;
+            lblTechStack.Font = new System.Drawing.Font("Microsoft YaHei UI", 9F);
+            lblTechStack.Location = new System.Drawing.Point(20, 210);
+            lblTechStack.Name = "lblTechStack";
+            lblTechStack.Size = new System.Drawing.Size(421, 20);
+            lblTechStack.TabIndex = 7;
+            lblTechStack.Text = "技术栈：.NET 8.0、Windows Forms、SQLite、HTTP客户端";
+            // 
+            // lblDocumentation
+            // 
+            lblDocumentation.AutoSize = true;
+            lblDocumentation.Font = new System.Drawing.Font("Microsoft YaHei UI", 9F);
+            lblDocumentation.Location = new System.Drawing.Point(20, 240);
+            lblDocumentation.Name = "lblDocumentation";
+            lblDocumentation.Size = new System.Drawing.Size(308, 20);
+            lblDocumentation.TabIndex = 8;
+            lblDocumentation.TabStop = true;
+            lblDocumentation.Text = "文档: https://rbetree.github.io/llm-agent/";
+            lblDocumentation.Click += lblDocumentation_Click;
             // 
             // chatPagePanel
             // 
@@ -915,193 +1361,6 @@ namespace llm_agent.UI.Forms
             aiWebsiteContentPanel.Size = new System.Drawing.Size(935, 790);
             aiWebsiteContentPanel.TabIndex = 0;
             // 
-            // settingsPanel
-            // 
-            settingsPanel.Controls.Add(settingsPageSplitContainer);
-            settingsPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            settingsPanel.Location = new System.Drawing.Point(0, 0);
-            settingsPanel.Margin = new System.Windows.Forms.Padding(4);
-            settingsPanel.Name = "settingsPanel";
-            settingsPanel.Padding = new System.Windows.Forms.Padding(0, 0, 10, 10);
-            settingsPanel.Size = new System.Drawing.Size(1229, 800);
-            settingsPanel.TabIndex = 1;
-            settingsPanel.Visible = false;
-            // 
-            // settingsPageSplitContainer
-            // 
-            settingsPageSplitContainer.Dock = System.Windows.Forms.DockStyle.Fill;
-            settingsPageSplitContainer.FixedPanel = System.Windows.Forms.FixedPanel.Panel1;
-            settingsPageSplitContainer.Location = new System.Drawing.Point(0, 0);
-            settingsPageSplitContainer.Margin = new System.Windows.Forms.Padding(0);
-            settingsPageSplitContainer.Name = "settingsPageSplitContainer";
-            // 
-            // settingsPageSplitContainer.Panel1
-            // 
-            settingsPageSplitContainer.Panel1.Controls.Add(settingsMenuPanel);
-            // 
-            // settingsPageSplitContainer.Panel2
-            // 
-            settingsPageSplitContainer.Panel2.Controls.Add(settingsContentContainer);
-            settingsPageSplitContainer.Size = new System.Drawing.Size(1219, 790);
-            settingsPageSplitContainer.SplitterDistance = 283;
-            settingsPageSplitContainer.SplitterWidth = 1;
-            settingsPageSplitContainer.TabIndex = 0;
-            // 
-            // settingsMenuPanel
-            // 
-            settingsMenuPanel.BackColor = System.Drawing.Color.FromArgb(248, 249, 250);
-            settingsMenuPanel.Controls.Add(aboutSettingsButton);
-            settingsMenuPanel.Controls.Add(dataSettingsButton);
-            settingsMenuPanel.Controls.Add(generalSettingsButton);
-            settingsMenuPanel.Controls.Add(shortcutSettingsButton);
-            settingsMenuPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            settingsMenuPanel.Location = new System.Drawing.Point(0, 0);
-            settingsMenuPanel.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            settingsMenuPanel.Name = "settingsMenuPanel";
-            settingsMenuPanel.Padding = new System.Windows.Forms.Padding(0, 20, 0, 0);
-            settingsMenuPanel.Size = new System.Drawing.Size(283, 790);
-            settingsMenuPanel.TabIndex = 0;
-            // 
-            // aboutSettingsButton
-            // 
-            aboutSettingsButton.BackColor = System.Drawing.Color.FromArgb(248, 249, 250);
-            aboutSettingsButton.Cursor = System.Windows.Forms.Cursors.Hand;
-            aboutSettingsButton.FlatAppearance.BorderSize = 0;
-            aboutSettingsButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            aboutSettingsButton.Font = new System.Drawing.Font("Microsoft YaHei UI", 10F);
-            aboutSettingsButton.Location = new System.Drawing.Point(0, 167);
-            aboutSettingsButton.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            aboutSettingsButton.Name = "aboutSettingsButton";
-            aboutSettingsButton.Padding = new System.Windows.Forms.Padding(21, 0, 0, 0);
-            aboutSettingsButton.Size = new System.Drawing.Size(283, 49);
-            aboutSettingsButton.TabIndex = 4;
-            aboutSettingsButton.Text = "关于";
-            aboutSettingsButton.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            aboutSettingsButton.UseVisualStyleBackColor = false;
-            // 
-            // dataSettingsButton
-            // 
-            dataSettingsButton.BackColor = System.Drawing.Color.FromArgb(248, 249, 250);
-            dataSettingsButton.Cursor = System.Windows.Forms.Cursors.Hand;
-            dataSettingsButton.FlatAppearance.BorderSize = 0;
-            dataSettingsButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            dataSettingsButton.Font = new System.Drawing.Font("Microsoft YaHei UI", 10F);
-            dataSettingsButton.Location = new System.Drawing.Point(0, 118);
-            dataSettingsButton.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            dataSettingsButton.Name = "dataSettingsButton";
-            dataSettingsButton.Padding = new System.Windows.Forms.Padding(21, 0, 0, 0);
-            dataSettingsButton.Size = new System.Drawing.Size(283, 49);
-            dataSettingsButton.TabIndex = 3;
-            dataSettingsButton.Text = "数据设置";
-            dataSettingsButton.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            dataSettingsButton.UseVisualStyleBackColor = false;
-            // 
-            // generalSettingsButton
-            // 
-            generalSettingsButton.BackColor = System.Drawing.Color.FromArgb(248, 249, 250);
-            generalSettingsButton.Cursor = System.Windows.Forms.Cursors.Hand;
-            generalSettingsButton.Dock = System.Windows.Forms.DockStyle.Top;
-            generalSettingsButton.FlatAppearance.BorderSize = 0;
-            generalSettingsButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            generalSettingsButton.Font = new System.Drawing.Font("Microsoft YaHei UI", 10F);
-            generalSettingsButton.Location = new System.Drawing.Point(0, 20);
-            generalSettingsButton.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            generalSettingsButton.Name = "generalSettingsButton";
-            generalSettingsButton.Padding = new System.Windows.Forms.Padding(21, 0, 0, 0);
-            generalSettingsButton.Size = new System.Drawing.Size(283, 49);
-            generalSettingsButton.TabIndex = 1;
-            generalSettingsButton.Text = "常规设置";
-            generalSettingsButton.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            generalSettingsButton.UseVisualStyleBackColor = false;
-            // 
-            // shortcutSettingsButton
-            // 
-            shortcutSettingsButton.BackColor = System.Drawing.Color.FromArgb(248, 249, 250);
-            shortcutSettingsButton.Cursor = System.Windows.Forms.Cursors.Hand;
-            shortcutSettingsButton.FlatAppearance.BorderSize = 0;
-            shortcutSettingsButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            shortcutSettingsButton.Font = new System.Drawing.Font("Microsoft YaHei UI", 10F);
-            shortcutSettingsButton.Location = new System.Drawing.Point(0, 69);
-            shortcutSettingsButton.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            shortcutSettingsButton.Name = "shortcutSettingsButton";
-            shortcutSettingsButton.Padding = new System.Windows.Forms.Padding(21, 0, 0, 0);
-            shortcutSettingsButton.Size = new System.Drawing.Size(283, 49);
-            shortcutSettingsButton.TabIndex = 2;
-            shortcutSettingsButton.Text = "快捷方式设置";
-            shortcutSettingsButton.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            shortcutSettingsButton.UseVisualStyleBackColor = false;
-            // 
-            // settingsContentContainer
-            // 
-            settingsContentContainer.Controls.Add(dataSettingsContainer);
-            settingsContentContainer.Controls.Add(aboutContainer);
-            settingsContentContainer.Controls.Add(generalSettingsContainer);
-            settingsContentContainer.Controls.Add(shortcutSettingsContainer);
-            settingsContentContainer.Dock = System.Windows.Forms.DockStyle.Fill;
-            settingsContentContainer.Location = new System.Drawing.Point(0, 0);
-            settingsContentContainer.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            settingsContentContainer.Name = "settingsContentContainer";
-            settingsContentContainer.Size = new System.Drawing.Size(935, 790);
-            settingsContentContainer.TabIndex = 0;
-            // 
-            // dataSettingsContainer
-            // 
-            dataSettingsContainer.BackColor = System.Drawing.Color.White;
-            dataSettingsContainer.Controls.Add(clearChatHistoryButton);
-            dataSettingsContainer.Dock = System.Windows.Forms.DockStyle.Fill;
-            dataSettingsContainer.Location = new System.Drawing.Point(0, 0);
-            dataSettingsContainer.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            dataSettingsContainer.Name = "dataSettingsContainer";
-            dataSettingsContainer.Size = new System.Drawing.Size(935, 790);
-            dataSettingsContainer.TabIndex = 4;
-            dataSettingsContainer.Visible = false;
-            // 
-            // clearChatHistoryButton
-            // 
-            clearChatHistoryButton.BackColor = System.Drawing.Color.FromArgb(100, 101, 165);
-            clearChatHistoryButton.Cursor = System.Windows.Forms.Cursors.Hand;
-            clearChatHistoryButton.FlatAppearance.BorderSize = 0;
-            clearChatHistoryButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            clearChatHistoryButton.Font = new System.Drawing.Font("Microsoft YaHei UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 134);
-            clearChatHistoryButton.ForeColor = System.Drawing.Color.White;
-            clearChatHistoryButton.Location = new System.Drawing.Point(21, 20);
-            clearChatHistoryButton.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            clearChatHistoryButton.Name = "clearChatHistoryButton";
-            clearChatHistoryButton.Size = new System.Drawing.Size(162, 74);
-            clearChatHistoryButton.TabIndex = 0;
-            clearChatHistoryButton.Text = "清除所有聊天记录";
-            clearChatHistoryButton.UseVisualStyleBackColor = false;
-            // 
-            // aboutContainer
-            // 
-            aboutContainer.Dock = System.Windows.Forms.DockStyle.Fill;
-            aboutContainer.Location = new System.Drawing.Point(0, 0);
-            aboutContainer.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            aboutContainer.Name = "aboutContainer";
-            aboutContainer.Size = new System.Drawing.Size(935, 790);
-            aboutContainer.TabIndex = 5;
-            aboutContainer.Visible = false;
-            // 
-            // generalSettingsContainer
-            // 
-            generalSettingsContainer.Dock = System.Windows.Forms.DockStyle.Fill;
-            generalSettingsContainer.Location = new System.Drawing.Point(0, 0);
-            generalSettingsContainer.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            generalSettingsContainer.Name = "generalSettingsContainer";
-            generalSettingsContainer.Size = new System.Drawing.Size(935, 790);
-            generalSettingsContainer.TabIndex = 3;
-            generalSettingsContainer.Visible = false;
-            // 
-            // shortcutSettingsContainer
-            // 
-            shortcutSettingsContainer.Dock = System.Windows.Forms.DockStyle.Fill;
-            shortcutSettingsContainer.Location = new System.Drawing.Point(0, 0);
-            shortcutSettingsContainer.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            shortcutSettingsContainer.Name = "shortcutSettingsContainer";
-            shortcutSettingsContainer.Size = new System.Drawing.Size(935, 790);
-            shortcutSettingsContainer.TabIndex = 2;
-            shortcutSettingsContainer.Visible = false;
-            // 
             // userProfilePanel
             // 
             userProfilePanel.Controls.Add(userProfilePageSplitContainer);
@@ -1644,6 +1903,16 @@ namespace llm_agent.UI.Forms
             welcomeTitleLabel.TabIndex = 0;
             welcomeTitleLabel.Text = "欢迎使用提示词库";
             // 
+            // chkEnableMarkdown
+            // 
+            chkEnableMarkdown.AutoSize = true;
+            chkEnableMarkdown.Location = new System.Drawing.Point(0, 30);
+            chkEnableMarkdown.Name = "chkEnableMarkdown";
+            chkEnableMarkdown.Size = new System.Drawing.Size(169, 24);
+            chkEnableMarkdown.TabIndex = 1;
+            chkEnableMarkdown.Text = "启用Markdown格式";
+            chkEnableMarkdown.UseVisualStyleBackColor = true;
+            // 
             // settingsContentPanel
             // 
             settingsContentPanel.Location = new System.Drawing.Point(0, 0);
@@ -1659,16 +1928,6 @@ namespace llm_agent.UI.Forms
             generalSettingsGroup.Size = new System.Drawing.Size(200, 100);
             generalSettingsGroup.TabIndex = 0;
             generalSettingsGroup.TabStop = false;
-            // 
-            // chkEnableMarkdown
-            // 
-            chkEnableMarkdown.AutoSize = true;
-            chkEnableMarkdown.Location = new System.Drawing.Point(0, 30);
-            chkEnableMarkdown.Name = "chkEnableMarkdown";
-            chkEnableMarkdown.Size = new System.Drawing.Size(169, 24);
-            chkEnableMarkdown.TabIndex = 1;
-            chkEnableMarkdown.Text = "启用Markdown格式";
-            chkEnableMarkdown.UseVisualStyleBackColor = true;
             // 
             // btnSaveSettings
             // 
@@ -1710,6 +1969,23 @@ namespace llm_agent.UI.Forms
             ((System.ComponentModel.ISupportInitialize)mainSplitContainer).EndInit();
             mainSplitContainer.ResumeLayout(false);
             navPanel.ResumeLayout(false);
+            settingsPanel.ResumeLayout(false);
+            settingsPageSplitContainer.Panel1.ResumeLayout(false);
+            settingsPageSplitContainer.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)settingsPageSplitContainer).EndInit();
+            settingsPageSplitContainer.ResumeLayout(false);
+            settingsMenuPanel.ResumeLayout(false);
+            settingsContentContainer.ResumeLayout(false);
+            shortcutSettingsContainer.ResumeLayout(false);
+            shortcutSettingsContainer.PerformLayout();
+            generalSettingsContainer.ResumeLayout(false);
+            grpGeneralSettings.ResumeLayout(false);
+            grpGeneralSettings.PerformLayout();
+            dataSettingsContainer.ResumeLayout(false);
+            grpDataManagement.ResumeLayout(false);
+            aboutContainer.ResumeLayout(false);
+            aboutContainer.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)picAppIcon).EndInit();
             chatPagePanel.ResumeLayout(false);
             chatPageSplitContainer.Panel1.ResumeLayout(false);
             chatPageSplitContainer.Panel2.ResumeLayout(false);
@@ -1745,14 +2021,6 @@ namespace llm_agent.UI.Forms
             websiteListContainer.Panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)websiteListContainer).EndInit();
             websiteListContainer.ResumeLayout(false);
-            settingsPanel.ResumeLayout(false);
-            settingsPageSplitContainer.Panel1.ResumeLayout(false);
-            settingsPageSplitContainer.Panel2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)settingsPageSplitContainer).EndInit();
-            settingsPageSplitContainer.ResumeLayout(false);
-            settingsMenuPanel.ResumeLayout(false);
-            settingsContentContainer.ResumeLayout(false);
-            dataSettingsContainer.ResumeLayout(false);
             userProfilePanel.ResumeLayout(false);
             userProfilePageSplitContainer.Panel1.ResumeLayout(false);
             userProfilePageSplitContainer.Panel2.ResumeLayout(false);
@@ -1811,9 +2079,27 @@ namespace llm_agent.UI.Forms
         private System.Windows.Forms.Panel settingsContentContainer;
         private System.Windows.Forms.Panel dataSettingsContainer;
         private System.Windows.Forms.Button clearChatHistoryButton;
+        private System.Windows.Forms.GroupBox grpDataManagement;
+        private System.Windows.Forms.Button btnBackupData;
+        private System.Windows.Forms.Button btnRestoreData;
         private System.Windows.Forms.Panel aboutContainer;
+        private System.Windows.Forms.PictureBox picAppIcon;
+        private System.Windows.Forms.Label lblAppName;
+        private System.Windows.Forms.Label lblVersion;
+        private System.Windows.Forms.Label lblDeveloper;
+        private System.Windows.Forms.Label lblLicense;
+        private System.Windows.Forms.LinkLabel lblGitHub;
+        private System.Windows.Forms.Label lblFeatures;
+        private System.Windows.Forms.Label lblTechStack;
+        private System.Windows.Forms.LinkLabel lblDocumentation;
         private System.Windows.Forms.Panel generalSettingsContainer;
+        private System.Windows.Forms.GroupBox grpGeneralSettings;
+        private System.Windows.Forms.Label lblSystemPrompt;
+        private System.Windows.Forms.TextBox txtSystemPrompt;
+        private System.Windows.Forms.Button btnSaveGeneralSettings;
         private System.Windows.Forms.Panel shortcutSettingsContainer;
+        private System.Windows.Forms.ListView lvShortcuts;
+        private System.Windows.Forms.Label lblShortcutsTitle;
         private System.Windows.Forms.Panel channelPanel;
         private System.Windows.Forms.SplitContainer channelPageSplitContainer;
         private System.Windows.Forms.Panel channelListPanel;

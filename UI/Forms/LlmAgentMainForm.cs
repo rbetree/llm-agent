@@ -105,7 +105,7 @@ namespace llm_agent.UI.Forms
 
                 SetupEvents();
                 SetupUI();
-                
+
                 // 显示当前登录用户信息
                 UpdateUserInfo();
             }
@@ -113,7 +113,7 @@ namespace llm_agent.UI.Forms
             {
                 // 记录异常
                 Console.Error.WriteLine($"初始化主窗体时出错: {ex.Message}");
-                MessageBox.Show($"初始化应用程序时出错: {ex.Message}\n\n应用程序可能无法正常工作。", 
+                MessageBox.Show($"初始化应用程序时出错: {ex.Message}\n\n应用程序可能无法正常工作。",
                     "初始化错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
@@ -328,7 +328,14 @@ namespace llm_agent.UI.Forms
 
             // 设置数据页面"清除所有聊天记录"按钮事件
             clearChatHistoryButton.Click += ClearChatHistoryButton_Click;
-            
+
+            // 设置页面其他按钮事件
+            btnSaveGeneralSettings.Click += SaveGeneralSettings;
+            btnBackupData.Click += BackupData;
+            btnRestoreData.Click += RestoreData;
+            // 已在Designer中设置了GitHub链接的事件处理
+            // lblGitHub.LinkClicked += (s, e) => System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo("https://github.com/rbetree/llm-agent") { UseShellExecute = true });
+
             // 用户页面事件
             newUserButton.Click += NewUserButton_Click;
         }
@@ -390,21 +397,16 @@ namespace llm_agent.UI.Forms
             }
             else if (targetPanel == settingsPanel)
             {
-                // 初始化设置面板状态
-                if (generalSettingsGroup != null)
-                {
-                    // 初始化Markdown支持复选框状态
-                    if (chkEnableMarkdown != null)
-                    {
-                        chkEnableMarkdown.Checked = _enableMarkdown;
-                    }
-
-                    // 其他设置页面初始化...
-                }
+                // 初始化各设置页面
+                InitializeGeneralSettings();
+                InitializeShortcutSettings();
+                InitializeDataSettings();
+                InitializeAboutPage();
 
                 // 默认选中通用设置按钮
                 SwitchSettingsPage(generalSettingsContainer);
-                generalSettingsButton.BackColor = Color.FromArgb(230, 230, 230);
+                // 删除这行，让按钮颜色完全由SwitchSettingsPage方法控制
+                // generalSettingsButton.BackColor = Color.FromArgb(230, 230, 230);
             }
             else if (targetPanel == promptsPanel)
             {
@@ -1154,10 +1156,10 @@ namespace llm_agent.UI.Forms
             {
                 // 获取当前用户ID
                 string userId = UserSession.Instance.GetCurrentUserId();
-                
+
                 // 设置当前会话
                 _chatHistoryManager.GetOrCreateSession(session.Id, userId);
-                
+
                 // 显示聊天界面
                 DisplayChatInterface();
             }
@@ -1203,13 +1205,13 @@ namespace llm_agent.UI.Forms
             {
                 // 获取当前用户ID
                 string userId = UserSession.Instance.GetCurrentUserId();
-                
+
                 // 创建新会话，传入用户ID以关联所有权
                 var session = _chatHistoryManager.CreateNewSession(userId);
-                
+
                 // 更新会话列表
                 UpdateChatList();
-                
+
                 // 切换到新会话
                 SwitchToChat(session);
             }
@@ -1506,6 +1508,25 @@ namespace llm_agent.UI.Forms
                     .Where(m => m.Role != ChatRole.System || m == session.Messages.FirstOrDefault())
                     .ToList();
 
+                // 如果有系统提示词，添加到消息列表的开头（不保存到会话中）
+                // 这样处理的好处是：
+                // 1. 系统提示词可以随时修改并立即应用到所有会话
+                // 2. 不影响会话历史记录，不会在UI中显示
+                // 3. 各LLM提供商会在API请求中正确处理系统提示词
+                if (!string.IsNullOrEmpty(_systemPrompt))
+                {
+                    // 创建一个临时的系统提示词消息，仅用于当前API请求
+                    var systemMessage = new ChatMessage
+                    {
+                        Role = ChatRole.System,
+                        Content = _systemPrompt,
+                        Timestamp = DateTime.Now
+                    };
+
+                    // 将系统提示词消息添加到列表开头，确保LLM首先处理系统指令
+                    messages.Insert(0, systemMessage);
+                }
+
                 try
                 {
                     // 开始API请求
@@ -1634,20 +1655,20 @@ namespace llm_agent.UI.Forms
                 InitializeChatPageModelSelector();
                 InitializeChatListPanel();
                 InitializeChatbox();
-                
+
                 // 初始化其他页面
                 InitializePromptsPanel();
                 InitializeAiWebsitePanel();
-                
+
                 // 加载聊天记录
                 LoadChatHistory();
-                
+
                 // 更新用户信息显示
                 UpdateUserInfo();
-                
+
                 // 默认显示聊天页面
                 SwitchToPanel(chatPagePanel, chatNavButton);
-                
+
                 // 更新窗口标题
                 UpdateTitle();
             }
@@ -1794,19 +1815,19 @@ namespace llm_agent.UI.Forms
             {
                 if (control is Button button)
                 {
-                    button.BackColor = Color.FromArgb(248, 249, 250);
+                    button.BackColor = Color.FromArgb(76, 76, 128);
                 }
             }
 
             // 高亮当前活动按钮
             if (targetContainer == shortcutSettingsContainer)
-                shortcutSettingsButton.BackColor = Color.FromArgb(230, 230, 230);
+                shortcutSettingsButton.BackColor = Color.FromArgb(100, 101, 165);
             else if (targetContainer == generalSettingsContainer)
-                generalSettingsButton.BackColor = Color.FromArgb(230, 230, 230);
+                generalSettingsButton.BackColor = Color.FromArgb(100, 101, 165);
             else if (targetContainer == dataSettingsContainer)
-                dataSettingsButton.BackColor = Color.FromArgb(230, 230, 230);
+                dataSettingsButton.BackColor = Color.FromArgb(100, 101, 165);
             else if (targetContainer == aboutContainer)
-                aboutSettingsButton.BackColor = Color.FromArgb(230, 230, 230);
+                aboutSettingsButton.BackColor = Color.FromArgb(100, 101, 165);
         }
 
         // 更新聊天区域的模型提供商选择列表
@@ -2762,16 +2783,16 @@ namespace llm_agent.UI.Forms
                 {
                     // 获取当前用户ID
                     string userId = UserSession.Instance.GetCurrentUserId();
-                    
+
                     // 清除聊天记录，传入用户ID以实现数据隔离
                     _chatHistoryManager.ClearAllSessions(userId);
-                    
+
                     // 更新聊天列表
                     UpdateChatList();
-                    
+
                     // 创建一个新的聊天会话
                     CreateNewChat();
-                    
+
                     MessageBox.Show("聊天记录已清除", "成功", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 catch (Exception ex)
@@ -2844,20 +2865,20 @@ namespace llm_agent.UI.Forms
             try
             {
                 chatListPanel.Controls.Clear();
-                
+
                 // 获取当前用户ID
                 string userId = UserSession.Instance.GetCurrentUserId();
-                
+
                 // 获取聊天会话列表，传入用户ID以实现数据隔离
                 var sessions = _chatHistoryManager.GetAllSessions(userId);
-                
+
                 // 过滤搜索结果
                 if (!string.IsNullOrWhiteSpace(searchBox.Text))
                 {
                     string searchText = searchBox.Text.ToLower();
                     sessions = sessions.Where(s => s.Title.ToLower().Contains(searchText)).ToList();
                 }
-                
+
                 // 为每个会话创建一个按钮
                 foreach (var session in sessions)
                 {
@@ -2939,10 +2960,10 @@ namespace llm_agent.UI.Forms
             {
                 // 获取当前用户ID
                 string userId = UserSession.Instance.GetCurrentUserId();
-                
+
                 // 获取所有会话控件
                 var chatButtons = chatListPanel.Controls.OfType<Button>().ToList();
-                
+
                 // 创建会话列表，按照控件顺序排列
                 var sessions = new List<ChatSession>();
                 foreach (var button in chatButtons)
@@ -2952,7 +2973,7 @@ namespace llm_agent.UI.Forms
                         sessions.Add(session);
                     }
                 }
-                
+
                 // 更新会话顺序，传入用户ID以验证所有权
                 _chatHistoryManager.UpdateSessionOrder(sessions, userId);
             }
@@ -3031,16 +3052,16 @@ namespace llm_agent.UI.Forms
                 {
                     // 获取当前用户ID
                     string userId = UserSession.Instance.GetCurrentUserId();
-                    
+
                     // 删除会话，传入用户ID以验证所有权
                     _chatHistoryManager.DeleteChat(session.Id, userId);
-                    
+
                     // 更新会话列表
                     UpdateChatList();
-                    
+
                     // 获取剩余会话
                     var sessions = _chatHistoryManager.GetAllSessions(userId);
-                    
+
                     // 如果还有会话，切换到第一个
                     if (sessions.Count > 0)
                     {
@@ -3087,7 +3108,8 @@ namespace llm_agent.UI.Forms
             chatboxControl.SetStreamResponse(_useStreamResponse);
 
             // 注册流式响应事件
-            chatboxControl.StreamResponseToggled += (s, e) => {
+            chatboxControl.StreamResponseToggled += (s, e) =>
+            {
                 _useStreamResponse = chatboxControl.UseStreamResponse;
                 // 保存设置
                 Properties.Settings.Default.EnableStreamResponse = _useStreamResponse;
@@ -3095,7 +3117,8 @@ namespace llm_agent.UI.Forms
             };
 
             // 注册模型选择事件
-            chatboxControl.ModelSelectionChanged += (s, e) => {
+            chatboxControl.ModelSelectionChanged += (s, e) =>
+            {
                 string selectedModel = chatboxControl.GetSelectedModel();
                 if (!string.IsNullOrEmpty(selectedModel))
                 {
@@ -3113,7 +3136,8 @@ namespace llm_agent.UI.Forms
                 attachButton.Click -= new EventHandler(chatboxControl.BuildAttachment);
 
                 // 添加新的事件处理
-                attachButton.Click += (s, e) => {
+                attachButton.Click += (s, e) =>
+                {
                     // 调用文件上传功能
                     UploadAttachment();
                 };
@@ -3127,7 +3151,8 @@ namespace llm_agent.UI.Forms
                 chatboxControl.RemoveSendMessageHandler();
 
                 // 添加新的发送事件处理
-                sendButton.Click += async (s, e) => {
+                sendButton.Click += async (s, e) =>
+                {
                     await SendMessage();
                 };
             }
@@ -3136,7 +3161,8 @@ namespace llm_agent.UI.Forms
             var chatTextbox = chatboxControl.Controls.Find("chatTextbox", true).FirstOrDefault() as TextBox;
             if (chatTextbox != null)
             {
-                chatTextbox.KeyDown += async (s, e) => {
+                chatTextbox.KeyDown += async (s, e) =>
+                {
                     if (e.Shift && e.KeyCode == Keys.Enter)
                     {
                         e.SuppressKeyPress = true; // 阻止Enter键的默认行为
@@ -3444,7 +3470,7 @@ namespace llm_agent.UI.Forms
                 Content = welcomeContent,
                 Timestamp = DateTime.Now
             };
-            
+
             // 确保 ChatModelAdapter.ToTextChatModel 不会返回 null
             var chatModel = ChatModelAdapter.ToTextChatModel(welcomeMessage);
             if (chatModel != null) // 添加 null 检查
@@ -3598,6 +3624,219 @@ namespace llm_agent.UI.Forms
             // 设置新建按钮事件处理
             newWebsiteButton.Click += NewWebsiteButton_Click;
         }
+
+        #region 设置页面初始化和事件处理
+
+        /// <summary>
+        /// 初始化常规设置页面
+        /// </summary>
+        private void InitializeGeneralSettings()
+        {
+            try
+            {
+                // 加载系统提示词
+                txtSystemPrompt.Text = Properties.Settings.Default.SystemPrompt;
+
+                // 初始化Markdown支持复选框状态
+                if (chkEnableMarkdown != null)
+                {
+                    chkEnableMarkdown.Checked = _enableMarkdown;
+                }
+
+                // 系统提示词文本框事件处理
+                txtSystemPrompt.TextChanged += (s, e) =>
+                {
+                    _systemPrompt = txtSystemPrompt.Text;
+                };
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"初始化常规设置时出错: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// 初始化快捷键设置页面
+        /// </summary>
+        private void InitializeShortcutSettings()
+        {
+            try
+            {
+                // 设置ListView列
+                lvShortcuts.Columns.Clear();
+                lvShortcuts.Columns.Add("功能", 200);
+                lvShortcuts.Columns.Add("快捷键", 150);
+                lvShortcuts.Columns.Add("说明", 300);
+
+                // 添加快捷键项目
+                var shortcuts = new[]
+                {
+                    new { Function = "发送消息", Shortcut = "Ctrl+Enter", Description = "在聊天输入框中发送消息" },
+                    new { Function = "新建对话", Shortcut = "Ctrl+N", Description = "创建新的聊天会话" },
+                    new { Function = "切换到聊天页面", Shortcut = "Alt+1", Description = "快速切换到聊天界面" },
+                    new { Function = "切换到设置页面", Shortcut = "Alt+2", Description = "快速切换到设置界面" },
+                    new { Function = "切换到AI网站页面", Shortcut = "Alt+3", Description = "快速切换到AI网站界面" },
+                    new { Function = "焦点到搜索框", Shortcut = "Ctrl+F", Description = "将焦点移动到搜索框" },
+                    new { Function = "清空聊天框", Shortcut = "Ctrl+L", Description = "清空当前聊天内容" },
+                    new { Function = "删除会话", Shortcut = "Delete", Description = "在聊天列表中删除选中的会话" },
+                    new { Function = "切换会话", Shortcut = "Alt+数字键", Description = "快速切换到对应编号的会话" }
+                };
+
+                foreach (var shortcut in shortcuts)
+                {
+                    var item = new ListViewItem(shortcut.Function);
+                    item.SubItems.Add(shortcut.Shortcut);
+                    item.SubItems.Add(shortcut.Description);
+                    lvShortcuts.Items.Add(item);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"初始化快捷键设置时出错: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// 初始化数据设置页面
+        /// </summary>
+        private void InitializeDataSettings()
+        {
+            // 数据设置页面已有清除聊天历史按钮，这里主要是确保备份恢复按钮正常工作
+            // 具体的备份恢复逻辑在对应的事件处理方法中实现
+        }
+
+        /// <summary>
+        /// 初始化关于页面
+        /// </summary>
+        private void InitializeAboutPage()
+        {
+            try
+            {
+                // 加载应用图标
+                string logoPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "logo.png");
+                if (File.Exists(logoPath))
+                {
+                    picAppIcon.Image = Image.FromFile(logoPath);
+                }
+
+                // 设置版本信息
+                var version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
+                lblVersion.Text = $"版本 {version.Major}.{version.Minor}.{version.Build}";
+
+                // 设置应用特点
+                lblFeatures.Text = "应用特点：多模型支持、美观交互体验、多轮对话、安全可靠";
+                
+                // 设置技术栈信息
+                lblTechStack.Text = "技术栈：.NET 8.0、Windows Forms、SQLite、HTTP客户端";
+                
+                // 设置文档链接
+                lblDocumentation.Text = "文档: https://rbetree.github.io/llm-agent/";
+                lblDocumentation.LinkBehavior = LinkBehavior.HoverUnderline;
+                lblDocumentation.LinkColor = Color.FromArgb(76, 76, 128);
+                lblDocumentation.ActiveLinkColor = Color.FromArgb(100, 101, 165);
+                lblDocumentation.VisitedLinkColor = Color.FromArgb(76, 76, 128);
+                
+                // 设置GitHub链接
+                lblGitHub.LinkBehavior = LinkBehavior.HoverUnderline;
+                lblGitHub.LinkColor = Color.FromArgb(76, 76, 128);
+                lblGitHub.ActiveLinkColor = Color.FromArgb(100, 101, 165);
+                lblGitHub.VisitedLinkColor = Color.FromArgb(76, 76, 128);
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"初始化关于页面时出错: {ex.Message}");
+                lblVersion.Text = "版本 1.0.0";
+            }
+        }
+
+        /// <summary>
+        /// 保存常规设置
+        /// </summary>
+        private void SaveGeneralSettings(object sender, EventArgs e)
+        {
+            try
+            {
+                Properties.Settings.Default.SystemPrompt = txtSystemPrompt.Text;
+                Properties.Settings.Default.Save();
+                _systemPrompt = txtSystemPrompt.Text;
+
+                MessageBox.Show("设置已保存", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"保存设置失败: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        /// <summary>
+        /// 备份数据
+        /// </summary>
+        private void BackupData(object sender, EventArgs e)
+        {
+            try
+            {
+                using (var saveDialog = new SaveFileDialog())
+                {
+                    saveDialog.Filter = "数据库文件 (*.db)|*.db|所有文件 (*.*)|*.*";
+                    saveDialog.DefaultExt = "db";
+                    saveDialog.FileName = $"llm-agent-backup-{DateTime.Now:yyyyMMdd-HHmmss}.db";
+
+                    if (saveDialog.ShowDialog() == DialogResult.OK)
+                    {
+                        string dbPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "llm_agent.db");
+                        if (File.Exists(dbPath))
+                        {
+                            File.Copy(dbPath, saveDialog.FileName, true);
+                            MessageBox.Show("数据备份成功", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        }
+                        else
+                        {
+                            MessageBox.Show("数据库文件不存在", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"备份数据失败: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        /// <summary>
+        /// 恢复数据
+        /// </summary>
+        private void RestoreData(object sender, EventArgs e)
+        {
+            try
+            {
+                var result = MessageBox.Show("恢复数据将覆盖当前所有数据，是否继续？", "确认",
+                    MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+
+                if (result == DialogResult.Yes)
+                {
+                    using (var openDialog = new OpenFileDialog())
+                    {
+                        openDialog.Filter = "数据库文件 (*.db)|*.db|所有文件 (*.*)|*.*";
+                        openDialog.DefaultExt = "db";
+
+                        if (openDialog.ShowDialog() == DialogResult.OK)
+                        {
+                            string dbPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "llm_agent.db");
+                            File.Copy(openDialog.FileName, dbPath, true);
+
+                            MessageBox.Show("数据恢复成功，请重启应用程序以生效", "提示",
+                                MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"恢复数据失败: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        #endregion
 
         /// <summary>
         /// 初始化内置浏览器
@@ -3975,10 +4214,10 @@ namespace llm_agent.UI.Forms
                 System.Diagnostics.ProcessStartInfo info = new System.Diagnostics.ProcessStartInfo();
                 info.FileName = Application.ExecutablePath;
                 info.Arguments = string.Join(" ", Environment.GetCommandLineArgs().Skip(1));
-                
+
                 // 启动新实例
                 System.Diagnostics.Process.Start(info);
-                
+
                 // 关闭当前实例
                 Application.Exit();
             }
@@ -3999,13 +4238,13 @@ namespace llm_agent.UI.Forms
             {
                 // 获取当前用户ID
                 string userId = UserSession.Instance.GetCurrentUserId();
-                
+
                 // 加载聊天记录，传入用户ID以实现数据隔离
                 var sessions = _chatHistoryManager.GetAllSessions(userId);
-                
+
                 // 更新聊天列表
                 UpdateChatList();
-                
+
                 // 如果没有会话，创建一个新的
                 if (sessions.Count == 0)
                 {
@@ -4032,13 +4271,13 @@ namespace llm_agent.UI.Forms
             {
                 // 加载用户列表
                 LoadUserList();
-                
+
                 // 加载用户详细信息
                 LoadUserDetails();
-                
+
                 // 确保修改密码区域隐藏
                 changePasswordGroupBox.Visible = false;
-                
+
                 // 清空密码输入框
                 txtOldPassword.Text = string.Empty;
                 txtNewPassword.Text = string.Empty;
@@ -4063,7 +4302,7 @@ namespace llm_agent.UI.Forms
             {
                 // 清空用户列表面板
                 userListPanel.Controls.Clear();
-                
+
                 // 获取当前用户ID
                 string currentUserId = UserSession.Instance.GetCurrentUserId();
 
@@ -4076,7 +4315,7 @@ namespace llm_agent.UI.Forms
                 {
                     users = users.Where(u => u.Username.IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) >= 0).ToList();
                 }
-                
+
                 // 为每个用户创建一个卡片
                 foreach (var user in users)
                 {
@@ -4087,7 +4326,7 @@ namespace llm_agent.UI.Forms
                     };
                     userCard.Width = userListPanel.ClientSize.Width - userCard.Margin.Horizontal;
                     userCard.OnUserSelected += UserCard_Selected;
-                    
+
                     userListPanel.Controls.Add(userCard);
                 }
             }
@@ -4096,7 +4335,7 @@ namespace llm_agent.UI.Forms
                 Console.Error.WriteLine($"加载用户列表时出错: {ex.Message}");
             }
         }
-        
+
         /// <summary>
         /// 用户搜索框文本变化事件处理
         /// </summary>
@@ -4111,7 +4350,7 @@ namespace llm_agent.UI.Forms
                 Console.Error.WriteLine($"搜索用户时出错: {ex.Message}");
             }
         }
-        
+
         /// <summary>
         /// 用户列表大小变化事件处理
         /// </summary>
@@ -4122,7 +4361,7 @@ namespace llm_agent.UI.Forms
                 // 当面板大小改变时调整所有UserCardItem的宽度
                 FlowLayoutPanel panel = sender as FlowLayoutPanel;
                 if (panel == null) return;
-                
+
                 foreach (Control control in panel.Controls)
                 {
                     if (control is UserCardItem userCard)
@@ -4136,7 +4375,7 @@ namespace llm_agent.UI.Forms
                 Console.Error.WriteLine($"调整用户卡片大小时出错: {ex.Message}");
             }
         }
-        
+
         /// <summary>
         /// 用户卡片选中事件处理
         /// </summary>
@@ -4156,7 +4395,7 @@ namespace llm_agent.UI.Forms
                         // 高亮状态的切换应由更明确的逻辑（如用户切换）处理。
                     }
                 }
-                
+
                 // 显示用户详细信息
                 DisplayUserDetails(user);
             }
@@ -4165,7 +4404,7 @@ namespace llm_agent.UI.Forms
                 Console.Error.WriteLine($"选择用户卡片时出错: {ex.Message}");
             }
         }
-        
+
         /// <summary>
         /// 显示用户详细信息
         /// </summary>
@@ -4174,25 +4413,25 @@ namespace llm_agent.UI.Forms
             try
             {
                 if (user == null) return;
-                
+
                 // 显示用户名
                 lblUserInfoTitle.Text = $"当前用户：{user.Username}";
-                
+
                 // 显示注册时间
                 string createdAtStr = user.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss");
                 lblUserCreatedAt.Text = $"注册时间：{createdAtStr}";
-                
+
                 // 显示上次登录时间
-                string lastLoginStr = user.LastLoginAt.HasValue 
-                    ? user.LastLoginAt.Value.ToString("yyyy-MM-dd HH:mm:ss") 
+                string lastLoginStr = user.LastLoginAt.HasValue
+                    ? user.LastLoginAt.Value.ToString("yyyy-MM-dd HH:mm:ss")
                     : "首次登录";
                 lblUserLastLogin.Text = $"上次登录：{lastLoginStr}";
-                
+
                 // 获取该用户的对话数量
                 string userId = user.Id;
                 var chatHistoryManager = new ChatHistoryManager();
                 int chatCount = chatHistoryManager.GetAllSessions(userId).Count;
-                
+
                 // 添加对话数量显示
                 Label lblChatCount = new Label();
                 lblChatCount.AutoSize = true;
@@ -4201,7 +4440,7 @@ namespace llm_agent.UI.Forms
                 lblChatCount.Size = new System.Drawing.Size(200, 20);
                 lblChatCount.TabIndex = 3;
                 lblChatCount.Text = $"对话数量：{chatCount}";
-                
+
                 // 先移除已有的对话数量标签（如果有）
                 foreach (Control control in userInfoGroupBox.Controls)
                 {
@@ -4211,10 +4450,10 @@ namespace llm_agent.UI.Forms
                         break;
                     }
                 }
-                
+
                 // 添加新的对话数量标签
                 userInfoGroupBox.Controls.Add(lblChatCount);
-                
+
                 // 添加管理员状态显示
                 Label lblAdminStatus = new Label();
                 lblAdminStatus.AutoSize = true;
@@ -4224,7 +4463,7 @@ namespace llm_agent.UI.Forms
                 lblAdminStatus.TabIndex = 4;
                 lblAdminStatus.Text = user.IsAdmin ? "管理员：是" : "管理员：否";
                 lblAdminStatus.ForeColor = user.IsAdmin ? System.Drawing.Color.Red : System.Drawing.Color.Black;
-                
+
                 // 先移除已有的管理员状态标签（如果有）
                 foreach (Control control in userInfoGroupBox.Controls)
                 {
@@ -4234,10 +4473,10 @@ namespace llm_agent.UI.Forms
                         break;
                     }
                 }
-                
+
                 // 添加新的管理员状态标签
                 userInfoGroupBox.Controls.Add(lblAdminStatus);
-                
+
                 // 如果不是当前用户，显示"切换到该账号"按钮
                 btnSwitchAccount.Visible = user.Id != UserSession.Instance.GetCurrentUserId();
                 btnSwitchAccount.Tag = user; // 保存用户对象，供点击事件使用
@@ -4247,7 +4486,7 @@ namespace llm_agent.UI.Forms
                 Console.Error.WriteLine($"显示用户详细信息时出错: {ex.Message}");
             }
         }
-        
+
         /// <summary>
         /// 新建用户按钮点击事件
         /// </summary>
@@ -4262,7 +4501,7 @@ namespace llm_agent.UI.Forms
                     {
                         // 刷新用户列表
                         LoadUserList();
-                        
+
                         // 显示成功消息
                         MessageBox.Show("用户创建成功！", "成功", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
@@ -4285,7 +4524,7 @@ namespace llm_agent.UI.Forms
                 if (UserSession.Instance.IsLoggedIn && UserSession.Instance.CurrentUser != null)
                 {
                     var user = UserSession.Instance.CurrentUser;
-                    
+
                     // 显示用户详细信息
                     DisplayUserDetails(user);
                 }
@@ -4305,12 +4544,12 @@ namespace llm_agent.UI.Forms
             {
                 // 显示修改密码区域
                 changePasswordGroupBox.Visible = true;
-                
+
                 // 清空密码输入框
                 txtOldPassword.Text = string.Empty;
                 txtNewPassword.Text = string.Empty;
                 txtConfirmPassword.Text = string.Empty;
-                
+
                 // 设置焦点到旧密码输入框
                 txtOldPassword.Focus();
             }
@@ -4330,7 +4569,7 @@ namespace llm_agent.UI.Forms
                 string oldPassword = txtOldPassword.Text;
                 string newPassword = txtNewPassword.Text;
                 string confirmPassword = txtConfirmPassword.Text;
-                
+
                 // 验证输入
                 if (string.IsNullOrWhiteSpace(oldPassword))
                 {
@@ -4338,36 +4577,36 @@ namespace llm_agent.UI.Forms
                     txtOldPassword.Focus();
                     return;
                 }
-                
+
                 if (string.IsNullOrWhiteSpace(newPassword))
                 {
                     MessageBox.Show("请输入新密码", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     txtNewPassword.Focus();
                     return;
                 }
-                
+
                 if (newPassword.Length < 6)
                 {
                     MessageBox.Show("新密码长度不能少于6个字符", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     txtNewPassword.Focus();
                     return;
                 }
-                
+
                 if (newPassword != confirmPassword)
                 {
                     MessageBox.Show("两次输入的新密码不一致", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     txtConfirmPassword.Focus();
                     return;
                 }
-                
+
                 // 调用业务层修改密码
                 var userService = new UserService();
                 string userId = UserSession.Instance.GetCurrentUserId();
-                
+
                 if (userService.ChangePassword(userId, oldPassword, newPassword))
                 {
                     MessageBox.Show("密码修改成功", "成功", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    
+
                     // 隐藏修改密码区域
                     changePasswordGroupBox.Visible = false;
                 }
@@ -4393,7 +4632,7 @@ namespace llm_agent.UI.Forms
             {
                 // 隐藏修改密码区域
                 changePasswordGroupBox.Visible = false;
-                
+
                 // 清空密码输入框
                 txtOldPassword.Text = string.Empty;
                 txtNewPassword.Text = string.Empty;
@@ -4414,7 +4653,7 @@ namespace llm_agent.UI.Forms
             {
                 // 获取要切换到的用户
                 User targetUser = btnSwitchAccount.Tag as User;
-                
+
                 if (targetUser == null)
                 {
                     // 如果没有指定目标用户，显示登录窗体
@@ -4440,22 +4679,22 @@ namespace llm_agent.UI.Forms
 
                         // 清除当前用户会话
                         UserSession.Instance.Logout(false); // 不从已登录用户列表中移除
-                        
+
                         // 显示登录窗体
                         using (var loginForm = new LoginForm())
                         {
                             // 隐藏主窗体
                             this.Hide();
-                            
+
                             // 如果登录成功，重新加载用户数据
                             if (loginForm.ShowDialog() == DialogResult.OK)
                             {
                                 // 更新用户信息显示
                                 UpdateUserInfo();
-                                
+
                                 // 重新加载聊天历史
                                 LoadChatHistory();
-                                
+
                                 // 重新显示主窗体
                                 this.Show();
                             }
@@ -4472,7 +4711,7 @@ namespace llm_agent.UI.Forms
                     // 检查目标用户是否已登录
                     var loggedInUserService = new LoggedInUserService();
                     bool isLoggedIn = loggedInUserService.IsUserLoggedIn(targetUser.Id);
-                    
+
                     if (isLoggedIn)
                     {
                         // 如果用户已登录，直接切换
@@ -4498,7 +4737,7 @@ namespace llm_agent.UI.Forms
 
                             // 设置新的当前用户
                             UserSession.Instance.SetCurrentUser(targetUser);
-                            
+
                             // 更新目标用户最后登录时间
                             try
                             {
@@ -4509,16 +4748,16 @@ namespace llm_agent.UI.Forms
                             {
                                 Console.Error.WriteLine($"更新目标用户最后登录时间失败: {ex.Message}");
                             }
-                            
+
                             // 更新用户信息显示
                             UpdateUserInfo();
-                            
+
                             // 重新加载用户列表（更新当前用户标记）
                             LoadUserList();
-                            
+
                             // 重新加载聊天历史
                             LoadChatHistory();
-                            
+
                             // 显示成功消息
                             MessageBox.Show($"已成功切换到用户 \"{targetUser.Username}\"", "切换成功", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         }
@@ -4533,7 +4772,7 @@ namespace llm_agent.UI.Forms
                                 // 验证密码
                                 var userService = new UserService();
                                 var user = userService.Login(targetUser.Username, passwordForm.Password);
-                                
+
                                 if (user != null)
                                 {
                                     // 更新当前用户最后登录时间
@@ -4555,16 +4794,16 @@ namespace llm_agent.UI.Forms
 
                                     // 设置新的当前用户
                                     UserSession.Instance.SetCurrentUser(user);
-                                    
+
                                     // 更新用户信息显示
                                     UpdateUserInfo();
-                                    
+
                                     // 重新加载用户列表（更新当前用户标记）
                                     LoadUserList();
-                                    
+
                                     // 重新加载聊天历史
                                     LoadChatHistory();
-                                    
+
                                     // 显示成功消息
                                     MessageBox.Show($"已成功切换到用户 \"{user.Username}\"", "切换成功", MessageBoxButtons.OK, MessageBoxIcon.Information);
                                 }
@@ -4613,22 +4852,22 @@ namespace llm_agent.UI.Forms
 
                     // 清除当前用户会话
                     UserSession.Instance.Logout();
-                    
+
                     // 显示登录窗体
                     using (var loginForm = new LoginForm())
                     {
                         // 隐藏主窗体
                         this.Hide();
-                        
+
                         // 如果登录成功，重新加载用户数据
                         if (loginForm.ShowDialog() == DialogResult.OK)
                         {
                             // 更新用户信息显示
                             UpdateUserInfo();
-                            
+
                             // 重新加载聊天历史
                             LoadChatHistory();
-                            
+
                             // 重新显示主窗体
                             this.Show();
                         }
@@ -4644,6 +4883,41 @@ namespace llm_agent.UI.Forms
             {
                 Console.Error.WriteLine($"退出登录时出错: {ex.Message}");
                 MessageBox.Show($"退出登录失败: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void shortcutSettingsButton_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        /// <summary>
+        /// GitHub链接点击事件
+        /// </summary>
+        private void lblGitHub_Click(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            try
+            {
+                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo("https://github.com/rbetree/llm-agent") { UseShellExecute = true });
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"打开链接失败: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        /// <summary>
+        /// 文档链接点击事件
+        /// </summary>
+        private void lblDocumentation_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo("https://rbetree.github.io/llm-agent/") { UseShellExecute = true });
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"打开链接失败: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
     }
