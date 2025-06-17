@@ -45,140 +45,142 @@ namespace llm_agent.UI.Forms
             btnFetchModels = new Button();
             btnClearAllModels = new Button();
             SuspendLayout();
-            //
+            // 
             // lblProvider
-            //
+            // 
             lblProvider.AutoSize = true;
-            lblProvider.Location = new Point(21, 25);
-            lblProvider.Margin = new Padding(5, 0, 5, 0);
+            lblProvider.Location = new Point(24, 42);
+            lblProvider.Margin = new Padding(6, 0, 6, 0);
             lblProvider.Name = "lblProvider";
-            lblProvider.Size = new Size(140, 31);
+            lblProvider.Size = new Size(88, 20);
             lblProvider.TabIndex = 0;
             lblProvider.Text = "服务提供商:";
-            //
+            lblProvider.Click += lblProvider_Click;
+            // 
             // txtProvider
-            //
-            txtProvider.Location = new Point(184, 20);
-            txtProvider.Margin = new Padding(5, 5, 5, 5);
+            // 
+            txtProvider.BackColor = Color.WhiteSmoke;
+            txtProvider.BorderStyle = BorderStyle.FixedSingle;
+            txtProvider.Location = new Point(124, 40);
+            txtProvider.Margin = new Padding(6, 6, 6, 6);
             txtProvider.Name = "txtProvider";
             txtProvider.ReadOnly = true;
-            txtProvider.Size = new Size(392, 38);
+            txtProvider.Size = new Size(441, 27);
             txtProvider.TabIndex = 1;
-            txtProvider.BackColor = System.Drawing.Color.WhiteSmoke;
-            txtProvider.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            //
+            // 
             // modelListView
-            //
+            // 
             modelListView.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            modelListView.BackColor = Color.White;
             modelListView.CheckBoxes = true;
             modelListView.Columns.AddRange(new ColumnHeader[] { columnHeader1, columnHeader2, columnHeader3, columnHeader4 });
             modelListView.FullRowSelect = true;
-            modelListView.Location = new Point(21, 85);
-            modelListView.Margin = new Padding(5, 5, 5, 5);
+            modelListView.Location = new Point(24, 106);
+            modelListView.Margin = new Padding(6, 6, 6, 6);
             modelListView.Name = "modelListView";
-            modelListView.Size = new Size(1355, 385);
+            modelListView.Size = new Size(1323, 480);
             modelListView.TabIndex = 2;
             modelListView.UseCompatibleStateImageBehavior = false;
             modelListView.View = View.Details;
-            modelListView.BackColor = System.Drawing.Color.White;
             modelListView.ItemChecked += modelListView_ItemChecked;
-            //
+            // 
             // columnHeader1
-            //
+            // 
             columnHeader1.Text = "启用";
-            //
+            // 
             // columnHeader2
-            //
+            // 
             columnHeader2.Text = "模型ID";
             columnHeader2.Width = 500;
-            //
+            // 
             // columnHeader3
-            //
+            // 
             columnHeader3.Text = "模型名称";
             columnHeader3.Width = 500;
-            //
+            // 
             // columnHeader4
-            //
+            // 
             columnHeader4.Text = "提供商";
             columnHeader4.Width = 100;
-            //
+            // 
             // btnSave
-            //
+            // 
             btnSave.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            btnSave.Location = new Point(1043, 490);
-            btnSave.Margin = new Padding(5, 5, 5, 5);
+            btnSave.BackColor = Color.FromArgb(100, 101, 165);
+            btnSave.FlatAppearance.BorderSize = 0;
+            btnSave.FlatAppearance.MouseDownBackColor = Color.FromArgb(76, 76, 128);
+            btnSave.FlatAppearance.MouseOverBackColor = Color.FromArgb(76, 76, 128);
+            btnSave.FlatStyle = FlatStyle.Flat;
+            btnSave.ForeColor = Color.White;
+            btnSave.Location = new Point(972, 612);
+            btnSave.Margin = new Padding(6, 6, 6, 6);
             btnSave.Name = "btnSave";
-            btnSave.Size = new Size(164, 45);
+            btnSave.Size = new Size(184, 56);
             btnSave.TabIndex = 3;
             btnSave.Text = "保存";
-            btnSave.BackColor = System.Drawing.Color.FromArgb(100, 101, 165);
-            btnSave.ForeColor = System.Drawing.Color.White;
-            btnSave.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            btnSave.FlatAppearance.BorderSize = 0;
-            btnSave.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(76, 76, 128);
-            btnSave.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(76, 76, 128);
             btnSave.UseVisualStyleBackColor = false;
             btnSave.Click += btnSave_Click;
-            //
+            // 
             // btnCancel
-            //
+            // 
             btnCancel.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            btnCancel.BackColor = Color.Transparent;
             btnCancel.DialogResult = DialogResult.Cancel;
-            btnCancel.Location = new Point(1214, 490);
-            btnCancel.Margin = new Padding(5, 5, 5, 5);
+            btnCancel.FlatAppearance.BorderSize = 0;
+            btnCancel.FlatStyle = FlatStyle.Flat;
+            btnCancel.ForeColor = Color.Gray;
+            btnCancel.Location = new Point(1165, 612);
+            btnCancel.Margin = new Padding(6, 6, 6, 6);
             btnCancel.Name = "btnCancel";
-            btnCancel.Size = new Size(164, 45);
+            btnCancel.Size = new Size(184, 56);
             btnCancel.TabIndex = 4;
             btnCancel.Text = "取消";
-            btnCancel.BackColor = System.Drawing.Color.Transparent;
-            btnCancel.ForeColor = System.Drawing.Color.Gray;
-            btnCancel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            btnCancel.FlatAppearance.BorderSize = 0;
             btnCancel.UseVisualStyleBackColor = true;
-            //
+            // 
             // btnFetchModels
-            //
+            // 
             btnFetchModels.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            btnFetchModels.Location = new Point(1111, 19);
-            btnFetchModels.Margin = new Padding(5, 5, 5, 5);
+            btnFetchModels.BackColor = Color.FromArgb(100, 101, 165);
+            btnFetchModels.FlatAppearance.BorderSize = 0;
+            btnFetchModels.FlatAppearance.MouseDownBackColor = Color.FromArgb(76, 76, 128);
+            btnFetchModels.FlatAppearance.MouseOverBackColor = Color.FromArgb(76, 76, 128);
+            btnFetchModels.FlatStyle = FlatStyle.Flat;
+            btnFetchModels.ForeColor = Color.White;
+            btnFetchModels.Location = new Point(1049, 24);
+            btnFetchModels.Margin = new Padding(6, 6, 6, 6);
             btnFetchModels.Name = "btnFetchModels";
-            btnFetchModels.Size = new Size(268, 45);
+            btnFetchModels.Size = new Size(302, 56);
             btnFetchModels.TabIndex = 5;
             btnFetchModels.Text = "从API获取模型列表";
-            btnFetchModels.BackColor = System.Drawing.Color.FromArgb(100, 101, 165);
-            btnFetchModels.ForeColor = System.Drawing.Color.White;
-            btnFetchModels.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            btnFetchModels.FlatAppearance.BorderSize = 0;
-            btnFetchModels.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(76, 76, 128);
-            btnFetchModels.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(76, 76, 128);
             btnFetchModels.UseVisualStyleBackColor = false;
             btnFetchModels.Click += btnFetchModels_Click;
-            //
+            // 
             // btnClearAllModels
-            //
+            // 
             btnClearAllModels.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            btnClearAllModels.Location = new Point(833, 19);
-            btnClearAllModels.Margin = new Padding(5, 5, 5, 5);
+            btnClearAllModels.BackColor = Color.FromArgb(100, 101, 165);
+            btnClearAllModels.FlatAppearance.BorderSize = 0;
+            btnClearAllModels.FlatAppearance.MouseDownBackColor = Color.FromArgb(76, 76, 128);
+            btnClearAllModels.FlatAppearance.MouseOverBackColor = Color.FromArgb(76, 76, 128);
+            btnClearAllModels.FlatStyle = FlatStyle.Flat;
+            btnClearAllModels.ForeColor = Color.White;
+            btnClearAllModels.Location = new Point(736, 24);
+            btnClearAllModels.Margin = new Padding(6, 6, 6, 6);
             btnClearAllModels.Name = "btnClearAllModels";
-            btnClearAllModels.Size = new Size(268, 45);
+            btnClearAllModels.Size = new Size(302, 56);
             btnClearAllModels.TabIndex = 7;
             btnClearAllModels.Text = "清除所有";
-            btnClearAllModels.BackColor = System.Drawing.Color.FromArgb(100, 101, 165);
-            btnClearAllModels.ForeColor = System.Drawing.Color.White;
-            btnClearAllModels.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            btnClearAllModels.FlatAppearance.BorderSize = 0;
-            btnClearAllModels.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(76, 76, 128);
-            btnClearAllModels.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(76, 76, 128);
             btnClearAllModels.UseVisualStyleBackColor = false;
             btnClearAllModels.Click += btnClearAllModels_Click;
-            //
+            // 
             // ModelManagementForm
-            //
+            // 
             AcceptButton = btnSave;
-            AutoScaleDimensions = new SizeF(8F, 16F);
+            AutoScaleDimensions = new SizeF(9F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
+            BackColor = Color.FromArgb(248, 249, 250);
             CancelButton = btnCancel;
-            ClientSize = new Size(1400, 550);
+            ClientSize = new Size(1374, 688);
             Controls.Add(btnFetchModels);
             Controls.Add(btnCancel);
             Controls.Add(btnSave);
@@ -186,14 +188,13 @@ namespace llm_agent.UI.Forms
             Controls.Add(txtProvider);
             Controls.Add(lblProvider);
             Controls.Add(btnClearAllModels);
-            Margin = new Padding(5, 5, 5, 5);
+            Margin = new Padding(6, 6, 6, 6);
             MaximizeBox = false;
             MinimizeBox = false;
             Name = "ModelManagementForm";
             StartPosition = FormStartPosition.CenterParent;
             Text = "模型管理";
             Load += ModelManagementForm_Load;
-            BackColor = System.Drawing.Color.FromArgb(248, 249, 250);
             ResumeLayout(false);
             PerformLayout();
         }
@@ -640,6 +641,11 @@ namespace llm_agent.UI.Forms
             {
                 MessageBox.Show($"清除模型时出错：{ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+        private void lblProvider_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

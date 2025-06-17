@@ -42,7 +42,8 @@ namespace llm_agent.UI.Forms
             // lblUsername
             // 
             lblUsername.AutoSize = true;
-            lblUsername.Location = new System.Drawing.Point(34, 70);
+            lblUsername.Location = new System.Drawing.Point(66, 68);
+            lblUsername.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             lblUsername.Name = "lblUsername";
             lblUsername.Size = new System.Drawing.Size(69, 20);
             lblUsername.TabIndex = 1;
@@ -50,17 +51,19 @@ namespace llm_agent.UI.Forms
             // 
             // txtUsername
             // 
-            txtUsername.Location = new System.Drawing.Point(50, 45);
-            txtUsername.Name = "txtUsername";
-            txtUsername.Size = new System.Drawing.Size(280, 23);
-            txtUsername.TabIndex = 1;
             txtUsername.BackColor = System.Drawing.Color.WhiteSmoke;
             txtUsername.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            txtUsername.Location = new System.Drawing.Point(66, 92);
+            txtUsername.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            txtUsername.Name = "txtUsername";
+            txtUsername.Size = new System.Drawing.Size(359, 27);
+            txtUsername.TabIndex = 1;
             // 
             // lblPassword
             // 
             lblPassword.AutoSize = true;
-            lblPassword.Location = new System.Drawing.Point(34, 135);
+            lblPassword.Location = new System.Drawing.Point(66, 132);
+            lblPassword.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             lblPassword.Name = "lblPassword";
             lblPassword.Size = new System.Drawing.Size(54, 20);
             lblPassword.TabIndex = 3;
@@ -68,18 +71,20 @@ namespace llm_agent.UI.Forms
             // 
             // txtPassword
             // 
-            txtPassword.Location = new System.Drawing.Point(50, 105);
-            txtPassword.Name = "txtPassword";
-            txtPassword.Size = new System.Drawing.Size(280, 23);
-            txtPassword.TabIndex = 3;
-            txtPassword.UseSystemPasswordChar = true;
             txtPassword.BackColor = System.Drawing.Color.WhiteSmoke;
             txtPassword.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            txtPassword.Location = new System.Drawing.Point(66, 156);
+            txtPassword.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            txtPassword.Name = "txtPassword";
+            txtPassword.Size = new System.Drawing.Size(359, 27);
+            txtPassword.TabIndex = 3;
+            txtPassword.UseSystemPasswordChar = true;
             // 
             // lblConfirmPassword
             // 
             lblConfirmPassword.AutoSize = true;
-            lblConfirmPassword.Location = new System.Drawing.Point(34, 200);
+            lblConfirmPassword.Location = new System.Drawing.Point(66, 187);
+            lblConfirmPassword.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             lblConfirmPassword.Name = "lblConfirmPassword";
             lblConfirmPassword.Size = new System.Drawing.Size(84, 20);
             lblConfirmPassword.TabIndex = 5;
@@ -87,25 +92,27 @@ namespace llm_agent.UI.Forms
             // 
             // txtConfirmPassword
             // 
-            txtConfirmPassword.Location = new System.Drawing.Point(50, 165);
-            txtConfirmPassword.Name = "txtConfirmPassword";
-            txtConfirmPassword.Size = new System.Drawing.Size(280, 23);
-            txtConfirmPassword.TabIndex = 5;
-            txtConfirmPassword.UseSystemPasswordChar = true;
             txtConfirmPassword.BackColor = System.Drawing.Color.WhiteSmoke;
             txtConfirmPassword.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            txtConfirmPassword.Location = new System.Drawing.Point(66, 211);
+            txtConfirmPassword.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            txtConfirmPassword.Name = "txtConfirmPassword";
+            txtConfirmPassword.Size = new System.Drawing.Size(359, 27);
+            txtConfirmPassword.TabIndex = 5;
+            txtConfirmPassword.UseSystemPasswordChar = true;
             // 
             // btnCreate
             // 
             btnCreate.BackColor = System.Drawing.Color.FromArgb(100, 101, 165);
             btnCreate.FlatAppearance.BorderSize = 0;
-            btnCreate.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(76)))), ((int)(((byte)(76)))), ((int)(((byte)(128)))));
-            btnCreate.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(76)))), ((int)(((byte)(76)))), ((int)(((byte)(128)))));
+            btnCreate.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(76, 76, 128);
+            btnCreate.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(76, 76, 128);
             btnCreate.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             btnCreate.ForeColor = System.Drawing.Color.White;
-            btnCreate.Location = new System.Drawing.Point(140, 220);
+            btnCreate.Location = new System.Drawing.Point(180, 259);
+            btnCreate.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             btnCreate.Name = "btnCreate";
-            btnCreate.Size = new System.Drawing.Size(90, 30);
+            btnCreate.Size = new System.Drawing.Size(116, 35);
             btnCreate.TabIndex = 6;
             btnCreate.Text = "创建";
             btnCreate.UseVisualStyleBackColor = false;
@@ -118,9 +125,10 @@ namespace llm_agent.UI.Forms
             btnCancel.FlatAppearance.BorderSize = 0;
             btnCancel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             btnCancel.ForeColor = System.Drawing.Color.Gray;
-            btnCancel.Location = new System.Drawing.Point(240, 220);
+            btnCancel.Location = new System.Drawing.Point(309, 259);
+            btnCancel.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             btnCancel.Name = "btnCancel";
-            btnCancel.Size = new System.Drawing.Size(90, 30);
+            btnCancel.Size = new System.Drawing.Size(116, 35);
             btnCancel.TabIndex = 7;
             btnCancel.Text = "取消";
             btnCancel.UseVisualStyleBackColor = true;
@@ -130,7 +138,8 @@ namespace llm_agent.UI.Forms
             // 
             lblTitle.AutoSize = true;
             lblTitle.Font = new System.Drawing.Font("Microsoft YaHei UI", 12F, System.Drawing.FontStyle.Bold);
-            lblTitle.Location = new System.Drawing.Point(34, 20);
+            lblTitle.Location = new System.Drawing.Point(44, 24);
+            lblTitle.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             lblTitle.Name = "lblTitle";
             lblTitle.Size = new System.Drawing.Size(112, 27);
             lblTitle.TabIndex = 0;
@@ -138,27 +147,28 @@ namespace llm_agent.UI.Forms
             // 
             // RegisterForm
             // 
-            this.AcceptButton = this.btnCreate;
-            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = System.Drawing.Color.FromArgb(248, 249, 250);
-            this.CancelButton = this.btnCancel;
-            this.ClientSize = new System.Drawing.Size(384, 281);
-            this.Controls.Add(this.btnCancel);
-            this.Controls.Add(this.btnCreate);
-            this.Controls.Add(this.txtConfirmPassword);
-            this.Controls.Add(this.lblConfirmPassword);
-            this.Controls.Add(this.txtPassword);
-            this.Controls.Add(this.lblPassword);
-            this.Controls.Add(this.txtUsername);
-            this.Controls.Add(this.lblUsername);
-            this.Controls.Add(this.lblTitle);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
-            this.MaximizeBox = false;
-            this.MinimizeBox = false;
-            this.Name = "RegisterForm";
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "创建新用户";
+            AcceptButton = btnCreate;
+            AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
+            AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            BackColor = System.Drawing.Color.FromArgb(248, 249, 250);
+            CancelButton = btnCancel;
+            ClientSize = new System.Drawing.Size(494, 331);
+            Controls.Add(btnCancel);
+            Controls.Add(btnCreate);
+            Controls.Add(txtConfirmPassword);
+            Controls.Add(lblConfirmPassword);
+            Controls.Add(txtPassword);
+            Controls.Add(lblPassword);
+            Controls.Add(txtUsername);
+            Controls.Add(lblUsername);
+            Controls.Add(lblTitle);
+            FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            MaximizeBox = false;
+            MinimizeBox = false;
+            Name = "RegisterForm";
+            StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
+            Text = "创建新用户";
             ResumeLayout(false);
             PerformLayout();
         }

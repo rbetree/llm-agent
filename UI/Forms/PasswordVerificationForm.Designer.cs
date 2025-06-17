@@ -28,127 +28,136 @@ namespace llm_agent.UI.Forms
         /// </summary>
         private void InitializeComponent()
         {
-            this.lblTitle = new System.Windows.Forms.Label();
-            this.lblUsernameTitle = new System.Windows.Forms.Label();
-            this.lblUsername = new System.Windows.Forms.Label();
-            this.lblPasswordTitle = new System.Windows.Forms.Label();
-            this.txtPassword = new System.Windows.Forms.TextBox();
-            this.btnConfirm = new System.Windows.Forms.Button();
-            this.btnCancel = new System.Windows.Forms.Button();
-            this.lblMessage = new System.Windows.Forms.Label();
-            this.SuspendLayout();
+            lblTitle = new System.Windows.Forms.Label();
+            lblUsernameTitle = new System.Windows.Forms.Label();
+            lblUsername = new System.Windows.Forms.Label();
+            lblPasswordTitle = new System.Windows.Forms.Label();
+            txtPassword = new System.Windows.Forms.TextBox();
+            btnConfirm = new System.Windows.Forms.Button();
+            btnCancel = new System.Windows.Forms.Button();
+            lblMessage = new System.Windows.Forms.Label();
+            SuspendLayout();
             // 
             // lblTitle
             // 
-            this.lblTitle.AutoSize = true;
-            this.lblTitle.Font = new System.Drawing.Font("Microsoft YaHei UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            this.lblTitle.Location = new System.Drawing.Point(100, 20);
-            this.lblTitle.Name = "lblTitle";
-            this.lblTitle.Size = new System.Drawing.Size(92, 27);
-            this.lblTitle.TabIndex = 0;
-            this.lblTitle.Text = "密码验证";
+            lblTitle.AutoSize = true;
+            lblTitle.Font = new System.Drawing.Font("Microsoft YaHei UI", 12F, System.Drawing.FontStyle.Bold);
+            lblTitle.Location = new System.Drawing.Point(43, 18);
+            lblTitle.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            lblTitle.Name = "lblTitle";
+            lblTitle.Size = new System.Drawing.Size(92, 27);
+            lblTitle.TabIndex = 0;
+            lblTitle.Text = "密码验证";
             // 
             // lblUsernameTitle
             // 
-            this.lblUsernameTitle.AutoSize = true;
-            this.lblUsernameTitle.Location = new System.Drawing.Point(30, 70);
-            this.lblUsernameTitle.Name = "lblUsernameTitle";
-            this.lblUsernameTitle.Size = new System.Drawing.Size(69, 20);
-            this.lblUsernameTitle.TabIndex = 1;
-            this.lblUsernameTitle.Text = "用户名：";
+            lblUsernameTitle.AutoSize = true;
+            lblUsernameTitle.Location = new System.Drawing.Point(90, 61);
+            lblUsernameTitle.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            lblUsernameTitle.Name = "lblUsernameTitle";
+            lblUsernameTitle.Size = new System.Drawing.Size(69, 20);
+            lblUsernameTitle.TabIndex = 1;
+            lblUsernameTitle.Text = "用户名：";
             // 
             // lblUsername
             // 
-            this.lblUsername.AutoSize = true;
-            this.lblUsername.Font = new System.Drawing.Font("Microsoft YaHei UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            this.lblUsername.Location = new System.Drawing.Point(105, 70);
-            this.lblUsername.Name = "lblUsername";
-            this.lblUsername.Size = new System.Drawing.Size(54, 19);
-            this.lblUsername.TabIndex = 2;
-            this.lblUsername.Text = "用户名";
+            lblUsername.AutoSize = true;
+            lblUsername.Font = new System.Drawing.Font("Microsoft YaHei UI", 9F, System.Drawing.FontStyle.Bold);
+            lblUsername.Location = new System.Drawing.Point(154, 62);
+            lblUsername.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            lblUsername.Name = "lblUsername";
+            lblUsername.Size = new System.Drawing.Size(54, 19);
+            lblUsername.TabIndex = 2;
+            lblUsername.Text = "用户名";
             // 
             // lblPasswordTitle
             // 
-            this.lblPasswordTitle.AutoSize = true;
-            this.lblPasswordTitle.Location = new System.Drawing.Point(30, 110);
-            this.lblPasswordTitle.Name = "lblPasswordTitle";
-            this.lblPasswordTitle.Size = new System.Drawing.Size(54, 20);
-            this.lblPasswordTitle.TabIndex = 3;
-            this.lblPasswordTitle.Text = "密码：";
+            lblPasswordTitle.AutoSize = true;
+            lblPasswordTitle.Location = new System.Drawing.Point(90, 123);
+            lblPasswordTitle.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            lblPasswordTitle.Name = "lblPasswordTitle";
+            lblPasswordTitle.Size = new System.Drawing.Size(54, 20);
+            lblPasswordTitle.TabIndex = 3;
+            lblPasswordTitle.Text = "密码：";
             // 
             // txtPassword
             // 
-            this.txtPassword.Location = new System.Drawing.Point(50, 60);
-            this.txtPassword.Name = "txtPassword";
-            this.txtPassword.Size = new System.Drawing.Size(280, 23);
-            this.txtPassword.TabIndex = 1;
-            this.txtPassword.UseSystemPasswordChar = true;
-            this.txtPassword.BackColor = System.Drawing.Color.WhiteSmoke;
-            this.txtPassword.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            txtPassword.BackColor = System.Drawing.Color.WhiteSmoke;
+            txtPassword.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            txtPassword.Location = new System.Drawing.Point(154, 121);
+            txtPassword.Margin = new System.Windows.Forms.Padding(4);
+            txtPassword.Name = "txtPassword";
+            txtPassword.Size = new System.Drawing.Size(245, 27);
+            txtPassword.TabIndex = 1;
+            txtPassword.UseSystemPasswordChar = true;
             // 
             // btnConfirm
             // 
-            this.btnConfirm.BackColor = System.Drawing.Color.FromArgb(100, 101, 165);
-            this.btnConfirm.FlatAppearance.BorderSize = 0;
-            this.btnConfirm.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(76)))), ((int)(((byte)(76)))), ((int)(((byte)(128)))));
-            this.btnConfirm.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(76)))), ((int)(((byte)(76)))), ((int)(((byte)(128)))));
-            this.btnConfirm.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnConfirm.ForeColor = System.Drawing.Color.White;
-            this.btnConfirm.Location = new System.Drawing.Point(130, 110);
-            this.btnConfirm.Name = "btnConfirm";
-            this.btnConfirm.Size = new System.Drawing.Size(90, 30);
-            this.btnConfirm.TabIndex = 2;
-            this.btnConfirm.Text = "确认";
-            this.btnConfirm.UseVisualStyleBackColor = false;
-            this.btnConfirm.Click += new System.EventHandler(this.btnConfirm_Click);
+            btnConfirm.BackColor = System.Drawing.Color.FromArgb(100, 101, 165);
+            btnConfirm.FlatAppearance.BorderSize = 0;
+            btnConfirm.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(76, 76, 128);
+            btnConfirm.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(76, 76, 128);
+            btnConfirm.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            btnConfirm.ForeColor = System.Drawing.Color.White;
+            btnConfirm.Location = new System.Drawing.Point(154, 176);
+            btnConfirm.Margin = new System.Windows.Forms.Padding(4);
+            btnConfirm.Name = "btnConfirm";
+            btnConfirm.Size = new System.Drawing.Size(116, 35);
+            btnConfirm.TabIndex = 2;
+            btnConfirm.Text = "确认";
+            btnConfirm.UseVisualStyleBackColor = false;
+            btnConfirm.Click += btnConfirm_Click;
             // 
             // btnCancel
             // 
-            this.btnCancel.BackColor = System.Drawing.Color.Transparent;
-            this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.btnCancel.FlatAppearance.BorderSize = 0;
-            this.btnCancel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnCancel.ForeColor = System.Drawing.Color.Gray;
-            this.btnCancel.Location = new System.Drawing.Point(240, 110);
-            this.btnCancel.Name = "btnCancel";
-            this.btnCancel.Size = new System.Drawing.Size(90, 30);
-            this.btnCancel.TabIndex = 3;
-            this.btnCancel.Text = "取消";
-            this.btnCancel.UseVisualStyleBackColor = true;
+            btnCancel.BackColor = System.Drawing.Color.Transparent;
+            btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+            btnCancel.FlatAppearance.BorderSize = 0;
+            btnCancel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            btnCancel.ForeColor = System.Drawing.Color.Gray;
+            btnCancel.Location = new System.Drawing.Point(296, 176);
+            btnCancel.Margin = new System.Windows.Forms.Padding(4);
+            btnCancel.Name = "btnCancel";
+            btnCancel.Size = new System.Drawing.Size(116, 35);
+            btnCancel.TabIndex = 3;
+            btnCancel.Text = "取消";
+            btnCancel.UseVisualStyleBackColor = true;
             // 
             // lblMessage
             // 
-            this.lblMessage.AutoSize = true;
-            this.lblMessage.ForeColor = System.Drawing.Color.Red;
-            this.lblMessage.Location = new System.Drawing.Point(105, 140);
-            this.lblMessage.Name = "lblMessage";
-            this.lblMessage.Size = new System.Drawing.Size(0, 20);
-            this.lblMessage.TabIndex = 7;
+            lblMessage.AutoSize = true;
+            lblMessage.ForeColor = System.Drawing.Color.Red;
+            lblMessage.Location = new System.Drawing.Point(90, 143);
+            lblMessage.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            lblMessage.Name = "lblMessage";
+            lblMessage.Size = new System.Drawing.Size(0, 20);
+            lblMessage.TabIndex = 7;
             // 
             // PasswordVerificationForm
             // 
-            this.AcceptButton = this.btnConfirm;
-            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = System.Drawing.Color.FromArgb(248, 249, 250);
-            this.CancelButton = this.btnCancel;
-            this.ClientSize = new System.Drawing.Size(384, 161);
-            this.Controls.Add(this.lblMessage);
-            this.Controls.Add(this.btnCancel);
-            this.Controls.Add(this.btnConfirm);
-            this.Controls.Add(this.txtPassword);
-            this.Controls.Add(this.lblPasswordTitle);
-            this.Controls.Add(this.lblUsername);
-            this.Controls.Add(this.lblUsernameTitle);
-            this.Controls.Add(this.lblTitle);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
-            this.MaximizeBox = false;
-            this.MinimizeBox = false;
-            this.Name = "PasswordVerificationForm";
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "密码验证";
-            this.ResumeLayout(false);
-            this.PerformLayout();
+            AcceptButton = btnConfirm;
+            AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
+            AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            BackColor = System.Drawing.Color.FromArgb(248, 249, 250);
+            CancelButton = btnCancel;
+            ClientSize = new System.Drawing.Size(492, 224);
+            Controls.Add(lblMessage);
+            Controls.Add(btnCancel);
+            Controls.Add(btnConfirm);
+            Controls.Add(txtPassword);
+            Controls.Add(lblPasswordTitle);
+            Controls.Add(lblUsername);
+            Controls.Add(lblUsernameTitle);
+            Controls.Add(lblTitle);
+            FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            Margin = new System.Windows.Forms.Padding(4);
+            MaximizeBox = false;
+            MinimizeBox = false;
+            Name = "PasswordVerificationForm";
+            StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
+            Text = "密码验证";
+            ResumeLayout(false);
+            PerformLayout();
 
         }
 

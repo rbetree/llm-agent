@@ -222,7 +222,7 @@ namespace llm_agent.Common.Utils
             _richTextBox.SelectionLength = quoteEnd - quoteStart;
             
             _richTextBox.SelectionColor = _defaultTextColor;
-            _richTextBox.SelectionBackColor = Color.FromArgb(245, 245, 245);
+            _richTextBox.SelectionBackColor = Color.Black;
             
             // 添加引用左边线（通过绘制字符实现）
             _richTextBox.AppendText(Environment.NewLine);
@@ -238,7 +238,7 @@ namespace llm_agent.Common.Utils
             _richTextBox.SelectionFont = _codeFont;
             
             _richTextBox.SelectionColor = _defaultTextColor;
-            _richTextBox.SelectionBackColor = Color.FromArgb(245, 245, 245);
+            _richTextBox.SelectionBackColor = Color.Black;
             
             string code = "";
             if (codeBlock is FencedCodeBlock fencedCodeBlock)
@@ -424,7 +424,7 @@ namespace llm_agent.Common.Utils
             
             _richTextBox.SelectionFont = _codeFont;
             _richTextBox.SelectionColor = _defaultTextColor;
-            _richTextBox.SelectionBackColor = Color.FromArgb(240, 240, 240);
+            _richTextBox.SelectionBackColor = Color.Black;
             
             _richTextBox.AppendText(code.Content.ToString());
             
