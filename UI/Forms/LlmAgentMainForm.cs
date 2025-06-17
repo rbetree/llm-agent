@@ -4734,115 +4734,56 @@ namespace llm_agent.UI.Forms
                 }
                 else
                 {
-                    // 检查目标用户是否已登录
-                    var loggedInUserService = new LoggedInUserService();
-                    bool isLoggedIn = loggedInUserService.IsUserLoggedIn(targetUser.Id);
-
-                    if (isLoggedIn)
+                    // 对于任何非当前用户，都需要密码验证
+                    // 显示密码验证窗口
+                    using (var passwordForm = new PasswordVerificationForm(targetUser.Username))
                     {
-                        // 如果用户已登录，直接切换
-                        if (MessageBox.Show($"确定要切换到用户 \"{targetUser.Username}\" 吗？当前会话数据将会保存。", "确认切换账号", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                        if (passwordForm.ShowDialog() == DialogResult.OK)
                         {
-                            // 更新当前用户最后登录时间
-                            string userId = UserSession.Instance.GetCurrentUserId();
-                            if (!string.IsNullOrEmpty(userId))
+                            // 验证密码
+                            var userService = new UserService();
+                            var user = userService.Login(targetUser.Username, passwordForm.Password);
+
+                            if (user != null)
                             {
-                                try
+                                // 更新当前用户最后登录时间
+                                string userId = UserSession.Instance.GetCurrentUserId();
+                                if (!string.IsNullOrEmpty(userId))
                                 {
-                                    var userService = new UserService();
-                                    userService.UpdateLastLoginTime(userId);
-                                }
-                                catch (Exception ex)
-                                {
-                                    Console.Error.WriteLine($"更新用户最后登录时间失败: {ex.Message}");
-                                }
-                            }
-
-                            // 保存所有未保存的数据
-                            SaveAllPendingData();
-
-                            // 设置新的当前用户
-                            UserSession.Instance.SetCurrentUser(targetUser);
-
-                            // 更新目标用户最后登录时间
-                            try
-                            {
-                                var userService = new UserService();
-                                userService.UpdateLastLoginTime(targetUser.Id);
-                            }
-                            catch (Exception ex)
-                            {
-                                Console.Error.WriteLine($"更新目标用户最后登录时间失败: {ex.Message}");
-                            }
-
-                            // 更新用户信息显示
-                            UpdateUserInfo();
-
-                            // 清除选中的用户卡片
-                            _selectedUserCard = null;
-
-                            // 重新加载用户列表（更新当前用户标记）
-                            LoadUserList();
-
-                            // 重新加载聊天历史
-                            LoadChatHistory();
-
-                            // 显示成功消息
-                            MessageBox.Show($"已成功切换到用户 \"{targetUser.Username}\"", "切换成功", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                        }
-                    }
-                    else
-                    {
-                        // 如果用户未登录，需要输入密码验证
-                        using (var passwordForm = new PasswordVerificationForm(targetUser.Username))
-                        {
-                            if (passwordForm.ShowDialog() == DialogResult.OK)
-                            {
-                                // 验证密码
-                                var userService = new UserService();
-                                var user = userService.Login(targetUser.Username, passwordForm.Password);
-
-                                if (user != null)
-                                {
-                                    // 更新当前用户最后登录时间
-                                    string userId = UserSession.Instance.GetCurrentUserId();
-                                    if (!string.IsNullOrEmpty(userId))
+                                    try
                                     {
-                                        try
-                                        {
-                                            userService.UpdateLastLoginTime(userId);
-                                        }
-                                        catch (Exception ex)
-                                        {
-                                            Console.Error.WriteLine($"更新用户最后登录时间失败: {ex.Message}");
-                                        }
+                                        userService.UpdateLastLoginTime(userId);
                                     }
-
-                                    // 保存所有未保存的数据
-                                    SaveAllPendingData();
-
-                                    // 设置新的当前用户
-                                    UserSession.Instance.SetCurrentUser(user);
-
-                                    // 更新用户信息显示
-                                    UpdateUserInfo();
-
-                                    // 清除选中的用户卡片
-                                    _selectedUserCard = null;
-
-                                    // 重新加载用户列表（更新当前用户标记）
-                                    LoadUserList();
-
-                                    // 重新加载聊天历史
-                                    LoadChatHistory();
-
-                                    // 显示成功消息
-                                    MessageBox.Show($"已成功切换到用户 \"{user.Username}\"", "切换成功", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                    catch (Exception ex)
+                                    {
+                                        Console.Error.WriteLine($"更新用户最后登录时间失败: {ex.Message}");
+                                    }
                                 }
-                                else
-                                {
-                                    MessageBox.Show("密码验证失败，无法切换用户", "验证失败", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                                }
+
+                                // 保存所有未保存的数据
+                                SaveAllPendingData();
+
+                                // 设置新的当前用户
+                                UserSession.Instance.SetCurrentUser(user);
+
+                                // 更新用户信息显示
+                                UpdateUserInfo();
+
+                                // 清除选中的用户卡片
+                                _selectedUserCard = null;
+
+                                // 重新加载用户列表（更新当前用户标记）
+                                LoadUserList();
+
+                                // 重新加载聊天历史
+                                LoadChatHistory();
+
+                                // 显示成功消息
+                                MessageBox.Show($"已成功切换到用户 \"{user.Username}\"", "切换成功", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                            }
+                            else
+                            {
+                                MessageBox.Show("密码验证失败，无法切换用户", "验证失败", MessageBoxButtons.OK, MessageBoxIcon.Error);
                             }
                         }
                     }
