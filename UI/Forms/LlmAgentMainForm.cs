@@ -81,6 +81,8 @@ namespace llm_agent.UI.Forms
         private Panel searchPanel;
         private Chatbox chatboxControl; // 新集成的现代化聊天控件
 
+        private UserCardItem _selectedUserCard = null; // 添加选中的用户卡片变量
+
         public LlmAgentMainForm()
         {
             try
@@ -1159,6 +1161,15 @@ namespace llm_agent.UI.Forms
 
                 // 设置当前会话
                 _chatHistoryManager.GetOrCreateSession(session.Id, userId);
+
+                // 更新所有ChatSessionItem的选中状态
+                foreach (Control control in chatListPanel.Controls)
+                {
+                    if (control is ChatSessionItem item)
+                    {
+                        item.IsSelected = (item.Session.Id == session.Id);
+                    }
+                }
 
                 // 显示聊天界面
                 DisplayChatInterface();
@@ -2879,6 +2890,10 @@ namespace llm_agent.UI.Forms
                     sessions = sessions.Where(s => s.Title.ToLower().Contains(searchText)).ToList();
                 }
 
+                // 获取当前选中的会话ID
+                var currentSession = _chatHistoryManager.GetCurrentSession();
+                string currentSessionId = currentSession?.Id;
+
                 // 为每个会话创建一个按钮
                 foreach (var session in sessions)
                 {
@@ -2886,6 +2901,12 @@ namespace llm_agent.UI.Forms
                     sessionItem.Session = session;
                     sessionItem.OnSessionSelected += (s, e) => SwitchToChat(e);
                     sessionItem.OnSessionDeleted += (s, e) => DeleteChatSession(e);
+
+                    // 设置当前选中的会话高亮显示
+                    if (currentSessionId != null && session.Id == currentSessionId)
+                    {
+                        sessionItem.IsSelected = true;
+                    }
 
                     // 添加到Panel之前先调整宽度
                     sessionItem.Width = chatListPanel.ClientSize.Width - sessionItem.Margin.Horizontal;
@@ -4316,13 +4337,17 @@ namespace llm_agent.UI.Forms
                     users = users.Where(u => u.Username.IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) >= 0).ToList();
                 }
 
+                // 保存选中的用户ID
+                string selectedUserId = _selectedUserCard?.User?.Id;
+
                 // 为每个用户创建一个卡片
                 foreach (var user in users)
                 {
                     var userCard = new UserCardItem
                     {
                         User = user,
-                        IsCurrentUser = user.Id == currentUserId,
+                        IsCurrentUser = user.Id == currentUserId, // 设置是否为当前用户（仅显示标签）
+                        IsSelected = user.Id == selectedUserId    // 设置是否为选中的用户（控制高亮）
                     };
                     userCard.Width = userListPanel.ClientSize.Width - userCard.Margin.Horizontal;
                     userCard.OnUserSelected += UserCard_Selected;
@@ -4390,11 +4415,12 @@ namespace llm_agent.UI.Forms
                 {
                     if (control is UserCardItem card)
                     {
-                        // 这里不再需要手动设置IsCurrentUser来切换高亮，
-                        // 因为点击事件发生时，我们只关心显示详情。
-                        // 高亮状态的切换应由更明确的逻辑（如用户切换）处理。
+                        card.IsSelected = (card.User.Id == user.Id);
                     }
                 }
+
+                // 更新选中的用户卡片
+                _selectedUserCard = sender as UserCardItem;
 
                 // 显示用户详细信息
                 DisplayUserDetails(user);
@@ -4752,6 +4778,9 @@ namespace llm_agent.UI.Forms
                             // 更新用户信息显示
                             UpdateUserInfo();
 
+                            // 清除选中的用户卡片
+                            _selectedUserCard = null;
+
                             // 重新加载用户列表（更新当前用户标记）
                             LoadUserList();
 
@@ -4797,6 +4826,9 @@ namespace llm_agent.UI.Forms
 
                                     // 更新用户信息显示
                                     UpdateUserInfo();
+
+                                    // 清除选中的用户卡片
+                                    _selectedUserCard = null;
 
                                     // 重新加载用户列表（更新当前用户标记）
                                     LoadUserList();

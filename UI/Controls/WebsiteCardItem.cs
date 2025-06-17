@@ -13,7 +13,7 @@ namespace llm_agent.UI.Controls
         private AiWebsite _website;
         private Color _defaultBackColor;
         private Color _hoverBackColor = Color.FromArgb(240, 240, 240);
-        private Color _selectedBackColor = Color.FromArgb(230, 240, 250);
+        private Color _selectedBackColor = Color.FromArgb(230, 230, 250);
         private bool _isSelected = false;
 
         /// <summary>

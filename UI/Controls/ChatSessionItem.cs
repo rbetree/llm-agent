@@ -12,6 +12,10 @@ namespace llm_agent.UI.Controls
         private ChatSession _session;
         private bool _isDragging = false;
         private Point _dragStartPoint;
+        private Color _defaultBackColor;
+        private Color _hoverBackColor = Color.FromArgb(240, 240, 240);
+        private Color _selectedBackColor = Color.FromArgb(230, 230, 250);
+        private bool _isSelected = false;
 
         public event EventHandler<ChatSession> OnSessionSelected;
         public event EventHandler<ChatSession> OnSessionDeleted;
@@ -20,6 +24,7 @@ namespace llm_agent.UI.Controls
         public ChatSessionItem()
         {
             InitializeComponent();
+            _defaultBackColor = BackColor;
             SetupEvents();
         }
 
@@ -50,6 +55,8 @@ namespace llm_agent.UI.Controls
             this.MouseDown += ChatSessionItem_MouseDown;
             this.MouseMove += ChatSessionItem_MouseMove;
             this.MouseUp += ChatSessionItem_MouseUp;
+            this.MouseEnter += ChatSessionItem_MouseEnter;
+            this.MouseLeave += ChatSessionItem_MouseLeave;
 
             // 添加大小变化事件
             this.SizeChanged += (s, e) => AdjustControlSizes();
@@ -85,6 +92,27 @@ namespace llm_agent.UI.Controls
             _isDragging = false;
         }
 
+        // 鼠标进入事件处理
+        private void ChatSessionItem_MouseEnter(object sender, EventArgs e)
+        {
+            if (!_isSelected)
+            {
+                BackColor = _hoverBackColor;
+            }
+        }
+
+        // 鼠标离开事件处理
+        private void ChatSessionItem_MouseLeave(object sender, EventArgs e)
+        {
+            UpdateBackgroundColor();
+        }
+
+        // 更新背景颜色
+        private void UpdateBackgroundColor()
+        {
+            BackColor = _isSelected ? _selectedBackColor : _defaultBackColor;
+        }
+
         // 属性
         [Browsable(false)]
         public ChatSession Session
@@ -94,6 +122,18 @@ namespace llm_agent.UI.Controls
             {
                 _session = value;
                 UpdateDisplay();
+            }
+        }
+
+        // 是否选中
+        [Browsable(false)]
+        public bool IsSelected
+        {
+            get { return _isSelected; }
+            set
+            {
+                _isSelected = value;
+                UpdateBackgroundColor();
             }
         }
 
