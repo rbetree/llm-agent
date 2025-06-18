@@ -296,7 +296,6 @@ namespace llm_agent.UI.Forms
             Button btnUpdateApiKey = settingsContentContainer.Controls.Find("btnUpdateApiKey", true).FirstOrDefault() as Button;
 
             // 设置菜单按钮事件
-            shortcutSettingsButton.Click += (s, e) => SwitchSettingsPage(shortcutSettingsContainer);
             generalSettingsButton.Click += (s, e) => SwitchSettingsPage(generalSettingsContainer);
             dataSettingsButton.Click += (s, e) => SwitchSettingsPage(dataSettingsContainer);
             aboutSettingsButton.Click += (s, e) => SwitchSettingsPage(aboutContainer);
@@ -401,7 +400,6 @@ namespace llm_agent.UI.Forms
             {
                 // 初始化各设置页面
                 InitializeGeneralSettings();
-                InitializeShortcutSettings();
                 InitializeDataSettings();
                 InitializeAboutPage();
 
@@ -1831,9 +1829,7 @@ namespace llm_agent.UI.Forms
             }
 
             // 高亮当前活动按钮
-            if (targetContainer == shortcutSettingsContainer)
-                shortcutSettingsButton.BackColor = Color.FromArgb(100, 101, 165);
-            else if (targetContainer == generalSettingsContainer)
+            if (targetContainer == generalSettingsContainer)
                 generalSettingsButton.BackColor = Color.FromArgb(100, 101, 165);
             else if (targetContainer == dataSettingsContainer)
                 dataSettingsButton.BackColor = Color.FromArgb(100, 101, 165);
@@ -3676,46 +3672,7 @@ namespace llm_agent.UI.Forms
             }
         }
 
-        /// <summary>
-        /// 初始化快捷键设置页面
-        /// </summary>
-        private void InitializeShortcutSettings()
-        {
-            try
-            {
-                // 设置ListView列
-                lvShortcuts.Columns.Clear();
-                lvShortcuts.Columns.Add("功能", 200);
-                lvShortcuts.Columns.Add("快捷键", 150);
-                lvShortcuts.Columns.Add("说明", 300);
 
-                // 添加快捷键项目
-                var shortcuts = new[]
-                {
-                    new { Function = "发送消息", Shortcut = "Ctrl+Enter", Description = "在聊天输入框中发送消息" },
-                    new { Function = "新建对话", Shortcut = "Ctrl+N", Description = "创建新的聊天会话" },
-                    new { Function = "切换到聊天页面", Shortcut = "Alt+1", Description = "快速切换到聊天界面" },
-                    new { Function = "切换到设置页面", Shortcut = "Alt+2", Description = "快速切换到设置界面" },
-                    new { Function = "切换到AI网站页面", Shortcut = "Alt+3", Description = "快速切换到AI网站界面" },
-                    new { Function = "焦点到搜索框", Shortcut = "Ctrl+F", Description = "将焦点移动到搜索框" },
-                    new { Function = "清空聊天框", Shortcut = "Ctrl+L", Description = "清空当前聊天内容" },
-                    new { Function = "删除会话", Shortcut = "Delete", Description = "在聊天列表中删除选中的会话" },
-                    new { Function = "切换会话", Shortcut = "Alt+数字键", Description = "快速切换到对应编号的会话" }
-                };
-
-                foreach (var shortcut in shortcuts)
-                {
-                    var item = new ListViewItem(shortcut.Function);
-                    item.SubItems.Add(shortcut.Shortcut);
-                    item.SubItems.Add(shortcut.Description);
-                    lvShortcuts.Items.Add(item);
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"初始化快捷键设置时出错: {ex.Message}");
-            }
-        }
 
         /// <summary>
         /// 初始化数据设置页面
@@ -4859,10 +4816,7 @@ namespace llm_agent.UI.Forms
             }
         }
 
-        private void shortcutSettingsButton_Click(object sender, EventArgs e)
-        {
 
-        }
 
         /// <summary>
         /// GitHub链接点击事件

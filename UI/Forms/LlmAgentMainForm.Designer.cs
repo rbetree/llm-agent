@@ -45,11 +45,7 @@ namespace llm_agent.UI.Forms
             aboutSettingsButton = new System.Windows.Forms.Button();
             dataSettingsButton = new System.Windows.Forms.Button();
             generalSettingsButton = new System.Windows.Forms.Button();
-            shortcutSettingsButton = new System.Windows.Forms.Button();
             settingsContentContainer = new System.Windows.Forms.Panel();
-            shortcutSettingsContainer = new System.Windows.Forms.Panel();
-            lvShortcuts = new System.Windows.Forms.ListView();
-            lblShortcutsTitle = new System.Windows.Forms.Label();
             generalSettingsContainer = new System.Windows.Forms.Panel();
             grpGeneralSettings = new System.Windows.Forms.GroupBox();
             btnSaveGeneralSettings = new System.Windows.Forms.Button();
@@ -167,7 +163,7 @@ namespace llm_agent.UI.Forms
             settingsPageSplitContainer.SuspendLayout();
             settingsMenuPanel.SuspendLayout();
             settingsContentContainer.SuspendLayout();
-            shortcutSettingsContainer.SuspendLayout();
+
             generalSettingsContainer.SuspendLayout();
             grpGeneralSettings.SuspendLayout();
             dataSettingsContainer.SuspendLayout();
@@ -416,7 +412,6 @@ namespace llm_agent.UI.Forms
             settingsMenuPanel.Controls.Add(aboutSettingsButton);
             settingsMenuPanel.Controls.Add(dataSettingsButton);
             settingsMenuPanel.Controls.Add(generalSettingsButton);
-            settingsMenuPanel.Controls.Add(shortcutSettingsButton);
             settingsMenuPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             settingsMenuPanel.Location = new System.Drawing.Point(0, 0);
             settingsMenuPanel.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
@@ -434,7 +429,7 @@ namespace llm_agent.UI.Forms
             aboutSettingsButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             aboutSettingsButton.Font = new System.Drawing.Font("Microsoft YaHei UI", 10F);
             aboutSettingsButton.ForeColor = System.Drawing.Color.White;
-            aboutSettingsButton.Location = new System.Drawing.Point(0, 142);
+            aboutSettingsButton.Location = new System.Drawing.Point(0, 96);
             aboutSettingsButton.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             aboutSettingsButton.Name = "aboutSettingsButton";
             aboutSettingsButton.Padding = new System.Windows.Forms.Padding(21, 0, 0, 0);
@@ -453,7 +448,7 @@ namespace llm_agent.UI.Forms
             dataSettingsButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             dataSettingsButton.Font = new System.Drawing.Font("Microsoft YaHei UI", 10F);
             dataSettingsButton.ForeColor = System.Drawing.Color.White;
-            dataSettingsButton.Location = new System.Drawing.Point(-1, 96);
+            dataSettingsButton.Location = new System.Drawing.Point(-1, 48);
             dataSettingsButton.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             dataSettingsButton.Name = "dataSettingsButton";
             dataSettingsButton.Padding = new System.Windows.Forms.Padding(21, 0, 0, 0);
@@ -481,30 +476,10 @@ namespace llm_agent.UI.Forms
             generalSettingsButton.Text = "常规设置";
             generalSettingsButton.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             generalSettingsButton.UseVisualStyleBackColor = false;
-            // 
-            // shortcutSettingsButton
-            // 
-            shortcutSettingsButton.BackColor = System.Drawing.Color.FromArgb(76, 76, 128);
-            shortcutSettingsButton.Cursor = System.Windows.Forms.Cursors.Hand;
-            shortcutSettingsButton.FlatAppearance.BorderSize = 0;
-            shortcutSettingsButton.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(100, 101, 165);
-            shortcutSettingsButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            shortcutSettingsButton.Font = new System.Drawing.Font("Microsoft YaHei UI", 10F);
-            shortcutSettingsButton.ForeColor = System.Drawing.Color.White;
-            shortcutSettingsButton.Location = new System.Drawing.Point(-1, 48);
-            shortcutSettingsButton.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            shortcutSettingsButton.Name = "shortcutSettingsButton";
-            shortcutSettingsButton.Padding = new System.Windows.Forms.Padding(21, 0, 0, 0);
-            shortcutSettingsButton.Size = new System.Drawing.Size(283, 49);
-            shortcutSettingsButton.TabIndex = 2;
-            shortcutSettingsButton.Text = "快捷方式设置";
-            shortcutSettingsButton.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            shortcutSettingsButton.UseVisualStyleBackColor = false;
-            shortcutSettingsButton.Click += shortcutSettingsButton_Click;
+
             // 
             // settingsContentContainer
             // 
-            settingsContentContainer.Controls.Add(shortcutSettingsContainer);
             settingsContentContainer.Controls.Add(generalSettingsContainer);
             settingsContentContainer.Controls.Add(dataSettingsContainer);
             settingsContentContainer.Controls.Add(aboutContainer);
@@ -514,42 +489,9 @@ namespace llm_agent.UI.Forms
             settingsContentContainer.Name = "settingsContentContainer";
             settingsContentContainer.Size = new System.Drawing.Size(935, 790);
             settingsContentContainer.TabIndex = 0;
-            // 
-            // shortcutSettingsContainer
-            // 
-            shortcutSettingsContainer.BackColor = System.Drawing.Color.White;
-            shortcutSettingsContainer.Controls.Add(lvShortcuts);
-            shortcutSettingsContainer.Controls.Add(lblShortcutsTitle);
-            shortcutSettingsContainer.Dock = System.Windows.Forms.DockStyle.Fill;
-            shortcutSettingsContainer.Location = new System.Drawing.Point(0, 0);
-            shortcutSettingsContainer.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            shortcutSettingsContainer.Name = "shortcutSettingsContainer";
-            shortcutSettingsContainer.Padding = new System.Windows.Forms.Padding(20);
-            shortcutSettingsContainer.Size = new System.Drawing.Size(935, 790);
-            shortcutSettingsContainer.TabIndex = 2;
-            shortcutSettingsContainer.Visible = false;
-            // 
-            // lvShortcuts
-            // 
-            lvShortcuts.Font = new System.Drawing.Font("Microsoft YaHei UI", 9F);
-            lvShortcuts.FullRowSelect = true;
-            lvShortcuts.GridLines = true;
-            lvShortcuts.Location = new System.Drawing.Point(20, 55);
-            lvShortcuts.Name = "lvShortcuts";
-            lvShortcuts.Size = new System.Drawing.Size(655, 486);
-            lvShortcuts.TabIndex = 1;
-            lvShortcuts.UseCompatibleStateImageBehavior = false;
-            lvShortcuts.View = System.Windows.Forms.View.Details;
-            // 
-            // lblShortcutsTitle
-            // 
-            lblShortcutsTitle.AutoSize = true;
-            lblShortcutsTitle.Font = new System.Drawing.Font("Microsoft YaHei UI", 12F, System.Drawing.FontStyle.Bold);
-            lblShortcutsTitle.Location = new System.Drawing.Point(20, 20);
-            lblShortcutsTitle.Name = "lblShortcutsTitle";
-            lblShortcutsTitle.Size = new System.Drawing.Size(112, 27);
-            lblShortcutsTitle.TabIndex = 0;
-            lblShortcutsTitle.Text = "键盘快捷键";
+
+
+
             // 
             // generalSettingsContainer
             // 
@@ -1976,8 +1918,7 @@ namespace llm_agent.UI.Forms
             settingsPageSplitContainer.ResumeLayout(false);
             settingsMenuPanel.ResumeLayout(false);
             settingsContentContainer.ResumeLayout(false);
-            shortcutSettingsContainer.ResumeLayout(false);
-            shortcutSettingsContainer.PerformLayout();
+
             generalSettingsContainer.ResumeLayout(false);
             grpGeneralSettings.ResumeLayout(false);
             grpGeneralSettings.PerformLayout();
@@ -2072,7 +2013,7 @@ namespace llm_agent.UI.Forms
         private System.Windows.Forms.Panel settingsPanel;
         private System.Windows.Forms.SplitContainer settingsPageSplitContainer;
         private System.Windows.Forms.Panel settingsMenuPanel;
-        private System.Windows.Forms.Button shortcutSettingsButton;
+
         private System.Windows.Forms.Button generalSettingsButton;
         private System.Windows.Forms.Button dataSettingsButton;
         private System.Windows.Forms.Button aboutSettingsButton;
@@ -2097,9 +2038,7 @@ namespace llm_agent.UI.Forms
         private System.Windows.Forms.Label lblSystemPrompt;
         private System.Windows.Forms.TextBox txtSystemPrompt;
         private System.Windows.Forms.Button btnSaveGeneralSettings;
-        private System.Windows.Forms.Panel shortcutSettingsContainer;
-        private System.Windows.Forms.ListView lvShortcuts;
-        private System.Windows.Forms.Label lblShortcutsTitle;
+
         private System.Windows.Forms.Panel channelPanel;
         private System.Windows.Forms.SplitContainer channelPageSplitContainer;
         private System.Windows.Forms.Panel channelListPanel;
