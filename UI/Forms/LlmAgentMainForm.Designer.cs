@@ -776,6 +776,7 @@ namespace llm_agent.UI.Forms
             // chatListContainer
             // 
             chatListContainer.Dock = System.Windows.Forms.DockStyle.Fill;
+            chatListContainer.IsSplitterFixed = true;
             chatListContainer.Location = new System.Drawing.Point(0, 0);
             chatListContainer.Margin = new System.Windows.Forms.Padding(0);
             chatListContainer.Name = "chatListContainer";
@@ -1231,6 +1232,7 @@ namespace llm_agent.UI.Forms
             // 
             websiteListContainer.Dock = System.Windows.Forms.DockStyle.Fill;
             websiteListContainer.FixedPanel = System.Windows.Forms.FixedPanel.Panel1;
+            websiteListContainer.IsSplitterFixed = true;
             websiteListContainer.Location = new System.Drawing.Point(0, 0);
             websiteListContainer.Margin = new System.Windows.Forms.Padding(0);
             websiteListContainer.Name = "websiteListContainer";
@@ -1320,6 +1322,7 @@ namespace llm_agent.UI.Forms
             userProfilePageSplitContainer.BackColor = System.Drawing.Color.FromArgb(100, 101, 165);
             userProfilePageSplitContainer.Dock = System.Windows.Forms.DockStyle.Fill;
             userProfilePageSplitContainer.FixedPanel = System.Windows.Forms.FixedPanel.Panel1;
+            userProfilePageSplitContainer.IsSplitterFixed = true;
             userProfilePageSplitContainer.Location = new System.Drawing.Point(0, 0);
             userProfilePageSplitContainer.Margin = new System.Windows.Forms.Padding(0);
             userProfilePageSplitContainer.Name = "userProfilePageSplitContainer";
@@ -1351,6 +1354,7 @@ namespace llm_agent.UI.Forms
             // 
             userListContainer.Cursor = System.Windows.Forms.Cursors.HSplit;
             userListContainer.Dock = System.Windows.Forms.DockStyle.Fill;
+            userListContainer.IsSplitterFixed = true;
             userListContainer.Location = new System.Drawing.Point(0, 0);
             userListContainer.Margin = new System.Windows.Forms.Padding(0);
             userListContainer.Name = "userListContainer";
@@ -1652,6 +1656,7 @@ namespace llm_agent.UI.Forms
             // promptsListContainer
             // 
             promptsListContainer.Dock = System.Windows.Forms.DockStyle.Fill;
+            promptsListContainer.IsSplitterFixed = true;
             promptsListContainer.Location = new System.Drawing.Point(0, 0);
             promptsListContainer.Margin = new System.Windows.Forms.Padding(0);
             promptsListContainer.Name = "promptsListContainer";

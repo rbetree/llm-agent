@@ -89,6 +89,10 @@ namespace llm_agent.UI.Forms
             {
                 InitializeComponent();
                 this.FormBorderStyle = FormBorderStyle.None; // Add this line
+
+                // 设置窗体图标
+                SetApplicationIcon();
+
                 InitializeHttpClient();
                 InitializeProviderFactory();
                 InitializeChatHistoryManager();
@@ -4845,6 +4849,26 @@ namespace llm_agent.UI.Forms
             catch (Exception ex)
             {
                 MessageBox.Show($"打开链接失败: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        /// <summary>
+        /// 设置应用程序图标
+        /// </summary>
+        private void SetApplicationIcon()
+        {
+            try
+            {
+                string iconPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "logo.ico");
+                if (File.Exists(iconPath))
+                {
+                    this.Icon = new Icon(iconPath);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"设置应用程序图标时出错: {ex.Message}");
+                // 不抛出异常，使用默认图标
             }
         }
     }
