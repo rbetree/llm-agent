@@ -375,11 +375,6 @@ namespace llm_agent.UI.Forms
                     // Gemini专用方法 (如果实现了)
                     supportedModels = await GetGeminiModelsAsync(geminiProvider);
                 }
-                else if (provider is ZhipuProvider zhipuProvider)
-                {
-                    // 智谱专用方法 (如果实现了)
-                    supportedModels = await GetZhipuModelsAsync(zhipuProvider);
-                }
                 else
                 {
                     // 通用方法，仅使用硬编码的支持列表
@@ -494,21 +489,7 @@ namespace llm_agent.UI.Forms
             }
         }
 
-        // 为智谱获取模型列表的辅助方法
-        private async Task<List<string>> GetZhipuModelsAsync(ZhipuProvider provider)
-        {
-            try
-            {
-                // 调用智谱AI提供商的API获取模型列表
-                return await provider.GetModelsFromApiAsync();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"获取智谱AI模型列表失败: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                // 不再返回默认模型列表
-                return new List<string>(); // 返回空列表
-            }
-        }
+
 
         private void btnSave_Click(object sender, EventArgs e)
         {
@@ -567,10 +548,6 @@ namespace llm_agent.UI.Forms
                     return Properties.Settings.Default.AnthropicApiKey;
                 case ProviderType.Google:
                     return Properties.Settings.Default.GeminiApiKey;
-                case ProviderType.ZhipuAI:
-                    return Properties.Settings.Default.ZhipuApiKey;
-                case ProviderType.Other:
-                    return Properties.Settings.Default.OtherApiKey;
                 default:
                     return string.Empty;
             }
@@ -588,10 +565,6 @@ namespace llm_agent.UI.Forms
                     return Properties.Settings.Default.AnthropicApiHost;
                 case ProviderType.Google:
                     return Properties.Settings.Default.GeminiApiHost;
-                case ProviderType.ZhipuAI:
-                    return Properties.Settings.Default.ZhipuApiHost;
-                case ProviderType.Other:
-                    return Properties.Settings.Default.OtherApiHost;
                 default:
                     return string.Empty;
             }

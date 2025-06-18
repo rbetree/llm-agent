@@ -38,10 +38,8 @@ namespace llm_agent.API.Provider
             // 在这里初始化所有支持的提供商
             _providers[ProviderType.OpenAI] = new OpenAIProvider(_httpClient, "", GetDefaultApiHost(ProviderType.OpenAI));
             _providers[ProviderType.AzureOpenAI] = new AzureOpenAIProvider(_httpClient, "", GetDefaultApiHost(ProviderType.AzureOpenAI));
-            _providers[ProviderType.ZhipuAI] = new ZhipuProvider(_httpClient, "", GetDefaultApiHost(ProviderType.ZhipuAI));
             _providers[ProviderType.Google] = new GeminiProvider(_httpClient, "", GetDefaultApiHost(ProviderType.Google));
             _providers[ProviderType.Anthropic] = new AnthropicProvider(_httpClient, "", GetDefaultApiHost(ProviderType.Anthropic));
-            _providers[ProviderType.Other] = new MockProvider("", GetDefaultApiHost(ProviderType.Other)); // 临时使用MockProvider
         }
         
         /// <summary>
@@ -76,8 +74,6 @@ namespace llm_agent.API.Provider
                 ProviderType.AzureOpenAI => "Azure OpenAI",
                 ProviderType.Anthropic => "Anthropic Claude",
                 ProviderType.Google => "Google Gemini",
-                ProviderType.ZhipuAI => "智谱 GLM",
-                ProviderType.Other => "其他",
                 _ => "未知提供商"
             };
         }
@@ -93,8 +89,6 @@ namespace llm_agent.API.Provider
                 ProviderType.AzureOpenAI => "https://your-resource-name.openai.azure.com",
                 ProviderType.Anthropic => "https://api.anthropic.com",
                 ProviderType.Google => "https://generativelanguage.googleapis.com/v1",
-                ProviderType.ZhipuAI => "https://open.bigmodel.cn/api/paas/v3",
-                ProviderType.Other => "",
                 _ => ""
             };
         }
@@ -117,15 +111,9 @@ namespace llm_agent.API.Provider
             else if (displayName.Contains("Anthropic", StringComparison.OrdinalIgnoreCase) || 
                      displayName.Contains("Claude", StringComparison.OrdinalIgnoreCase))
                 return ProviderType.Anthropic;
-            else if (displayName.Contains("Google", StringComparison.OrdinalIgnoreCase) || 
+            else if (displayName.Contains("Google", StringComparison.OrdinalIgnoreCase) ||
                      displayName.Contains("Gemini", StringComparison.OrdinalIgnoreCase))
                 return ProviderType.Google;
-            else if (displayName.Contains("智谱", StringComparison.OrdinalIgnoreCase) || 
-                     displayName.Contains("GLM", StringComparison.OrdinalIgnoreCase))
-                return ProviderType.ZhipuAI;
-            else if (displayName.Contains("其他", StringComparison.OrdinalIgnoreCase) ||
-                     displayName.Contains("Other", StringComparison.OrdinalIgnoreCase))
-                return ProviderType.Other;
             
             // 默认返回OpenAI
             return ProviderType.OpenAI;
@@ -164,7 +152,6 @@ namespace llm_agent.API.Provider
                 ProviderType.AzureOpenAI => new AzureOpenAIProvider(httpClient, apiKey, apiHost),
                 ProviderType.Anthropic => new AnthropicProvider(httpClient, apiKey, apiHost),
                 ProviderType.Google => new GeminiProvider(httpClient, apiKey, apiHost),
-                ProviderType.ZhipuAI => new ZhipuProvider(httpClient, apiKey, apiHost),
                 _ => new MockProvider(apiKey, apiHost)
             };
         }

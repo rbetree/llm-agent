@@ -42,12 +42,8 @@ namespace llm_agent.Properties
         public string AnthropicApiHost { get; set; } = "";
         public string GeminiApiKey { get; set; } = "";
         public string GeminiApiHost { get; set; } = "";
-        public string ZhipuApiKey { get; set; } = "";
-        public string ZhipuApiHost { get; set; } = "";
         public string SiliconFlowApiKey { get; set; } = "";
         public string SiliconFlowApiHost { get; set; } = "";
-        public string OtherApiKey { get; set; } = "";
-        public string OtherApiHost { get; set; } = "";
         
         private void InitializeDatabase()
         {

@@ -4,9 +4,7 @@ namespace llm_agent.Model
     {
         OpenAI,
         AzureOpenAI,
-        ZhipuAI,
         Anthropic,
-        Google,
-        Other
+        Google
     }
 }

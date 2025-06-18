@@ -1363,8 +1363,6 @@ namespace llm_agent.UI.Forms
                 ProviderType.AzureOpenAI => "Azure OpenAI",
                 ProviderType.Anthropic => "Anthropic Claude",
                 ProviderType.Google => "Google Gemini",
-                ProviderType.ZhipuAI => "智谱 GLM",
-                ProviderType.Other => "其他",
                 _ => "未知提供商"
             };
         }
@@ -1398,10 +1396,6 @@ namespace llm_agent.UI.Forms
                     return Properties.Settings.Default.AnthropicApiKey;
                 case ProviderType.Google:
                     return Properties.Settings.Default.GeminiApiKey;
-                case ProviderType.ZhipuAI:
-                    return Properties.Settings.Default.ZhipuApiKey;
-                case ProviderType.Other:
-                    return Properties.Settings.Default.OtherApiKey;
                 default:
                     return string.Empty;
             }
@@ -1419,10 +1413,6 @@ namespace llm_agent.UI.Forms
                     return Properties.Settings.Default.AnthropicApiHost;
                 case ProviderType.Google:
                     return Properties.Settings.Default.GeminiApiHost;
-                case ProviderType.ZhipuAI:
-                    return Properties.Settings.Default.ZhipuApiHost;
-                case ProviderType.Other:
-                    return Properties.Settings.Default.OtherApiHost;
                 default:
                     return string.Empty;
             }
@@ -1902,10 +1892,6 @@ namespace llm_agent.UI.Forms
                     return "Claude";
                 case ProviderType.Google:
                     return "Google";
-                case ProviderType.ZhipuAI:
-                    return "ZhipuAI";
-                case ProviderType.Other:
-                    return "Other";
                 default:
                     return providerType.ToString();
             }
@@ -1943,12 +1929,6 @@ namespace llm_agent.UI.Forms
             else if (displayName.Contains("Google", StringComparison.OrdinalIgnoreCase) ||
                      displayName.Contains("Gemini", StringComparison.OrdinalIgnoreCase))
                 return ProviderType.Google;
-            else if (displayName.Contains("智谱", StringComparison.OrdinalIgnoreCase) ||
-                     displayName.Contains("GLM", StringComparison.OrdinalIgnoreCase))
-                return ProviderType.ZhipuAI;
-            else if (displayName.Contains("其他", StringComparison.OrdinalIgnoreCase) ||
-                     displayName.Contains("Other", StringComparison.OrdinalIgnoreCase))
-                return ProviderType.Other;
 
             // 默认返回OpenAI
             return ProviderType.OpenAI;
@@ -2134,10 +2114,6 @@ namespace llm_agent.UI.Forms
                                         else if (provider is GeminiProvider geminiProvider)
                                         {
                                             modelList = await geminiProvider.GetModelsFromApiAsync();
-                                        }
-                                        else if (provider is ZhipuProvider zhipuProvider)
-                                        {
-                                            modelList = await zhipuProvider.GetModelsFromApiAsync();
                                         }
                                         else if (provider is SiliconFlowProvider siliconFlowProvider)
                                         {
@@ -2457,14 +2433,6 @@ namespace llm_agent.UI.Forms
                                     Properties.Settings.Default.GeminiApiKey = channel.ApiKey;
                                     Properties.Settings.Default.GeminiApiHost = channel.ApiHost;
                                     break;
-                                case ProviderType.ZhipuAI:
-                                    Properties.Settings.Default.ZhipuApiKey = channel.ApiKey;
-                                    Properties.Settings.Default.ZhipuApiHost = channel.ApiHost;
-                                    break;
-                                case ProviderType.Other:
-                                    Properties.Settings.Default.OtherApiKey = channel.ApiKey;
-                                    Properties.Settings.Default.OtherApiHost = channel.ApiHost;
-                                    break;
                             }
 
                             // 更新API设置
@@ -2566,14 +2534,6 @@ namespace llm_agent.UI.Forms
                                 case ProviderType.Google:
                                     Properties.Settings.Default.GeminiApiKey = channel.ApiKey;
                                     Properties.Settings.Default.GeminiApiHost = channel.ApiHost;
-                                    break;
-                                case ProviderType.ZhipuAI:
-                                    Properties.Settings.Default.ZhipuApiKey = channel.ApiKey;
-                                    Properties.Settings.Default.ZhipuApiHost = channel.ApiHost;
-                                    break;
-                                case ProviderType.Other:
-                                    Properties.Settings.Default.OtherApiKey = channel.ApiKey;
-                                    Properties.Settings.Default.OtherApiHost = channel.ApiHost;
                                     break;
                             }
 
