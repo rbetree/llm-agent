@@ -17,48 +17,80 @@ LlmAgentMainForm
 ├── mainSplitContainer
 │   ├── Panel1 (导航栏)
 │   │   └── navPanel
-│   │       ├── logoPanel
 │   │       ├── avatarButton
 │   │       ├── chatNavButton
+│   │       ├── channelNavButton
 │   │       ├── websiteNavButton
 │   │       ├── promptsNavButton
-│   │       ├── filesNavButton
 │   │       └── settingsNavButton
 │   │
 │   └── Panel2 (内容区)
-│       ├── chatPagePanel (三列布局示例)
+│       ├── chatPagePanel
 │       │   └── chatPageSplitContainer
-│       │       ├── Panel1 (中间列)
-│       │       │   └── chatListPanel
-│       │       │       ├── newChatButton
-│       │       │       ├── searchPanel
-│       │       │       │   └── searchBox
-│       │       │       └── 聊天历史项目...
+│       │       ├── Panel1 (聊天列表)
+│       │       │   └── chatListContainer
+│       │       │       ├── Panel1 (搜索和新建)
+│       │       │       │   ├── searchBox
+│       │       │       │   └── newChatButton
+│       │       │       └── Panel2 (聊天列表)
+│       │       │           └── chatListPanel
 │       │       │
-│       │       └── Panel2 (右侧列)
-│       │           └── chatContainer
-│       │               ├── Panel1
-│       │               │   └── chatOutputPanel
-│       │               │       └── txtOutput
-│       │               │
-│       │               └── Panel2
-│       │                   └── inputPanel
-│       │                       ├── txtInput
-│       │                       ├── btnSend
-│       │                       └── btnUpload
+│       │       └── Panel2 (聊天内容)
+│       │           └── inputPanel
 │       │
-│       ├── settingsPanel
-│       │   └── settingsPageSplitContainer
-│       │       ├── Panel1 (设置菜单)
-│       │       │   └── settingsMenuPanel
-│       │       │
-│       │       └── Panel2 (设置内容)
-│       │           └── settingsContentContainer
+│       ├── channelPanel
+│       │   └── channelPageSplitContainer
+│       │       ├── Panel1 (渠道列表)
+│       │       │   └── channelListPanel
+│       │       │       └── channelListBox
+│       │       └── Panel2 (渠道详情)
+│       │           └── channelDetailsPanel
 │       │
 │       ├── aiWebsitePanel
+│       │   └── aiWebsitePageSplitContainer
+│       │       ├── Panel1 (网站列表)
+│       │       │   └── aiWebsiteMenuPanel
+│       │       │       └── websiteListContainer
+│       │       │           ├── Panel1 (搜索和新建)
+│       │       │           │   ├── websiteSearchBox
+│       │       │           │   └── newWebsiteButton
+│       │       │           └── Panel2 (网站列表)
+│       │       │               └── websiteListPanel
+│       │       └── Panel2 (网站内容)
+│       │           └── aiWebsiteContentPanel
+│       │
 │       ├── userProfilePanel
-│       ├── filesPanel
-│       └── promptsPanel
+│       │   └── userProfilePageSplitContainer
+│       │       ├── Panel1 (用户列表)
+│       │       │   └── userProfileMenuPanel
+│       │       │       └── userListContainer
+│       │       │           ├── Panel1 (搜索和新建)
+│       │       │           │   ├── userSearchBox
+│       │       │           │   └── newUserButton
+│       │       │           └── Panel2 (用户列表)
+│       │       │               └── userListPanel
+│       │       └── Panel2 (用户详情)
+│       │           └── userProfileContentPanel
+│       │
+│       ├── promptsPanel
+│       │   └── promptsPageSplitContainer
+│       │       ├── Panel1 (提示词列表)
+│       │       │   └── promptsListContainer
+│       │       │       ├── Panel1 (搜索和新建)
+│       │       │       │   ├── promptSearchBox
+│       │       │       │   └── newPromptButton
+│       │       │       └── Panel2 (提示词列表)
+│       │       │           └── promptsListPanel
+│       │       └── Panel2 (提示词内容)
+│       │           └── promptsContentPanel
+│       │
+│       └── settingsPanel
+│           └── settingsPageSplitContainer
+│               ├── Panel1 (设置菜单)
+│               │   └── settingsMenuPanel
+│               └── Panel2 (设置内容)
+│                   └── settingsContentContainer
+│                       └── settingsContentPanel
 ```
 
 ## 导航流程

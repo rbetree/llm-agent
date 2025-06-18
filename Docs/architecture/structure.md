@@ -14,32 +14,52 @@ llm-agent/
 │       ├── LlmAgentMainForm.resx        # 主窗体资源文件
 │       └── ...
 ├── BLL/                # 业务逻辑层
-│   ├── ChatManager.cs  # 聊天管理
-│   ├── HistoryManager.cs # 历史记录管理
-│   └── ...
+│   ├── ChatHistoryManager.cs  # 聊天历史管理
+│   ├── ChannelManager.cs      # 渠道管理
+│   ├── ChannelService.cs      # 渠道服务
+│   ├── UserService.cs         # 用户服务
+│   ├── LoggedInUserService.cs # 登录用户服务
+│   ├── PromptManager.cs       # 提示词管理
+│   └── WebsiteManager.cs      # 网站管理
 ├── DAL/                # 数据访问层
-│   ├── ChatRepository.cs  # 聊天数据存取
-│   └── ...
+│   ├── ChatRepository.cs         # 聊天数据存取
+│   ├── DatabaseManager.cs        # 数据库管理
+│   ├── UserRepository.cs         # 用户数据仓库
+│   ├── LoggedInUserRepository.cs # 登录用户数据仓库
+│   ├── PromptRepository.cs       # 提示词数据仓库
+│   └── WebsiteRepository.cs      # 网站数据仓库
 ├── Model/              # 数据实体类
-│   ├── ChatMessage.cs  # 聊天消息模型
-│   ├── ChatSession.cs  # 会话模型
-│   └── LLMModel.cs     # 模型定义
+│   ├── ChatMessage.cs     # 聊天消息模型
+│   ├── ChatSession.cs     # 会话模型
+│   ├── ChatRole.cs        # 聊天角色枚举
+│   ├── Channel.cs         # 渠道模型
+│   ├── Models.cs          # 模型信息定义
+│   ├── User.cs            # 用户模型
+│   ├── Prompt.cs          # 提示词模型
+│   ├── AiWebsite.cs       # AI网站模型
+│   ├── WebsiteCredential.cs # 网站凭据模型
+│   └── ProviderType.cs    # 提供商类型枚举
 ├── API/                # 第三方API接口
-│   ├── Provider/       # LLM提供商
-│   │   ├── ILLMProvider.cs  # 提供商接口
-│   │   ├── ProviderFactory.cs 
-│   │   ├── OpenAIProvider.cs
-│   │   └── ...
-│   └── ...
+│   └── Provider/       # LLM提供商
+│       ├── LLMProvider.cs      # 提供商接口
+│       ├── BaseLLMProvider.cs  # 基础提供商类
+│       ├── ProviderFactory.cs  # 提供商工厂
+│       ├── OpenAIProvider.cs   # OpenAI提供商
+│       ├── AzureOpenAIProvider.cs # Azure OpenAI提供商
+│       ├── AnthropicProvider.cs   # Anthropic提供商
+│       ├── GeminiProvider.cs      # Google Gemini提供商
+│       └── SiliconFlowProvider.cs # SiliconFlow提供商
 ├── Common/             # 通用工具类
 │   ├── Utils/          # 工具类
 │   ├── Extensions/     # 扩展方法
 │   ├── Exceptions/     # 自定义异常类
 │   └── Program.cs      # 程序入口点
 ├── Docs/               # 项目文档
-│   ├── 项目结构与设计说明.md # 本文档：项目架构与设计说明
-│   ├── ui设计.md         # UI设计文档
-│   └── 交互逻辑和UI说明.md # 交互逻辑说明
+│   ├── .vitepress/     # VitePress配置
+│   ├── architecture/   # 架构文档
+│   ├── guide/          # 使用指南
+│   ├── public/         # 静态资源
+│   └── index.md        # 文档首页
 └── llm-agent.csproj    # 项目文件
 ```
 
@@ -82,8 +102,13 @@ llm-agent/
 - 实现异步操作和错误处理
 
 主要组件：
-- `ChatManager.cs` - 管理聊天业务逻辑
-- `HistoryManager.cs` - 历史记录管理
+- `ChatHistoryManager.cs` - 管理聊天历史业务逻辑
+- `ChannelManager.cs` - 渠道管理
+- `ChannelService.cs` - 渠道服务
+- `UserService.cs` - 用户服务
+- `LoggedInUserService.cs` - 登录用户服务
+- `PromptManager.cs` - 提示词管理
+- `WebsiteManager.cs` - 网站管理
 
 ### 3. DAL层（数据访问层）
 
@@ -95,6 +120,11 @@ llm-agent/
 
 主要组件：
 - `ChatRepository.cs` - 聊天数据存取实现
+- `DatabaseManager.cs` - 数据库管理
+- `UserRepository.cs` - 用户数据仓库
+- `LoggedInUserRepository.cs` - 登录用户数据仓库
+- `PromptRepository.cs` - 提示词数据仓库
+- `WebsiteRepository.cs` - 网站数据仓库
 
 ### 4. Model层（数据实体类）
 
@@ -105,9 +135,16 @@ llm-agent/
 - 包含数据验证属性
 
 主要组件：
-- `ChatMessage.cs` - 定义聊天消息和相关模型
+- `ChatMessage.cs` - 定义聊天消息模型
 - `ChatSession.cs` - 定义会话模型
-- `LLMModel.cs` - 定义LLM模型相关信息
+- `ChatRole.cs` - 定义聊天角色枚举
+- `Channel.cs` - 定义渠道模型
+- `Models.cs` - 定义LLM模型相关信息
+- `User.cs` - 定义用户模型
+- `Prompt.cs` - 定义提示词模型
+- `AiWebsite.cs` - 定义AI网站模型
+- `WebsiteCredential.cs` - 定义网站凭据模型
+- `ProviderType.cs` - 定义提供商类型枚举
 
 ### 5. API层（第三方接口）
 
@@ -118,9 +155,14 @@ llm-agent/
 - 支持异步操作模式
 
 主要组件：
-- `Provider/ILLMProvider.cs` - 定义提供商接口
+- `Provider/LLMProvider.cs` - 定义提供商接口
+- `Provider/BaseLLMProvider.cs` - 基础提供商抽象类
 - `Provider/ProviderFactory.cs` - 工厂模式创建提供商实例
-- 各提供商实现类 - 根据不同API规范实现通信
+- `Provider/OpenAIProvider.cs` - OpenAI提供商实现
+- `Provider/AzureOpenAIProvider.cs` - Azure OpenAI提供商实现
+- `Provider/AnthropicProvider.cs` - Anthropic提供商实现
+- `Provider/GeminiProvider.cs` - Google Gemini提供商实现
+- `Provider/SiliconFlowProvider.cs` - SiliconFlow提供商实现
 
 ### 6. Common层（通用工具）
 

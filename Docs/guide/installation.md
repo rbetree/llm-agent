@@ -16,13 +16,11 @@
 1. 访问[GitHub发布页面](https://github.com/rbetree/llm-agent/releases)
 2. 下载最新版本的压缩包:`Llm-Agent.zip`
 3. 将ZIP文件解压到您选择的任何位置
-4. 双击`LlmAgent.exe`启动应用程序
+4. 双击`llm-agent.exe`启动应用程序
 
 ## 对话前设置
 
 ### 配置API密钥
-
->为了便于老师直接使用，应用限期自带deepseek-api
 
 1. 启动LLM Agent应用程序
 2. 点击左侧导航栏中的"渠道"选项
@@ -35,10 +33,11 @@
 6. 点击"保存"按钮完成配置
 
 ::: tip 获取API密钥
-- gpt: [OpenAI](https://platform.openai.com/account/api-keys)
-- claude: [Anthropic](https://console.anthropic.com/)
-- gemini: [Google](https://makersuite.google.com/app/apikey)
-- deepseek: [Deepseek](https://platform.deepseek.com/api_keys)
+- **OpenAI**: [OpenAI Platform](https://platform.openai.com/api-keys)
+- **Azure OpenAI**: [Azure Portal](https://portal.azure.com/)
+- **Anthropic**: [Anthropic Console](https://console.anthropic.com/keys)
+- **Google Gemini**: [Google AI Studio](https://aistudio.google.com/app/apikey)
+- **兼容OpenAI格式的服务**: 如[智谱AI](https://open.bigmodel.cn/)、[SiliconFlow](https://siliconflow.cn/)、[DeepSeek](https://platform.deepseek.com/api_keys)等
 :::
 
 ### 验证API连接

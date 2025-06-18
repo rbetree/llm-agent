@@ -10,7 +10,7 @@ LLM Agent是一个基于.NET 8.0和Windows Forms开发的桌面应用程序，�
 
 ## 主要特性
 
-- **多模型支持**: 支持OpenAI、Anthropic、Google等多家服务提供商的模型
+- **多模型支持**: 支持OpenAI、Azure OpenAI、Anthropic、Google等多家服务提供商的模型，以及智谱AI、SiliconFlow等兼容OpenAI格式的服务
 - **流式响应**: 实时显示模型生成内容，提供类似打字机的流畅体验
 - **Markdown格式**: 支持Markdown格式的消息展示，让AI回复更加美观易读
 - **灵活配置**: 支持自定义API密钥、服务器地址和系统提示词
@@ -46,9 +46,10 @@ LLM Agent是一个基于.NET 8.0和Windows Forms开发的桌面应用程序，�
 
 ### 应用支持哪些模型？
 
-- OpenAI所有大语言模型
-- Anthropic: Claude所有大语言模型
-- Google: Gemini所有大语言模型
-- 使用OpenAI格式的所有大语言模型
+- **OpenAI**: GPT-4、GPT-4 Turbo、GPT-4o、GPT-3.5 Turbo等
+- **Azure OpenAI**: 企业级OpenAI服务的所有模型
+- **Anthropic**: Claude 3 Opus、Claude 3 Sonnet、Claude 3 Haiku、Claude 2.1等
+- **Google**: Gemini 1.5 Pro、Gemini 1.5 Flash、Gemini 1.0 Pro等
+- **兼容OpenAI格式的服务**: 如智谱AI（GLM-4、GLM-4-Flash等）、SiliconFlow（Yi-Large、DeepSeek、Mistral等）、DeepSeek等，支持自定义API端点
 
 详细支持列表请参阅[支持的模型](./usage.md#支持的模型)。 

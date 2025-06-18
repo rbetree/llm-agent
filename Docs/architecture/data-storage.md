@@ -101,14 +101,35 @@ CREATE TABLE Models (
     Id TEXT PRIMARY KEY,
     Name TEXT NOT NULL,
     ProviderType TEXT NOT NULL,
-    Category INTEGER NOT NULL,
     ContextLength INTEGER,
     TokenPrice REAL,
     Enabled INTEGER NOT NULL DEFAULT 1
 );
 ```
 
-#### 4. UserSettings表
+#### 4. Users表
+```sql
+CREATE TABLE Users (
+    Id TEXT PRIMARY KEY,
+    Username TEXT NOT NULL UNIQUE,
+    PasswordHash TEXT NOT NULL,
+    Salt TEXT NOT NULL,
+    CreatedAt TEXT NOT NULL,
+    LastLoginAt TEXT,
+    IsAdmin INTEGER NOT NULL DEFAULT 0
+);
+```
+
+#### 5. LoggedInUsers表
+```sql
+CREATE TABLE LoggedInUsers (
+    UserId TEXT PRIMARY KEY,
+    LastLoginAt TEXT NOT NULL,
+    FOREIGN KEY (UserId) REFERENCES Users(Id) ON DELETE CASCADE
+);
+```
+
+#### 6. UserSettings表
 ```sql
 CREATE TABLE UserSettings (
     Key TEXT PRIMARY KEY,
@@ -116,7 +137,7 @@ CREATE TABLE UserSettings (
 );
 ```
 
-#### 5. Prompts表
+#### 7. Prompts表
 ```sql
 CREATE TABLE Prompts (
     Id TEXT PRIMARY KEY,
@@ -129,7 +150,7 @@ CREATE TABLE Prompts (
 );
 ```
 
-#### 6. AiWebsites表
+#### 8. AiWebsites表
 ```sql
 CREATE TABLE AiWebsites (
     Id TEXT PRIMARY KEY,
@@ -146,7 +167,7 @@ CREATE TABLE AiWebsites (
 );
 ```
 
-#### 7. WebsiteCredentials表
+#### 9. WebsiteCredentials表
 ```sql
 CREATE TABLE WebsiteCredentials (
     Id TEXT PRIMARY KEY,
@@ -160,7 +181,7 @@ CREATE TABLE WebsiteCredentials (
 );
 ```
 
-#### 8. Channels表
+#### 10. Channels表
 ```sql
 CREATE TABLE Channels (
     Id TEXT PRIMARY KEY,
@@ -175,7 +196,7 @@ CREATE TABLE Channels (
 );
 ```
 
-#### 9. ChannelModels表
+#### 11. ChannelModels表
 ```sql
 CREATE TABLE ChannelModels (
     Id INTEGER PRIMARY KEY AUTOINCREMENT,

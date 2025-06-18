@@ -22,12 +22,23 @@ flowchart TD
 - **主要组件**：
   - `Forms/` - 包含应用程序窗体
     - `LlmAgentMainForm.cs` - 主窗体
+    - `LoginForm.cs` - 登录窗体
+    - `RegisterForm.cs` - 注册窗体
+    - `PasswordVerificationForm.cs` - 密码验证窗体
     - `ModelManagementForm.cs` - 模型管理窗体
-    - `ModelTestForm.cs` - 模型测试窗体
-    - `ChannelTestForm.cs` - 渠道测试窗体
+    - `AddWebsiteForm.cs` - 添加网站窗体
+    - `Test/ModelTestForm.cs` - 模型测试窗体
+    - `Test/ChannelTestForm.cs` - 渠道测试窗体
   - `Controls/` - 自定义控件
     - `ChatSessionItem.cs` - 聊天会话项控件
-    - `ChatMessageItem.cs` - 聊天消息项控件
+    - `PromptCardItem.cs` - 提示词卡片控件
+    - `UserCardItem.cs` - 用户卡片控件
+    - `WebsiteCardItem.cs` - 网站卡片控件
+    - `WebsiteBrowser.cs` - 网站浏览器控件
+    - `CustomTitleBar.cs` - 自定义标题栏控件
+    - `ChatForm/` - 聊天相关控件
+      - `Chatbox.cs` - 聊天框控件
+      - `ChatItem.cs` - 聊天项控件
 
 ### 业务逻辑层 (BLL 目录)
 
@@ -36,6 +47,10 @@ flowchart TD
   - `ChatHistoryManager.cs` - 聊天历史管理
   - `ChannelManager.cs` - 渠道管理
   - `ChannelService.cs` - 渠道服务
+  - `UserService.cs` - 用户服务
+  - `LoggedInUserService.cs` - 登录用户服务
+  - `PromptManager.cs` - 提示词管理
+  - `WebsiteManager.cs` - 网站管理
 
 ### 数据访问层 (DAL 目录)
 
@@ -43,7 +58,10 @@ flowchart TD
 - **主要组件**：
   - `ChatRepository.cs` - 聊天数据仓库
   - `DatabaseManager.cs` - 数据库管理
-  - `ChannelRepository.cs` - 渠道数据仓库
+  - `UserRepository.cs` - 用户数据仓库
+  - `LoggedInUserRepository.cs` - 登录用户数据仓库
+  - `PromptRepository.cs` - 提示词数据仓库
+  - `WebsiteRepository.cs` - 网站数据仓库
 
 ### 数据模型 (Model 目录)
 
@@ -51,8 +69,14 @@ flowchart TD
 - **主要组件**：
   - `ChatSession.cs` - 聊天会话模型
   - `ChatMessage.cs` - 聊天消息模型
+  - `ChatRole.cs` - 聊天角色枚举
   - `Channel.cs` - 渠道模型
   - `Models.cs` - 模型信息定义
+  - `User.cs` - 用户模型
+  - `Prompt.cs` - 提示词模型
+  - `AiWebsite.cs` - AI网站模型
+  - `WebsiteCredential.cs` - 网站凭据模型
+  - `ProviderType.cs` - 提供商类型枚举
 
 ## 数据存储机制
 
@@ -107,12 +131,13 @@ flowchart TD
    classDiagram
      class ChatMessage {
        +string Id
-       +string Role
+       +ChatRole Role
        +string Content
        +DateTime CreatedAt
        +DateTime UpdatedAt
-       +string Timestamp
+       +DateTime Timestamp
        +string ModelId
+       +string RoleString
      }
    ```
 
@@ -120,14 +145,14 @@ flowchart TD
    ```mermaid
    classDiagram
      class Channel {
-       +string Id
+       +Guid Id
        +string Name
-       +string ProviderType
+       +ProviderType ProviderType
        +string ApiKey
        +string ApiHost
        +bool IsEnabled
        +bool UseStreamResponse
-       +List~ModelInfo~ SupportedModels
+       +List~string~ SupportedModels
        +DateTime CreatedAt
        +DateTime UpdatedAt
      }
@@ -140,9 +165,8 @@ flowchart TD
        +string Id
        +string Name
        +string ProviderType
-       +int Category
-       +int ContextLength
-       +double TokenPrice
+       +int? ContextLength
+       +double? TokenPrice
        +bool Enabled
      }
    ```
@@ -152,13 +176,17 @@ flowchart TD
 ```mermaid
 erDiagram
     ChatSession ||--o{ ChatMessage : contains
-    ChatSession }|--|| Channel : uses
-    Channel ||--o{ ChannelModel : supports
+    User ||--o{ ChatSession : owns
+    User ||--o{ Prompt : creates
+    User ||--o{ WebsiteCredential : has
+    AiWebsite ||--o{ WebsiteCredential : stores
 ```
 
 - 一个聊天会话包含多条聊天消息
-- 发送消息时使用特定渠道和模型
-- 一个渠道支持多个模型
+- 一个用户拥有多个聊天会话
+- 一个用户可以创建多个提示词
+- 一个用户可以有多个网站凭据
+- 一个AI网站可以存储多个用户的凭据
 
 ## 控件间数据交流
 
@@ -173,6 +201,9 @@ classDiagram
         -ChannelManager _channelManager
         -ChannelService _channelService
         -ProviderFactory _providerFactory
+        -PromptManager _promptManager
+        -WebsiteManager _websiteManager
+        -UserService _userService
     }
 ```
 

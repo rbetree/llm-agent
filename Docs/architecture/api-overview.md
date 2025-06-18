@@ -4,11 +4,11 @@
 
 ## 概述
 
-LLM Agent支持多种大语言模型服务提供商的API，通过统一的接口抽象，简化了与不同模型的交互。所有提供商实现都基于`ILLMProvider`接口，确保一致的使用体验。
+LLM Agent支持多种大语言模型服务提供商的API，通过统一的接口抽象，简化了与不同模型的交互。所有提供商实现都基于`LLMProvider`接口，确保一致的使用体验。
 
 ## 核心接口
 
-### ILLMProvider
+### LLMProvider
 
 所有模型提供商必须实现的核心接口：
 
@@ -145,4 +145,4 @@ catch (ApiException ex)
 - [OpenAI API文档](https://platform.openai.com/docs/api-reference)
 - [Anthropic API文档](https://docs.anthropic.com/claude/reference/getting-started-with-the-api)
 - [Google Gemini API文档](https://ai.google.dev/docs/gemini_api_overview)
-- [ZhipuAI API文档](https://open.bigmodel.cn/dev/api) 
+- [SiliconFlow API文档](https://siliconflow.cn/docs/api)
