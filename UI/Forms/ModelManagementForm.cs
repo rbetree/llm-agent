@@ -8,6 +8,7 @@ using System.Linq;
 using System.Drawing;
 using System.Threading.Tasks;
 using llm_agent.DAL;
+using llm_agent.Common.Utils;
 
 namespace llm_agent.UI.Forms
 {
@@ -541,13 +542,13 @@ namespace llm_agent.UI.Forms
             switch (providerType)
             {
                 case ProviderType.OpenAI:
-                    return Properties.Settings.Default.OpenAIApiKey;
+                    return SettingsHelper.GetOpenAIApiKey();
                 case ProviderType.AzureOpenAI:
-                    return Properties.Settings.Default.AzureApiKey;
+                    return SettingsHelper.GetAzureApiKey();
                 case ProviderType.Anthropic:
-                    return Properties.Settings.Default.AnthropicApiKey;
+                    return SettingsHelper.GetAnthropicApiKey();
                 case ProviderType.Google:
-                    return Properties.Settings.Default.GeminiApiKey;
+                    return SettingsHelper.GetGoogleApiKey();
                 default:
                     return string.Empty;
             }

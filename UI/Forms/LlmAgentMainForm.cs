@@ -1389,13 +1389,13 @@ namespace llm_agent.UI.Forms
             switch (providerType)
             {
                 case ProviderType.OpenAI:
-                    return Properties.Settings.Default.OpenAIApiKey;
+                    return SettingsHelper.GetOpenAIApiKey();
                 case ProviderType.AzureOpenAI:
-                    return Properties.Settings.Default.AzureApiKey;
+                    return SettingsHelper.GetAzureApiKey();
                 case ProviderType.Anthropic:
-                    return Properties.Settings.Default.AnthropicApiKey;
+                    return SettingsHelper.GetAnthropicApiKey();
                 case ProviderType.Google:
-                    return Properties.Settings.Default.GeminiApiKey;
+                    return SettingsHelper.GetGoogleApiKey();
                 default:
                     return string.Empty;
             }
@@ -2418,25 +2418,24 @@ namespace llm_agent.UI.Forms
                             switch (providerType)
                             {
                                 case ProviderType.OpenAI:
-                                    Properties.Settings.Default.OpenAIApiKey = channel.ApiKey;
-                                    Properties.Settings.Default.OpenAIApiHost = channel.ApiHost;
+                                    SettingsHelper.SetOpenAIApiKey(channel.ApiKey);
+                                    SettingsHelper.SetOpenAIApiHost(channel.ApiHost);
                                     break;
                                 case ProviderType.AzureOpenAI:
-                                    Properties.Settings.Default.AzureApiKey = channel.ApiKey;
-                                    Properties.Settings.Default.AzureApiHost = channel.ApiHost;
+                                    SettingsHelper.SetAzureApiKey(channel.ApiKey);
+                                    SettingsHelper.SetAzureApiHost(channel.ApiHost);
                                     break;
                                 case ProviderType.Anthropic:
-                                    Properties.Settings.Default.AnthropicApiKey = channel.ApiKey;
-                                    Properties.Settings.Default.AnthropicApiHost = channel.ApiHost;
+                                    SettingsHelper.SetAnthropicApiKey(channel.ApiKey);
+                                    SettingsHelper.SetAnthropicApiHost(channel.ApiHost);
                                     break;
                                 case ProviderType.Google:
-                                    Properties.Settings.Default.GeminiApiKey = channel.ApiKey;
-                                    Properties.Settings.Default.GeminiApiHost = channel.ApiHost;
+                                    SettingsHelper.SetGoogleApiKey(channel.ApiKey);
+                                    SettingsHelper.SetGoogleApiHost(channel.ApiHost);
                                     break;
                             }
 
-                            // 更新API设置
-                            Properties.Settings.Default.Save();
+                            // API设置已通过SettingsHelper自动保存
 
                             // 更新窗体标题
                             UpdateTitle();
@@ -2520,25 +2519,24 @@ namespace llm_agent.UI.Forms
                             switch (channel.ProviderType)
                             {
                                 case ProviderType.OpenAI:
-                                    Properties.Settings.Default.OpenAIApiKey = channel.ApiKey;
-                                    Properties.Settings.Default.OpenAIApiHost = channel.ApiHost;
+                                    SettingsHelper.SetOpenAIApiKey(channel.ApiKey);
+                                    SettingsHelper.SetOpenAIApiHost(channel.ApiHost);
                                     break;
                                 case ProviderType.AzureOpenAI:
-                                    Properties.Settings.Default.AzureApiKey = channel.ApiKey;
-                                    Properties.Settings.Default.AzureApiHost = channel.ApiHost;
+                                    SettingsHelper.SetAzureApiKey(channel.ApiKey);
+                                    SettingsHelper.SetAzureApiHost(channel.ApiHost);
                                     break;
                                 case ProviderType.Anthropic:
-                                    Properties.Settings.Default.AnthropicApiKey = channel.ApiKey;
-                                    Properties.Settings.Default.AnthropicApiHost = channel.ApiHost;
+                                    SettingsHelper.SetAnthropicApiKey(channel.ApiKey);
+                                    SettingsHelper.SetAnthropicApiHost(channel.ApiHost);
                                     break;
                                 case ProviderType.Google:
-                                    Properties.Settings.Default.GeminiApiKey = channel.ApiKey;
-                                    Properties.Settings.Default.GeminiApiHost = channel.ApiHost;
+                                    SettingsHelper.SetGoogleApiKey(channel.ApiKey);
+                                    SettingsHelper.SetGoogleApiHost(channel.ApiHost);
                                     break;
                             }
 
-                            // 更新API设置
-                            Properties.Settings.Default.Save();
+                            // API设置已通过SettingsHelper自动保存
 
                             // 更新窗体标题
                             UpdateTitle();

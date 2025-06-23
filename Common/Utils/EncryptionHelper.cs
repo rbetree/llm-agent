@@ -7,7 +7,8 @@ using System.Text;
 namespace llm_agent.Common.Utils
 {
     /// <summary>
-    /// 加密工具类，用于网站凭据的安全存储
+    /// 加密工具类，用于敏感数据的安全存储
+    /// 包括网站凭据、API密钥等敏感信息
     /// </summary>
     public static class EncryptionHelper
     {
@@ -239,6 +240,80 @@ namespace llm_agent.Common.Utils
                 4 => "强",
                 _ => "未知"
             };
+        }
+
+        /// <summary>
+        /// 检测字符串是否已经被加密
+        /// </summary>
+        /// <param name="text">要检测的文本</param>
+        /// <returns>如果已加密返回true，否则返回false</returns>
+        public static bool IsEncrypted(string text)
+        {
+            if (string.IsNullOrEmpty(text))
+                return false;
+
+            try
+            {
+                // 尝试Base64解码，如果失败说明不是加密数据
+                var bytes = Convert.FromBase64String(text);
+
+                // 加密数据通常有一定的长度（至少16字节的AES块）
+                if (bytes.Length < 16)
+                    return false;
+
+                // 尝试解密，如果成功且结果合理，说明是加密数据
+                var decrypted = Decrypt(text);
+
+                // 如果解密失败（返回空字符串），说明不是有效的加密数据
+                if (string.IsNullOrEmpty(decrypted))
+                    return false;
+
+                // 如果解密结果与原文相同，说明原文可能就是明文
+                if (decrypted == text)
+                    return false;
+
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 安全地加密文本，如果已经加密则直接返回
+        /// </summary>
+        /// <param name="text">要加密的文本</param>
+        /// <returns>加密后的文本</returns>
+        public static string EncryptIfNeeded(string text)
+        {
+            if (string.IsNullOrEmpty(text))
+                return text;
+
+            // 如果已经加密，直接返回
+            if (IsEncrypted(text))
+                return text;
+
+            // 否则进行加密
+            return Encrypt(text);
+        }
+
+        /// <summary>
+        /// 安全地解密文本，如果是明文则直接返回
+        /// </summary>
+        /// <param name="text">要解密的文本</param>
+        /// <returns>解密后的明文</returns>
+        public static string DecryptIfNeeded(string text)
+        {
+            if (string.IsNullOrEmpty(text))
+                return text;
+
+            // 如果是加密数据，进行解密
+            if (IsEncrypted(text))
+                return Decrypt(text);
+
+            // 否则直接返回明文
+            return text;
         }
     }
 }

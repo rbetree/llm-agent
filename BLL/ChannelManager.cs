@@ -6,6 +6,7 @@ using System.IO;
 using llm_agent.Model;
 using llm_agent.Common.Exceptions;
 using llm_agent.DAL;
+using llm_agent.Common.Utils;
 using System.Net.Http;
 
 namespace llm_agent.BLL
@@ -78,7 +79,7 @@ namespace llm_agent.BLL
                                 Id = Guid.Parse(reader["Id"].ToString()),
                                 Name = reader["Name"].ToString(),
                                 ProviderType = (ProviderType)Enum.Parse(typeof(ProviderType), reader["ProviderType"].ToString()),
-                                ApiKey = reader["ApiKey"].ToString(),
+                                ApiKey = EncryptionHelper.DecryptIfNeeded(reader["ApiKey"].ToString()),
                                 ApiHost = reader["ApiHost"].ToString(),
                                 IsEnabled = Convert.ToBoolean(Convert.ToInt32(reader["IsEnabled"])),
                                 UseStreamResponse = Convert.ToBoolean(Convert.ToInt32(reader["UseStreamResponse"])),
@@ -122,7 +123,7 @@ namespace llm_agent.BLL
                                 Id = Guid.Parse(reader["Id"].ToString()),
                                 Name = reader["Name"].ToString(),
                                 ProviderType = (ProviderType)Enum.Parse(typeof(ProviderType), reader["ProviderType"].ToString()),
-                                ApiKey = reader["ApiKey"].ToString(),
+                                ApiKey = EncryptionHelper.DecryptIfNeeded(reader["ApiKey"].ToString()),
                                 ApiHost = reader["ApiHost"].ToString(),
                                 IsEnabled = Convert.ToBoolean(Convert.ToInt32(reader["IsEnabled"])),
                                 UseStreamResponse = Convert.ToBoolean(Convert.ToInt32(reader["UseStreamResponse"])),
@@ -181,7 +182,7 @@ namespace llm_agent.BLL
                             command.Parameters.AddWithValue("@id", channel.Id.ToString());
                             command.Parameters.AddWithValue("@name", channel.Name);
                             command.Parameters.AddWithValue("@providerType", channel.ProviderType.ToString());
-                            command.Parameters.AddWithValue("@apiKey", channel.ApiKey ?? "");
+                            command.Parameters.AddWithValue("@apiKey", EncryptionHelper.EncryptIfNeeded(channel.ApiKey ?? ""));
                             command.Parameters.AddWithValue("@apiHost", channel.ApiHost ?? "");
                             command.Parameters.AddWithValue("@isEnabled", channel.IsEnabled ? 1 : 0);
                             command.Parameters.AddWithValue("@useStreamResponse", channel.UseStreamResponse ? 1 : 0);
@@ -254,7 +255,7 @@ namespace llm_agent.BLL
                             command.Parameters.AddWithValue("@id", channel.Id.ToString());
                             command.Parameters.AddWithValue("@name", channel.Name);
                             command.Parameters.AddWithValue("@providerType", channel.ProviderType.ToString());
-                            command.Parameters.AddWithValue("@apiKey", channel.ApiKey ?? "");
+                            command.Parameters.AddWithValue("@apiKey", EncryptionHelper.EncryptIfNeeded(channel.ApiKey ?? ""));
                             command.Parameters.AddWithValue("@apiHost", channel.ApiHost ?? "");
                             command.Parameters.AddWithValue("@isEnabled", channel.IsEnabled ? 1 : 0);
                             command.Parameters.AddWithValue("@useStreamResponse", channel.UseStreamResponse ? 1 : 0);
@@ -479,7 +480,7 @@ namespace llm_agent.BLL
                                 Id = Guid.Parse(reader["Id"].ToString()),
                                 Name = reader["Name"].ToString(),
                                 ProviderType = (ProviderType)Enum.Parse(typeof(ProviderType), reader["ProviderType"].ToString()),
-                                ApiKey = reader["ApiKey"].ToString(),
+                                ApiKey = EncryptionHelper.DecryptIfNeeded(reader["ApiKey"].ToString()),
                                 ApiHost = reader["ApiHost"].ToString(),
                                 IsEnabled = Convert.ToBoolean(Convert.ToInt32(reader["IsEnabled"])),
                                 UseStreamResponse = Convert.ToBoolean(Convert.ToInt32(reader["UseStreamResponse"])),

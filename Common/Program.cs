@@ -2,6 +2,7 @@ using System;
 using System.Windows.Forms;
 using llm_agent.UI.Forms;
 using llm_agent.BLL;
+using llm_agent.Common.Utils;
 
 namespace llm_agent.Common
 {
@@ -19,6 +20,9 @@ namespace llm_agent.Common
 
             // 初始化管理员账号
             InitializeAdminAccount();
+
+            // 迁移现有API密钥到加密存储
+            MigrateApiKeysToEncrypted();
 
             bool autoLoginSuccess = false;
             try
@@ -61,7 +65,7 @@ namespace llm_agent.Common
             {
                 // 创建用户服务
                 var userService = new UserService();
-                
+
                 // 确保管理员账号存在
                 userService.EnsureAdminExists("admin", "admin9");
             }
@@ -69,6 +73,36 @@ namespace llm_agent.Common
             {
                 Console.Error.WriteLine($"初始化管理员账号时出错: {ex.Message}");
                 MessageBox.Show($"初始化管理员账号时出错: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        /// <summary>
+        /// 迁移现有API密钥到加密存储
+        /// </summary>
+        private static void MigrateApiKeysToEncrypted()
+        {
+            try
+            {
+                // 验证加密功能是否正常
+                if (!EncryptionHelper.ValidateEncryption())
+                {
+                    Console.Error.WriteLine("警告: 加密功能验证失败，API密钥可能无法正确加密");
+                    return;
+                }
+
+                // 迁移Settings中的API密钥
+                SettingsHelper.MigrateApiKeysToEncrypted();
+
+                // 验证设置加密功能
+                if (!SettingsHelper.ValidateEncryptionSettings())
+                {
+                    Console.Error.WriteLine("警告: 设置加密功能验证失败");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"迁移API密钥到加密存储时出错: {ex.Message}");
+                // 不显示MessageBox，因为这不是致命错误，应用程序可以继续运行
             }
         }
     }
