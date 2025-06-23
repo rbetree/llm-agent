@@ -411,12 +411,12 @@ namespace llm_agent.UI.Controls.ChatForm
         }
 
         //Inspired from Slack, you can also press Shift + Enter to enter text.
+        //Note: Shift+Enter handling has been moved to the main form's global keyboard handler
+        //to ensure proper integration with the AI model response system
         async void OnEnter(object sender, KeyEventArgs e)
         {
-            if (e.Shift && e.KeyValue == 13)
-            {
-                SendMessage(this, null);
-            }
+            // Shift+Enter handling removed - now handled by main form's global keyboard handler
+            // This prevents conflicts and ensures proper AI model integration
         }
 
         //When the Control resizes, it will trigger the resize event for all the ChatItem object inside as well, again with a default width of 60%.

@@ -1700,8 +1700,8 @@ namespace llm_agent.UI.Forms
         // 全局键盘快捷键处理
         private void LlmAgentMainForm_KeyDown(object sender, KeyEventArgs e)
         {
-            // 发送消息 - Ctrl+Enter
-            if (e.Control && e.KeyCode == Keys.Enter)
+            // 发送消息 - Ctrl+Enter 或 Shift+Enter
+            if ((e.Control && e.KeyCode == Keys.Enter) || (e.Shift && e.KeyCode == Keys.Enter))
             {
                 // 查找Chatbox的输入框控件
                 var chatTextbox = chatboxControl?.Controls.Find("chatTextbox", true)?.FirstOrDefault() as TextBox;
@@ -3138,19 +3138,8 @@ namespace llm_agent.UI.Forms
                 };
             }
 
-            // 配置输入框的按键事件（Shift+Enter发送）
-            var chatTextbox = chatboxControl.Controls.Find("chatTextbox", true).FirstOrDefault() as TextBox;
-            if (chatTextbox != null)
-            {
-                chatTextbox.KeyDown += async (s, e) =>
-                {
-                    if (e.Shift && e.KeyCode == Keys.Enter)
-                    {
-                        e.SuppressKeyPress = true; // 阻止Enter键的默认行为
-                        await SendMessage();
-                    }
-                };
-            }
+            // 注意：输入框的快捷键事件（Shift+Enter和Ctrl+Enter）现在由全局键盘事件处理器统一管理
+            // 这样可以避免事件冲突并确保一致的行为
 
             // 将 Chatbox 添加到chatPageSplitContainer.Panel2（主要面板）
             chatPageSplitContainer.Panel2.Controls.Add(chatboxControl);
