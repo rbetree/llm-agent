@@ -4,56 +4,51 @@
 
 ## 概述
 
-LLM Agent支持多种大语言模型服务提供商的API，通过统一的接口抽象，简化了与不同模型的交互。所有提供商实现都基于`LLMProvider`接口，确保一致的使用体验。
+LLM Agent支持多种大语言模型服务提供商的API，通过统一的抽象类，简化了与不同模型的交互。所有提供商实现都基于`BaseLLMProvider`抽象类，确保一致的使用体验。
 
 ## 核心接口
 
-### LLMProvider
-
-所有模型提供商必须实现的核心接口：
-
-```csharp
-public interface ILLMProvider
-{
-    string Name { get; }
-    ProviderType ProviderType { get; }
-    
-    Task<List<ModelInfo>> GetAvailableModelsAsync();
-    Task<ChatMessage> SendMessageAsync(ChatMessage message, ChatSession session, ModelInfo model, bool useStream = false);
-    Task<ChatMessage> SendMessageStreamAsync(ChatMessage message, ChatSession session, ModelInfo model, Action<string> onPartialResponse);
-    Task<bool> TestConnectionAsync();
-}
-```
-
 ### BaseLLMProvider
 
-提供基本实现的抽象类：
+所有模型提供商必须继承的基础抽象类：
 
 ```csharp
-public abstract class BaseLLMProvider : ILLMProvider
+public abstract class BaseLLMProvider
 {
-    protected string ApiKey { get; }
-    protected string ApiHost { get; }
-    
-    // 基本实现...
-    
-    // 子类必须实现的抽象方法
-    protected abstract Task<ChatMessage> SendMessageInternalAsync(ChatMessage message, ChatSession session, ModelInfo model);
-    protected abstract Task<ChatMessage> SendMessageStreamInternalAsync(ChatMessage message, ChatSession session, ModelInfo model, Action<string> onPartialResponse);
-    protected abstract Task<bool> TestConnectionInternalAsync();
+    protected string ApiKey { get; set; }
+    protected string ApiHost { get; set; }
+    protected string CurrentModel { get; set; }
+
+    // 抽象方法，子类必须实现
+    public abstract List<string> GetSupportedModels();
+    public abstract Task<string> ChatAsync(List<ChatMessage> messages, string modelId);
+    public virtual async IAsyncEnumerable<string> StreamChatAsync(List<ChatMessage> messages, string modelId, CancellationToken cancellationToken = default);
+
+    // 通用方法
+    public virtual void UpdateApiKey(string apiKey);
+    public virtual void UpdateApiHost(string apiHost);
+    public abstract ProviderType GetProviderType();
 }
 ```
+
+
 
 ## 支持的提供商
 
 LLM Agent支持以下模型提供商的API：
 
-1. OpenAI
-2. Azure OpenAI
-3. Anthropic Claude
-4. Google Gemini
-5. ZhipuAI
-6. SiliconFlow
+### 原生支持的提供商
+1. **OpenAI** - 支持GPT系列模型
+2. **Azure OpenAI** - 企业级OpenAI服务
+3. **Anthropic Claude** - 支持Claude系列模型
+4. **Google Gemini** - 支持Gemini系列模型
+
+### OpenAI兼容服务
+通过OpenAI提供商类型支持的兼容服务：
+- **SiliconFlow** - 支持Claude、Yi-Large、Mistral等模型
+- **智谱AI** - 支持GLM系列模型
+- **DeepSeek** - 支持DeepSeek系列模型
+- **其他兼容OpenAI格式的服务**
 
 每个提供商都有特定的API参数和配置选项。
 
@@ -64,35 +59,42 @@ LLM Agent支持以下模型提供商的API：
 ```csharp
 // 获取提供商实例
 var providerFactory = new ProviderFactory();
-var provider = providerFactory.GetProvider(ProviderType.OpenAI, apiKey, apiHost);
+var provider = providerFactory.GetProvider(ProviderType.OpenAI);
 
-// 获取可用模型
-var models = await provider.GetAvailableModelsAsync();
+// 设置API密钥和主机
+provider.UpdateApiKey("your-api-key");
+provider.UpdateApiHost("https://api.openai.com/v1");
+
+// 获取支持的模型
+var models = provider.GetSupportedModels();
+
+// 构建消息列表
+var messages = new List<ChatMessage>
+{
+    new ChatMessage { Role = ChatRole.User, Content = "你好！" }
+};
 
 // 发送消息
-var response = await provider.SendMessageAsync(
-    new ChatMessage { Role = "user", Content = "你好！" },
-    new ChatSession { Id = Guid.NewGuid().ToString() },
-    models.First(),
-    useStream: false
-);
+var response = await provider.ChatAsync(messages, models.First());
 
-Console.WriteLine(response.Content);
+Console.WriteLine(response);
 ```
 
 ### 流式响应
 
 ```csharp
+// 构建消息列表
+var messages = new List<ChatMessage>
+{
+    new ChatMessage { Role = ChatRole.User, Content = "讲个故事" }
+};
+
 // 处理流式响应
-await provider.SendMessageStreamAsync(
-    new ChatMessage { Role = "user", Content = "讲个故事" },
-    new ChatSession { Id = Guid.NewGuid().ToString() },
-    models.First(),
-    partialResponse => {
-        // 处理部分响应
-        Console.Write(partialResponse);
-    }
-);
+await foreach (var chunk in provider.StreamChatAsync(messages, models.First()))
+{
+    // 处理部分响应
+    Console.Write(chunk);
+}
 ```
 
 ## 错误处理

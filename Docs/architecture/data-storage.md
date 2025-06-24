@@ -79,7 +79,8 @@ CREATE TABLE ChatSessions (
     Title TEXT NOT NULL,
     CreatedAt TEXT NOT NULL,
     UpdatedAt TEXT NOT NULL,
-    OrderIndex INTEGER DEFAULT 0
+    OrderIndex INTEGER DEFAULT 0,
+    UserId TEXT DEFAULT NULL REFERENCES Users(Id)
 );
 ```
 
@@ -129,15 +130,7 @@ CREATE TABLE LoggedInUsers (
 );
 ```
 
-#### 6. UserSettings表
-```sql
-CREATE TABLE UserSettings (
-    Key TEXT PRIMARY KEY,
-    Value TEXT
-);
-```
-
-#### 7. Prompts表
+#### 6. Prompts表
 ```sql
 CREATE TABLE Prompts (
     Id TEXT PRIMARY KEY,
@@ -150,7 +143,7 @@ CREATE TABLE Prompts (
 );
 ```
 
-#### 8. AiWebsites表
+#### 7. AiWebsites表
 ```sql
 CREATE TABLE AiWebsites (
     Id TEXT PRIMARY KEY,
@@ -167,7 +160,7 @@ CREATE TABLE AiWebsites (
 );
 ```
 
-#### 9. WebsiteCredentials表
+#### 8. WebsiteCredentials表
 ```sql
 CREATE TABLE WebsiteCredentials (
     Id TEXT PRIMARY KEY,
@@ -181,7 +174,7 @@ CREATE TABLE WebsiteCredentials (
 );
 ```
 
-#### 10. Channels表
+#### 9. Channels表
 ```sql
 CREATE TABLE Channels (
     Id TEXT PRIMARY KEY,
@@ -196,7 +189,7 @@ CREATE TABLE Channels (
 );
 ```
 
-#### 11. ChannelModels表
+#### 10. ChannelModels表
 ```sql
 CREATE TABLE ChannelModels (
     Id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -251,3 +244,40 @@ CREATE TABLE ChannelModels (
 - 一个聊天会话包含多条聊天消息（一对多）
 - 一个渠道可以支持多个模型（一对多）
 - 一个AI网站可以有多个凭据记录（一对多）
+
+## 数据安全
+
+系统对敏感用户数据使用AES-256加密存储：
+
+### 加密存储的数据类型
+
+- ✅ **网站凭据**：WebsiteCredentials表中的用户名、密码、备注
+- ✅ **API密钥**：Channels表中的ApiKey字段
+- ✅ **配置API密钥**：Properties.Settings中的各种API密钥
+
+### 加密特性
+
+- **加密算法**: AES-256
+- **密钥派生**: PBKDF2 (10000次迭代)
+- **设备绑定**: 基于机器名、用户名等设备特征生成密钥
+- **向后兼容**: 自动检测并迁移现有明文数据
+- **透明处理**: 应用程序层自动处理加密/解密操作
+
+### 未加密的数据
+
+- **用户密码**：使用哈希+盐值存储（不可逆）
+- **聊天消息**：明文存储（用户隐私数据，本地存储）
+- **其他配置信息**：非敏感数据，明文存储
+
+### 安全实现
+
+```csharp
+// 自动加密存储
+channel.ApiKey = EncryptionHelper.EncryptIfNeeded(apiKey);
+
+// 自动解密读取
+string decryptedKey = EncryptionHelper.DecryptIfNeeded(channel.ApiKey);
+
+// 向后兼容检测
+bool isEncrypted = EncryptionHelper.IsEncrypted(data);
+```

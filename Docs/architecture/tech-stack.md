@@ -2,17 +2,12 @@
 
 LLM Agent项目采用了一系列现代技术和框架，以下是项目的核心技术栈说明。
 
-## 开发平台
+## 开发技术栈
 
 - **.NET 8.0**: 最新的.NET平台，提供高性能、跨平台的开发环境
 - **Windows Forms**: 用于构建Windows桌面应用程序的UI框架
-- **Visual Studio 2022**: 主要开发工具，提供强大的设计器和调试功能
-
-## 数据存储
-
+- **C#**: 项目开发语言，提供强大的类型安全和表达能力
 - **SQLite**: 轻量级嵌入式数据库，用于存储聊天历史和模型信息
-- **JSON**: 用于配置文件和渠道信息的序列化和持久化
-- **Settings API**: .NET内置的应用程序设置管理机制
 
 ## 第三方API集成
 
@@ -23,16 +18,11 @@ LLM Agent项目采用了一系列现代技术和框架，以下是项目的核�
 ## 核心库和框架
 
 - **System.Text.Json**: 用于JSON序列化和反序列化
-- **System.Data.SQLite**: SQLite数据库访问
+- **System.Data.SQLite.Core**: SQLite数据库访问
 - **System.Net.Http**: HTTP客户端实现
-- **System.ComponentModel**: 用于实现属性通知和数据绑定
-
-## UI组件和控件
-
-- **自定义控件**: 扩展标准Windows Forms控件，实现特定功能
-- **SplitContainer**: 实现可调整大小的多面板布局
-- **RichTextBox**: 支持富文本显示，用于渲染Markdown格式消息
-- **ContextMenuStrip**: 提供上下文菜单功能
+- **System.Security.Cryptography.ProtectedData**: 用于敏感数据加密存储
+- **Markdig**: Markdown解析和渲染库，用于美化聊天消息显示
+- **Microsoft.Web.WebView2**: 内置浏览器控件，用于AI网站浏览功能
 
 ## 设计模式应用
 
@@ -56,8 +46,10 @@ LLM Agent项目采用了一系列现代技术和框架，以下是项目的核�
 
 ## 开发工具链
 
+- **Visual Studio 2022**: 主要开发IDE，支持.NET 8.0开发
 - **Git**: 版本控制系统
-- **GitHub Actions**: CI/CD自动化
+- **GitHub**: 代码托管平台
+- **GitHub Actions**: CI/CD自动化，用于自动构建和发布
+- **GitHub Pages**: 文档网站托管
 - **NuGet**: 包管理器，管理第三方依赖
-- **Visual Studio Code**: 轻量级编辑器，用于快速编辑和查看代码
 - **VitePress**: 文档生成工具，用于构建项目文档网站

@@ -36,9 +36,16 @@ flowchart TD
     - `WebsiteCardItem.cs` - 网站卡片控件
     - `WebsiteBrowser.cs` - 网站浏览器控件
     - `CustomTitleBar.cs` - 自定义标题栏控件
+    - `HiddenScrollBarFlowLayoutPanel.cs` - 隐藏滚动条的流布局面板
     - `ChatForm/` - 聊天相关控件
       - `Chatbox.cs` - 聊天框控件
       - `ChatItem.cs` - 聊天项控件
+      - `ChatModelAdapter.cs` - 聊天模型适配器
+      - `ChatModels.cs` - 聊天模型定义
+      - `ChatPanel.Functions.cs` - 聊天面板功能扩展
+      - `ChatboxInfo.cs` - 聊天框信息类
+    - `SimpleMessageDisplay/` - 简单消息显示控件
+      - `SimpleMessageDisplay.cs` - 简化版消息显示控件
 
 ### 业务逻辑层 (BLL 目录)
 
@@ -62,6 +69,19 @@ flowchart TD
   - `LoggedInUserRepository.cs` - 登录用户数据仓库
   - `PromptRepository.cs` - 提示词数据仓库
   - `WebsiteRepository.cs` - 网站数据仓库
+
+### API接口层 (API 目录)
+
+- **职责**：封装与外部LLM服务的交互
+- **主要组件**：
+  - `Provider/BaseLLMProvider.cs` - 提供商基础抽象类
+  - `Provider/LLMProvider.cs` - LLM提供商接口定义
+  - `Provider/ProviderFactory.cs` - 提供商工厂
+  - `Provider/OpenAIProvider.cs` - OpenAI提供商实现
+  - `Provider/AzureOpenAIProvider.cs` - Azure OpenAI提供商实现
+  - `Provider/AnthropicProvider.cs` - Anthropic提供商实现
+  - `Provider/GeminiProvider.cs` - Google Gemini提供商实现
+  - `Provider/SiliconFlowProvider.cs` - SiliconFlow兼容服务实现
 
 ### 数据模型 (Model 目录)
 
