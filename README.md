@@ -12,7 +12,7 @@
 
 ## 应用截图
 
-> 此处将添加应用程序的实际截图，展示主界面和主要功能。
+![聊天页](Resources\聊天页.png)
 
 ## 功能
 
@@ -117,7 +117,7 @@ llm-agent/
    # 或使用命令行构建
    cd llm-agent
    dotnet build -c Release
-
+   
    # 或使用命令行运行
    cd llm-agent
    dotnet run
